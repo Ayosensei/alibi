@@ -12,6 +12,7 @@
     "cases:validate": "node scripts/validate-cases.mjs cases",
     "test": "vitest run",
     "mcp": "tsx mcp/server.ts",
+    "demo:reset": "node scripts/demo-reset.mjs",
     "prepare": "git config core.hooksPath .githooks"
   },
   "dependencies": {
