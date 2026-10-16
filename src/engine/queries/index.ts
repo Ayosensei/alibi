@@ -4,3 +4,5 @@ export * from './board';
 export * from './reasoning';
 export * from './investigation';
 export * from './ask';
+export * from './bait';
+export * from './verdict';
