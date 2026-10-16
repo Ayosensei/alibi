@@ -1,0 +1,2 @@
+// Query truth evidence and its proven assertions located inside a specific room
+MATCH (e:Evidence {room: $room}) OPTIONAL MATCH (e)-[:ASSERTS]->(a:Assertion) RETURN e.id AS id, e.room AS room, e.title AS title, e.text AS text, e.window AS window, e.windowKind AS windowKind, e.revealsEdge AS revealsEdge, e.knowers AS knowers, e.actSlot AS actSlot, e.actRoom AS actRoom, e.actRestrictsTo AS actRestrictsTo, e.relationId AS relationId, [x IN collect(a) WHERE x IS NOT NULL | {subject: x.subject, slot: x.slot, room: x.room}] AS asserts
