@@ -27,6 +27,13 @@ function PlayPageContent({ level }: { level: string }) {
     error,
     initCase,
     runInspectorAction,
+    selectTab,
+    setBriefingOpen,
+    setBaitModalOpen,
+    setAccuseModalOpen,
+    isBriefingOpen,
+    isBaitModalOpen,
+    isAccuseModalOpen,
   } = useGameStore();
 
   React.useEffect(() => {
@@ -45,6 +52,107 @@ function PlayPageContent({ level }: { level: string }) {
       };
     }
   }, [isPresentMode]);
+
+  // Global Keyboard Shortcuts (?, P, B, A, 1-4, Escape)
+  React.useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      if (e.ctrlKey || e.metaKey || e.altKey) {
+        return;
+      }
+
+      const key = e.key.toLowerCase();
+
+      // '?' opens case briefing
+      if (e.key === '?') {
+        e.preventDefault();
+        setBriefingOpen(!isBriefingOpen);
+        return;
+      }
+
+      // 'p' toggles presentation mode
+      if (key === 'p') {
+        e.preventDefault();
+        const url = new URL(window.location.href);
+        if (url.searchParams.get('present') === '1') {
+          url.searchParams.delete('present');
+          document.documentElement.classList.remove('present-mode');
+        } else {
+          url.searchParams.set('present', '1');
+          document.documentElement.classList.add('present-mode');
+        }
+        window.history.replaceState({}, '', url.toString());
+        return;
+      }
+
+      // 'b' opens bait modal
+      if (key === 'b') {
+        if (caseData && caseData.baitsAllowed > 0) {
+          e.preventDefault();
+          setBaitModalOpen(!isBaitModalOpen);
+        }
+        return;
+      }
+
+      // 'a' opens accuse modal
+      if (key === 'a') {
+        e.preventDefault();
+        setAccuseModalOpen(!isAccuseModalOpen);
+        return;
+      }
+
+      // '1' to '4' switches tabs
+      if (key === '1') {
+        e.preventDefault();
+        selectTab('timeline');
+        return;
+      }
+      if (key === '2') {
+        e.preventDefault();
+        selectTab('board');
+        return;
+      }
+      if (key === '3') {
+        e.preventDefault();
+        selectTab('inspector');
+        return;
+      }
+      if (key === '4') {
+        e.preventDefault();
+        selectTab('notes');
+        return;
+      }
+
+      // Escape closes open modals
+      if (e.key === 'Escape') {
+        setBriefingOpen(false);
+        setBaitModalOpen(false);
+        setAccuseModalOpen(false);
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    caseData,
+    isPresentMode,
+    isBriefingOpen,
+    isBaitModalOpen,
+    isAccuseModalOpen,
+    setBriefingOpen,
+    setBaitModalOpen,
+    setAccuseModalOpen,
+    selectTab,
+  ]);
 
   if (isLoading && !caseData) {
     return (

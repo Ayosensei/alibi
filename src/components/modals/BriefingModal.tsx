@@ -83,8 +83,8 @@ export function BriefingModal() {
           </div>
         )}
 
-        {/* Action Button */}
-        <div className="pt-2">
+        {/* Action Button & Shortcuts Reference */}
+        <div className="pt-2 space-y-3">
           <Button
             variant="default"
             size="default"
@@ -94,6 +94,14 @@ export function BriefingModal() {
             <Play className="size-4 mr-2" />
             Begin Investigation
           </Button>
+
+          <div className="pt-2 border-t border-border flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-text-tertiary">
+            <span><kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-border text-text-secondary">?</kbd> Briefing</span>
+            <span><kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-border text-text-secondary">P</kbd> Present</span>
+            <span><kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-border text-text-secondary">B</kbd> Bait</span>
+            <span><kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-border text-text-secondary">A</kbd> Accuse</span>
+            <span><kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-border text-text-secondary">1-4</kbd> Tabs</span>
+          </div>
         </div>
       </div>
     </div>

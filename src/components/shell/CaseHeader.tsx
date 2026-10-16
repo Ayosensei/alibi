@@ -19,12 +19,15 @@ export function CaseHeader() {
     caseData,
     board,
     setAccuseModalOpen,
+    setBaitModalOpen,
     runInspectorAction,
     setBriefingOpen,
     isInspectorStreaming,
   } = useGameStore();
 
   if (!caseData) return null;
+
+  const baitsLeft = board?.baitsLeft ?? caseData.baitsAllowed;
 
   // Window calculation: from board?.window or caseData.publicWindow
   const activeWindow = board?.window ?? caseData.publicWindow;
@@ -79,10 +82,27 @@ export function CaseHeader() {
           size="sm"
           onClick={() => setBriefingOpen(true)}
           className="text-xs text-text-secondary hover:text-text-primary hidden md:inline-flex"
+          title="Case Briefing & Shortcuts (?)"
         >
           <HelpCircle className="size-3.5 mr-1" />
           Briefing
+          <kbd className="ml-1.5 px-1 py-0.5 rounded bg-surface-2 border border-border text-xs text-text-tertiary">?</kbd>
         </Button>
+
+        {caseData.baitsAllowed > 0 && (
+          <Button
+            variant="brass"
+            size="sm"
+            disabled={baitsLeft <= 0}
+            onClick={() => setBaitModalOpen(true)}
+            className="text-xs"
+            title="Use Bait Announcement (B)"
+          >
+            <Sparkles className="size-3.5 mr-1" />
+            Bait ({baitsLeft})
+            <kbd className="ml-1 px-1 py-0.5 rounded bg-surface-2 border border-border text-xs text-text-primary">B</kbd>
+          </Button>
+        )}
 
         <Button
           variant="secondary"
@@ -100,9 +120,11 @@ export function CaseHeader() {
           size="sm"
           onClick={() => setAccuseModalOpen(true)}
           className="text-xs"
+          title="File Formal Accusation (A)"
         >
           <ShieldAlert className="size-3.5 mr-1" />
           Accuse
+          <kbd className="ml-1.5 px-1 py-0.5 rounded bg-surface-2 border border-border text-xs text-text-primary">A</kbd>
         </Button>
       </div>
     </header>

@@ -34,11 +34,11 @@ export function FileTabsPanel() {
     runInspectorAction,
   } = useGameStore();
 
-  const tabs: Array<{ id: typeof selectedTab; label: string; icon: React.ReactNode }> = [
-    { id: 'timeline', label: 'Timeline', icon: <CalendarDays className="size-3.5" /> },
-    { id: 'board', label: 'Board', icon: <LayoutGrid className="size-3.5" /> },
-    { id: 'inspector', label: 'Inspector', icon: <Sparkles className="size-3.5 text-inspector" /> },
-    { id: 'notes', label: 'Notes', icon: <BookOpen className="size-3.5" /> },
+  const tabs: Array<{ id: typeof selectedTab; label: string; num: string; icon: React.ReactNode }> = [
+    { id: 'timeline', label: 'Timeline', num: '1', icon: <CalendarDays className="size-3.5" /> },
+    { id: 'board', label: 'Board', num: '2', icon: <LayoutGrid className="size-3.5" /> },
+    { id: 'inspector', label: 'Inspector', num: '3', icon: <Sparkles className="size-3.5 text-inspector" /> },
+    { id: 'notes', label: 'Notes', num: '4', icon: <BookOpen className="size-3.5" /> },
   ];
 
   return (
@@ -59,10 +59,14 @@ export function FileTabsPanel() {
                     ? 'border-primary text-text-primary bg-surface-2'
                     : 'border-transparent text-text-secondary hover:text-text-primary'
                 }`}
+                title={`Switch to ${tab.label} (${tab.num})`}
               >
                 <span className="flex items-center gap-1.5">
                   {tab.icon}
                   <span>{tab.label}</span>
+                  <kbd className="px-1 py-0.5 rounded bg-surface-2 border border-border text-xs text-text-tertiary">
+                    {tab.num}
+                  </kbd>
                 </span>
               </Button>
             );

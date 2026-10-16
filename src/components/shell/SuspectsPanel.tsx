@@ -147,20 +147,30 @@ export function SuspectsPanel() {
 
       {/* 3. Bait Announcement Section */}
       <div className="border-t border-border pt-4">
-        <Button
-          variant="brass"
-          size="default"
-          onClick={() => setBaitModalOpen(true)}
-          className="w-full justify-between"
-        >
-          <div className="flex items-center gap-2">
-            <Sparkles className="size-4" />
-            <span>Use Bait Announcement</span>
+        {caseData.baitsAllowed > 0 ? (
+          <Button
+            variant="brass"
+            size="default"
+            disabled={baitsLeft <= 0}
+            onClick={() => setBaitModalOpen(true)}
+            className="w-full justify-between"
+            title="Use Bait Announcement (B)"
+          >
+            <div className="flex items-center gap-2">
+              <Sparkles className="size-4" />
+              <span>Use Bait Announcement</span>
+            </div>
+            <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-surface-1 text-brass border border-brass/40">
+              {baitsLeft} left
+            </span>
+          </Button>
+        ) : (
+          <div className="py-2.5 px-3 rounded bg-surface-2 border border-border text-center">
+            <span className="font-mono text-xs text-text-tertiary">
+              No Baits in Level 1 (unlocks in L2/L3)
+            </span>
           </div>
-          <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-surface-1 text-brass border border-brass/40">
-            {baitsLeft} left
-          </span>
-        </Button>
+        )}
       </div>
     </aside>
   );
