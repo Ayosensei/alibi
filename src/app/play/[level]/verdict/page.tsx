@@ -502,8 +502,6 @@ function VerdictContent({ level }: { level: string }) {
   );
 }
 
-export const dynamic = 'force-dynamic';
-
 export default function VerdictPage({
   params,
 }: {
