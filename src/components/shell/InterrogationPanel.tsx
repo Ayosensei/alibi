@@ -13,7 +13,7 @@ import {
   UserCheck,
   HeartCrack,
   Moon,
-  Send,
+  HelpCircle,
   ShieldAlert,
   Loader2,
   Sparkles,
@@ -31,6 +31,7 @@ export function InterrogationPanel() {
   const [activePicker, setActivePicker] = React.useState<'none' | 'where' | 'saw'>('none');
   const [selectedSlot, setSelectedSlot] = React.useState<number | null>(null);
   const [selectedWitnessTarget, setSelectedWitnessTarget] = React.useState<string | null>(null);
+  const [exhaustedKeys, setExhaustedKeys] = React.useState<Set<string>>(new Set());
 
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
@@ -46,15 +47,29 @@ export function InterrogationPanel() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [suspectMessages, isAsking]);
 
+  const getQuestionKey = (
+    suspectId: string,
+    topic: string,
+    slot?: number | null,
+    about?: string | null
+  ) => `${suspectId}_${topic}_${slot ?? ''}_${about ?? ''}`;
+
   const handleAsk = async (
     topic: z.infer<typeof Topic>,
     slot?: number,
     about?: string
   ) => {
+    if (!selectedSuspectId) return;
+
+    const qKey = getQuestionKey(selectedSuspectId, topic, slot, about);
     setActivePicker('none');
     setSelectedSlot(null);
     setSelectedWitnessTarget(null);
-    await askQuestion(topic, slot, about);
+
+    const res = await askQuestion(topic, slot, about);
+    if (res && res.status === 'nothing_new') {
+      setExhaustedKeys((prev) => new Set([...prev, qKey]));
+    }
   };
 
   if (!suspect) {
@@ -188,11 +203,19 @@ export function InterrogationPanel() {
             <div className="grid grid-cols-4 gap-1.5">
               {caseData.slots.map((timeStr, idx) => {
                 const slotNum = idx + 1;
+                const slotKey = getQuestionKey(
+                  suspect.id,
+                  activePicker === 'where' ? 'whereabouts' : 'witness',
+                  slotNum
+                );
+                const isExhausted = exhaustedKeys.has(slotKey);
+
                 return (
                   <Button
                     key={slotNum}
-                    variant="secondary"
+                    variant={isExhausted ? 'ghost' : 'secondary'}
                     size="sm"
+                    disabled={isExhausted || isAsking}
                     onClick={() => {
                       if (activePicker === 'where') {
                         handleAsk('whereabouts', slotNum);
@@ -200,7 +223,9 @@ export function InterrogationPanel() {
                         setSelectedSlot(slotNum);
                       }
                     }}
-                    className="text-xs font-mono py-1 px-2 h-auto flex flex-col items-center gap-0.5"
+                    className={`text-xs font-mono py-1 px-2 h-auto flex flex-col items-center gap-0.5 ${
+                      isExhausted ? 'opacity-40 line-through' : ''
+                    }`}
                   >
                     <span className="font-bold text-text-primary">{timeStr}</span>
                     <span className="text-text-tertiary text-xs">Slot {slotNum}</span>
@@ -214,18 +239,31 @@ export function InterrogationPanel() {
           {activePicker === 'saw' && selectedSlot !== null && (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
               {caseData.people
-                .filter((p) => p.id !== selectedSuspectId)
-                .map((target) => (
-                  <Button
-                    key={target.id}
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => handleAsk('witness', selectedSlot, target.id)}
-                    className="text-xs truncate justify-start"
-                  >
-                    {target.name}
-                  </Button>
-                ))}
+                .filter((p) => p.id !== suspect.id)
+                .map((target) => {
+                  const witnessKey = getQuestionKey(
+                    suspect.id,
+                    'witness',
+                    selectedSlot,
+                    target.id
+                  );
+                  const isExhausted = exhaustedKeys.has(witnessKey);
+
+                  return (
+                    <Button
+                      key={target.id}
+                      variant={isExhausted ? 'ghost' : 'secondary'}
+                      size="sm"
+                      disabled={isExhausted || isAsking}
+                      onClick={() => handleAsk('witness', selectedSlot, target.id)}
+                      className={`text-xs truncate justify-start ${
+                        isExhausted ? 'opacity-40 line-through' : ''
+                      }`}
+                    >
+                      {target.name}
+                    </Button>
+                  );
+                })}
             </div>
           )}
         </div>
@@ -262,11 +300,22 @@ export function InterrogationPanel() {
 
           {victim && (
             <Button
-              variant="secondary"
+              variant={
+                exhaustedKeys.has(getQuestionKey(suspect.id, 'motive'))
+                  ? 'ghost'
+                  : 'secondary'
+              }
               size="sm"
-              disabled={isAsking}
+              disabled={
+                isAsking ||
+                exhaustedKeys.has(getQuestionKey(suspect.id, 'motive'))
+              }
               onClick={() => handleAsk('motive')}
-              className="text-xs"
+              className={`text-xs ${
+                exhaustedKeys.has(getQuestionKey(suspect.id, 'motive'))
+                  ? 'opacity-40'
+                  : ''
+              }`}
             >
               <HeartCrack className="size-3 mr-1" />
               History with {victim.name.split(' ')[0]}
@@ -274,14 +323,36 @@ export function InterrogationPanel() {
           )}
 
           <Button
-            variant="secondary"
-            size="sm"
-            disabled={isAsking}
+            variant={
+              exhaustedKeys.has(getQuestionKey(suspect.id, 'general'))
+                ? 'ghost'
+                : 'secondary'
+            }
+              size="sm"
+            disabled={
+              isAsking ||
+              exhaustedKeys.has(getQuestionKey(suspect.id, 'general'))
+            }
             onClick={() => handleAsk('general')}
-            className="text-xs"
+            className={`text-xs ${
+              exhaustedKeys.has(getQuestionKey(suspect.id, 'general'))
+                ? 'opacity-40'
+                : ''
+            }`}
           >
             <Moon className="size-3 mr-1" />
             About the night
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={isAsking}
+            onClick={() => handleAsk('general')}
+            className="text-xs text-text-secondary hover:text-text-primary"
+          >
+            <HelpCircle className="size-3 mr-1" />
+            Anything else?
           </Button>
         </div>
       </div>
