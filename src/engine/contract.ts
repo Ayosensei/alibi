@@ -380,3 +380,5 @@ export const InspectorEvent = z.discriminatedUnion('type', [
     source: z.enum(['llm', 'deterministic', 'recorded']),
   }),
 ]);
+
+export type InspectorEventType = z.infer<typeof InspectorEvent>;
