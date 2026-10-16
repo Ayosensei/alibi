@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
 export default function Home() {
@@ -18,12 +19,16 @@ export default function Home() {
         </p>
 
         <div className="flex items-center gap-4 mt-4">
-          <Button variant="default" size="default">
-            Begin Investigation
-          </Button>
-          <Button variant="secondary" size="default">
-            Case Files
-          </Button>
+          <Link href="/season/1">
+            <Button variant="default" size="default">
+              Begin Investigation
+            </Button>
+          </Link>
+          <Link href="/season/1">
+            <Button variant="secondary" size="default">
+              Case Files
+            </Button>
+          </Link>
         </div>
       </div>
     </main>

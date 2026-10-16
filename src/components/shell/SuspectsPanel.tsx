@@ -1,0 +1,167 @@
+'use client';
+
+import * as React from 'react';
+import { Button } from '@/components/ui/button';
+import { Chip, SuspectCard } from '@/components/atoms';
+import { useGameStore } from '@/lib/store';
+import {
+  Search,
+  Check,
+  Sparkles,
+  MapPin,
+  Lock,
+  DoorOpen,
+} from 'lucide-react';
+
+export function SuspectsPanel() {
+  const {
+    caseData,
+    board,
+    selectedSuspectId,
+    selectSuspect,
+    searchRoomAction,
+    setBaitModalOpen,
+    isLoading,
+  } = useGameStore();
+
+  if (!caseData) return null;
+
+  const searchedSet = new Set(board?.searchedRooms ?? []);
+  const baitsLeft = board?.baitsLeft ?? caseData.baitsAllowed;
+
+  return (
+    <aside className="w-full lg:w-72 xl:w-80 shrink-0 flex flex-col bg-surface-1 border-r border-border overflow-y-auto p-4 space-y-6 select-none">
+      {/* 1. Suspects Section */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="font-mono text-xs uppercase tracking-widest text-brass">
+            Persons of Interest
+          </span>
+          <span className="text-xs text-text-tertiary font-mono tabular-nums">
+            {caseData.people.filter((p) => !p.victim).length} Suspects
+          </span>
+        </div>
+
+        <div className="space-y-2">
+          {caseData.people.map((person) => {
+            // Count statements and observations for this person from board
+            const statementsCount =
+              board?.statements.filter((s) => s.by === person.id).length ?? 0;
+            // Observations count from chat history
+            const observationsCount = 0;
+
+            return (
+              <SuspectCard
+                key={person.id}
+                id={person.id}
+                name={person.name}
+                role={person.role}
+                isVictim={person.victim}
+                statementsCount={statementsCount}
+                observationsCount={observationsCount}
+                isSelected={selectedSuspectId === person.id}
+                onClick={() => !person.victim && selectSuspect(person.id)}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 2. Rooms & Search Section */}
+      <div className="space-y-3 border-t border-border pt-4">
+        <div className="flex items-center justify-between">
+          <span className="font-mono text-xs uppercase tracking-widest text-brass">
+            Rooms & Crime Scene
+          </span>
+          <span className="text-xs text-text-tertiary font-mono tabular-nums">
+            {searchedSet.size}/{caseData.rooms.length} Searched
+          </span>
+        </div>
+
+        <div className="space-y-1.5">
+          {caseData.rooms.map((room) => {
+            const isSearched = searchedSet.has(room.id);
+            const isCrimeScene = room.id === caseData.crimeScene;
+
+            // Count exhibits in this room discovered on board
+            const roomExhibits =
+              board?.evidence.filter((e) => e.room === room.id).length ?? 0;
+
+            return (
+              <div
+                key={room.id}
+                className={`flex items-center justify-between p-2 rounded-lg border text-xs transition-colors ${
+                  isSearched
+                    ? 'bg-surface-2/60 border-border/40 text-text-secondary'
+                    : 'bg-surface-2 border-border text-text-primary'
+                }`}
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <MapPin
+                    className={`size-3.5 shrink-0 ${
+                      isCrimeScene ? 'text-thread' : 'text-text-tertiary'
+                    }`}
+                  />
+                  <div className="flex items-center gap-1.5 truncate">
+                    <span className="font-medium truncate">{room.name}</span>
+                    {isCrimeScene && (
+                      <span className="font-mono text-xs text-thread shrink-0">
+                        (Scene)
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {roomExhibits > 0 && (
+                    <Chip variant="default" className="text-xs px-1.5 py-0">
+                      {roomExhibits} {roomExhibits === 1 ? 'exhibit' : 'exhibits'}
+                    </Chip>
+                  )}
+
+                  <Button
+                    variant={isSearched ? 'ghost' : 'secondary'}
+                    size="sm"
+                    disabled={isSearched || isLoading}
+                    onClick={() => searchRoomAction(room.id)}
+                    className="h-7 px-2 text-xs"
+                  >
+                    {isSearched ? (
+                      <>
+                        <Check className="size-3 text-status-cleared mr-1" />
+                        Done
+                      </>
+                    ) : (
+                      <>
+                        <Search className="size-3 mr-1" />
+                        Search
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 3. Bait Announcement Section */}
+      <div className="border-t border-border pt-4">
+        <Button
+          variant="brass"
+          size="default"
+          onClick={() => setBaitModalOpen(true)}
+          className="w-full justify-between"
+        >
+          <div className="flex items-center gap-2">
+            <Sparkles className="size-4" />
+            <span>Use Bait Announcement</span>
+          </div>
+          <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-surface-1 text-brass border border-brass/40">
+            {baitsLeft} left
+          </span>
+        </Button>
+      </div>
+    </aside>
+  );
+}

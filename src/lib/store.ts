@@ -1,0 +1,371 @@
+// src/lib/store.ts — Zustand game state store
+import { create } from 'zustand';
+import {
+  api,
+  type StartOutput,
+  type BoardOutput,
+  type ContradictionsOutput,
+  type RehearsedOutput,
+  type ImpossibleMovesOutput,
+  type AskOutput,
+  type SearchOutput,
+  type UseBaitOutput,
+  type AccuseOutput,
+} from './api';
+import type { InspectorEventType, Topic } from '@/engine/contract';
+import { z } from 'zod';
+
+export interface ChatMessage {
+  id: string;
+  suspectId: string;
+  speaker: 'player' | 'suspect';
+  text: string;
+  observation?: string | null;
+  firewallWarning?: boolean;
+  tick?: number;
+}
+
+export interface LevelProgress {
+  stars: number;
+  solved: boolean;
+  accusationsUsed: number;
+  arcClue?: string | null;
+}
+
+export interface GameState {
+  playerId: string;
+  caseId: string;
+  caseData: StartOutput | null;
+  board: BoardOutput | null;
+  contradictions: ContradictionsOutput['pairs'];
+  rehearsed: RehearsedOutput['groups'];
+  impossible: ImpossibleMovesOutput['moves'];
+  isLoading: boolean;
+  error: string | null;
+
+  // Selection & UI modals
+  selectedSuspectId: string | null;
+  selectedTab: 'timeline' | 'board' | 'inspector' | 'notes';
+  isBriefingOpen: boolean;
+  isBaitModalOpen: boolean;
+  isAccuseModalOpen: boolean;
+  isSearchModalOpen: boolean;
+  activeSearchRoomId: string | null;
+  lastSearchResults: SearchOutput | null;
+
+  // Interrogation history
+  chatHistory: ChatMessage[];
+  isAsking: boolean;
+
+  // Inspector SSE stream
+  inspectorEvents: InspectorEventType[];
+  isInspectorStreaming: boolean;
+  activeInspectorSource: 'llm' | 'deterministic' | 'recorded' | null;
+
+  // Board highlights & focus
+  highlights: {
+    refs: string[];
+    highlightedCardId: string | null;
+    focusedCell: { person: string; slot: number } | null;
+  };
+
+  // Cross-level progress
+  progress: Record<string, LevelProgress>;
+
+  // Verdict outcome
+  lastVerdict: AccuseOutput | null;
+
+  // Actions
+  initCase: (caseId: string, reset?: boolean) => Promise<void>;
+  refreshBoard: () => Promise<void>;
+  selectSuspect: (suspectId: string | null) => void;
+  selectTab: (tab: 'timeline' | 'board' | 'inspector' | 'notes') => void;
+  setBriefingOpen: (open: boolean) => void;
+  setBaitModalOpen: (open: boolean) => void;
+  setAccuseModalOpen: (open: boolean) => void;
+  setSearchModalOpen: (open: boolean) => void;
+  askQuestion: (
+    topic: z.infer<typeof Topic>,
+    slot?: number,
+    about?: string
+  ) => Promise<AskOutput | null>;
+  searchRoomAction: (roomId: string) => Promise<SearchOutput | null>;
+  useBaitAction: (baitId: string) => Promise<UseBaitOutput | null>;
+  accuseSuspectsAction: (persons: string[]) => Promise<AccuseOutput | null>;
+  runInspectorAction: (mode?: 'assist' | 'cold_case') => void;
+  setHighlightRefs: (refs: string[]) => void;
+  setFocusedCard: (id: string | null) => void;
+  setFocusedCell: (cell: { person: string; slot: number } | null) => void;
+  clearHighlights: () => void;
+}
+
+export const useGameStore = create<GameState>((set, get) => ({
+  playerId: 'demo',
+  caseId: 'l1-quiet-pact',
+  caseData: null,
+  board: null,
+  contradictions: [],
+  rehearsed: [],
+  impossible: [],
+  isLoading: false,
+  error: null,
+
+  selectedSuspectId: null,
+  selectedTab: 'timeline',
+  isBriefingOpen: false,
+  isBaitModalOpen: false,
+  isAccuseModalOpen: false,
+  isSearchModalOpen: false,
+  activeSearchRoomId: null,
+  lastSearchResults: null,
+
+  chatHistory: [],
+  isAsking: false,
+
+  inspectorEvents: [],
+  isInspectorStreaming: false,
+  activeInspectorSource: null,
+
+  highlights: {
+    refs: [],
+    highlightedCardId: null,
+    focusedCell: null,
+  },
+
+  progress: {
+    'l1-quiet-pact': { stars: 0, solved: false, accusationsUsed: 0 },
+    'l2-stopped-watch': { stars: 0, solved: false, accusationsUsed: 0 },
+    'l3-blackout-dinner': { stars: 0, solved: false, accusationsUsed: 0 },
+  },
+
+  lastVerdict: null,
+
+  initCase: async (caseId: string, reset = false) => {
+    set({ isLoading: true, error: null, caseId, lastVerdict: null });
+    const { playerId } = get();
+
+    const startRes = await api.startCase(playerId, caseId, reset);
+    if (!startRes.ok) {
+      set({ isLoading: false, error: startRes.error.message });
+      return;
+    }
+
+    const caseData = startRes.data;
+    // Set first suspect selected by default
+    const firstSuspect = caseData.people.find((p) => !p.victim)?.id ?? null;
+
+    set({
+      caseData,
+      selectedSuspectId: firstSuspect,
+      isBriefingOpen: true,
+      chatHistory: [],
+      inspectorEvents: [],
+      lastSearchResults: null,
+    });
+
+    await get().refreshBoard();
+    set({ isLoading: false });
+  },
+
+  refreshBoard: async () => {
+    const { playerId, caseId } = get();
+    const [boardRes, contraRes, rehRes, impRes] = await Promise.all([
+      api.getBoard(playerId, caseId),
+      api.findContradictions(playerId, caseId),
+      api.findRehearsedAlibis(playerId, caseId),
+      api.findImpossibleMoves(playerId, caseId),
+    ]);
+
+    set({
+      board: boardRes.ok ? boardRes.data : null,
+      contradictions: contraRes.ok ? contraRes.data.pairs : [],
+      rehearsed: rehRes.ok ? rehRes.data.groups : [],
+      impossible: impRes.ok ? impRes.data.moves : [],
+    });
+  },
+
+  selectSuspect: (suspectId) => set({ selectedSuspectId: suspectId }),
+  selectTab: (tab) => set({ selectedTab: tab }),
+  setBriefingOpen: (open) => set({ isBriefingOpen: open }),
+  setBaitModalOpen: (open) => set({ isBaitModalOpen: open }),
+  setAccuseModalOpen: (open) => set({ isAccuseModalOpen: open }),
+  setSearchModalOpen: (open) => set({ isSearchModalOpen: open }),
+
+  askQuestion: async (topic, slot, about) => {
+    const { playerId, caseId, selectedSuspectId, board } = get();
+    if (!selectedSuspectId) return null;
+
+    set({ isAsking: true, error: null });
+
+    // Format human player line
+    const suspect = get().caseData?.people.find((p) => p.id === selectedSuspectId);
+    const slotTime = slot && get().caseData?.slots[slot - 1] ? get().caseData?.slots[slot - 1] : `slot ${slot}`;
+
+    let playerQuestion = 'Tell me what you know.';
+    if (topic === 'whereabouts' && slot) playerQuestion = `Where were you at ${slotTime}?`;
+    else if (topic === 'witness' && slot) playerQuestion = `Who did you see at ${slotTime}?`;
+    else if (topic === 'motive') playerQuestion = `What was your history with the victim?`;
+    else if (topic === 'general') playerQuestion = `Tell me about the night.`;
+
+    const playerMsg: ChatMessage = {
+      id: `msg_p_${Date.now()}`,
+      suspectId: selectedSuspectId,
+      speaker: 'player',
+      text: playerQuestion,
+      tick: (board?.tick ?? 0) + 1,
+    };
+
+    set((s) => ({ chatHistory: [...s.chatHistory, playerMsg] }));
+
+    const res = await api.ask(playerId, caseId, selectedSuspectId, topic, slot, about);
+    set({ isAsking: false });
+
+    if (!res.ok) {
+      set({ error: res.error.message });
+      return null;
+    }
+
+    const suspectMsg: ChatMessage = {
+      id: `msg_s_${Date.now()}`,
+      suspectId: selectedSuspectId,
+      speaker: 'suspect',
+      text: res.data.reply,
+      observation: res.data.observation,
+      firewallWarning: !res.data.firewall.passed,
+      tick: (board?.tick ?? 0) + 1,
+    };
+
+    set((s) => ({ chatHistory: [...s.chatHistory, suspectMsg] }));
+    await get().refreshBoard();
+    return res.data;
+  },
+
+  searchRoomAction: async (roomId: string) => {
+    const { playerId, caseId } = get();
+    set({ isLoading: true, activeSearchRoomId: roomId });
+
+    const res = await api.search(playerId, caseId, roomId);
+    set({ isLoading: false });
+
+    if (!res.ok) {
+      set({ error: res.error.message });
+      return null;
+    }
+
+    set({
+      lastSearchResults: res.data,
+      isSearchModalOpen: true,
+    });
+
+    await get().refreshBoard();
+    return res.data;
+  },
+
+  useBaitAction: async (baitId: string) => {
+    const { playerId, caseId } = get();
+    set({ isLoading: true });
+
+    const res = await api.useBait(playerId, caseId, baitId);
+    set({ isLoading: false });
+
+    if (!res.ok) {
+      set({ error: res.error.message });
+      return null;
+    }
+
+    // Add suspect reactions to chat history if relevant
+    for (const react of res.data.reactions) {
+      set((s) => ({
+        chatHistory: [
+          ...s.chatHistory,
+          {
+            id: `msg_bait_${react.person}_${Date.now()}`,
+            suspectId: react.person,
+            speaker: 'suspect',
+            text: react.text,
+            observation: react.observation,
+          },
+        ],
+      }));
+    }
+
+    await get().refreshBoard();
+    return res.data;
+  },
+
+  accuseSuspectsAction: async (persons: string[]) => {
+    const { playerId, caseId } = get();
+    set({ isLoading: true });
+
+    const res = await api.accuse(playerId, caseId, persons);
+    set({ isLoading: false });
+
+    if (!res.ok) {
+      set({ error: res.error.message });
+      return null;
+    }
+
+    const data = res.data;
+    set({ lastVerdict: data });
+
+    // Update level progress if level is over or solved
+    if (data.result === 'full' || data.levelOver) {
+      set((s) => ({
+        progress: {
+          ...s.progress,
+          [caseId]: {
+            stars: Math.max(s.progress[caseId]?.stars ?? 0, data.stars),
+            solved: data.result === 'full',
+            accusationsUsed: (s.progress[caseId]?.accusationsUsed ?? 0) + 1,
+            arcClue: get().caseData?.arcClue,
+          },
+        },
+      }));
+    }
+
+    return data;
+  },
+
+  runInspectorAction: (mode = 'assist') => {
+    const { playerId, caseId } = get();
+    set({
+      isInspectorStreaming: true,
+      inspectorEvents: [],
+      activeInspectorSource: null,
+    });
+
+    api.streamInspector(
+      { playerId, caseId, mode },
+      (event) => {
+        set((s) => ({ inspectorEvents: [...s.inspectorEvents, event] }));
+        if (event.type === 'tool_result' && event.highlight?.length) {
+          set((s) => ({
+            highlights: {
+              ...s.highlights,
+              refs: Array.from(new Set([...s.highlights.refs, ...event.highlight])),
+            },
+          }));
+        }
+        if (event.type === 'done') {
+          set({ activeInspectorSource: event.source });
+        }
+      },
+      (err) => {
+        set({ isInspectorStreaming: false, error: err.message });
+      },
+      () => {
+        set({ isInspectorStreaming: false });
+        get().refreshBoard();
+      }
+    );
+  },
+
+  setHighlightRefs: (refs) =>
+    set((s) => ({ highlights: { ...s.highlights, refs } })),
+  setFocusedCard: (id) =>
+    set((s) => ({ highlights: { ...s.highlights, highlightedCardId: id } })),
+  setFocusedCell: (cell) =>
+    set((s) => ({ highlights: { ...s.highlights, focusedCell: cell } })),
+  clearHighlights: () =>
+    set({ highlights: { refs: [], highlightedCardId: null, focusedCell: null } }),
+}));
