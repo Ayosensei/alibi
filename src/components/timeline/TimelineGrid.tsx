@@ -116,7 +116,7 @@ export function TimelineGrid() {
           titlePrefix="Ask someone where they "
           titleItalic="were"
           titleSuffix="."
-          description="The timeline populates as suspects make location assertions and physical exhibits are discovered."
+          description="The timeline populates as suspects state their whereabouts and physical proof is discovered."
           icon={<Clock className="size-6 text-text-tertiary" />}
         />
       </div>
@@ -132,19 +132,19 @@ export function TimelineGrid() {
           <div className="flex items-center gap-1.5">
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-paper text-ink border border-ink/20 shadow-xs font-mono text-xs">
               <Feather className="size-2.5" />
-              Statement
+              Spoken Claim
             </span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-3 text-text-primary border border-border shadow-xs font-mono text-xs">
               <Pin className="size-2.5 text-brass" />
-              Evidence
+              Physical Proof
             </span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-inspector/10 text-inspector border border-dashed border-inspector/50 font-mono text-xs">
               <Sparkles className="size-2.5 text-inspector" />
-              Inferred
+              Elimination
             </span>
           </div>
         </div>
@@ -410,11 +410,11 @@ export function TimelineGrid() {
                       {p?.name ?? mv.person}
                     </span>
                     <span className="font-mono text-status-impossible text-xs font-medium">
-                      Needs {mv.needed} slots · Has {mv.available}
+                      Too far: {mv.needed} doors away · Only {mv.available} {mv.available === 1 ? 'slot' : 'slots'} apart
                     </span>
                   </div>
                   <p className="text-text-secondary text-xs">
-                    Route requires {mv.needed} steps: {mv.path.map(getRoomName).join(' → ')}
+                    Journey requires {mv.needed} room transitions: {mv.path.map(getRoomName).join(' → ')}
                   </p>
                 </div>
               );

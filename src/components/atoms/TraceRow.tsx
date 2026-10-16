@@ -10,6 +10,17 @@ export interface TraceRowProps {
   className?: string;
 }
 
+const TOOL_FRIENDLY_NAMES: Record<string, string> = {
+  findContradictions: 'Contradiction Detection',
+  checkFeasibility: 'Travel Alibi Validation',
+  findRehearsedAlibis: 'Rehearsed Story Scan',
+  findImpossibleMoves: 'Impossible Journeys Check',
+  whoCouldHave: 'Candidate Elimination',
+  motivePaths: 'Motive Chain Traversal',
+  alibiSupport: 'Witness Reliability Check',
+  getBoard: 'Case Board Sync',
+};
+
 export function TraceRow({
   agent,
   tool,
@@ -19,6 +30,7 @@ export function TraceRow({
   className,
 }: TraceRowProps) {
   const isInspector = agent === 'inspector';
+  const displayName = tool ? (TOOL_FRIENDLY_NAMES[tool] ?? tool) : (queryId || 'query');
 
   return (
     <div
@@ -35,11 +47,11 @@ export function TraceRow({
           )}
         />
         <span className="font-semibold text-text-primary truncate">
-          {tool || queryId || 'query'}
+          {displayName}
         </span>
-        {queryId && tool && (
+        {tool && (
           <span className="text-text-tertiary truncate hidden sm:inline">
-            ({queryId})
+            ({tool})
           </span>
         )}
       </div>
