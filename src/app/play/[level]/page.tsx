@@ -5,6 +5,7 @@ import { use, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useGameStore } from '@/lib/store';
 import { CaseHeader } from '@/components/shell/CaseHeader';
+import { CaseObjectiveBanner } from '@/components/shell/CaseObjectiveBanner';
 import { SuspectsPanel } from '@/components/shell/SuspectsPanel';
 import { InterrogationPanel } from '@/components/shell/InterrogationPanel';
 import { FileTabsPanel } from '@/components/shell/FileTabsPanel';
@@ -185,6 +186,9 @@ function PlayPageContent({ level }: { level: string }) {
     >
       {/* 56px Header */}
       <CaseHeader />
+
+      {/* Dynamic Detective Lead Banner */}
+      <CaseObjectiveBanner />
 
       {/* Screen size recommendation notice */}
       <div className="xl:hidden py-1 px-4 bg-surface-2 border-b border-border text-center text-xs font-mono text-text-secondary">
