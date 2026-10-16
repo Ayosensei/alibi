@@ -37,6 +37,15 @@ function PlayPageContent({ level }: { level: string }) {
     });
   }, [level, initialMode, initCase, runInspectorAction]);
 
+  React.useEffect(() => {
+    if (isPresentMode) {
+      document.documentElement.classList.add('present-mode');
+      return () => {
+        document.documentElement.classList.remove('present-mode');
+      };
+    }
+  }, [isPresentMode]);
+
   if (isLoading && !caseData) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center space-y-4">
@@ -59,15 +68,6 @@ function PlayPageContent({ level }: { level: string }) {
       </div>
     );
   }
-
-  React.useEffect(() => {
-    if (isPresentMode) {
-      document.documentElement.classList.add('present-mode');
-      return () => {
-        document.documentElement.classList.remove('present-mode');
-      };
-    }
-  }, [isPresentMode]);
 
   return (
     <div
