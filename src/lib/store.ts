@@ -84,6 +84,7 @@ export interface GameState {
 
   // Verdict outcome
   lastVerdict: AccuseOutput | null;
+  usedBaitIds: string[];
 
   // Actions
   initCase: (caseId: string, reset?: boolean) => Promise<void>;
@@ -164,9 +165,10 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   lastVerdict: null,
   prefilledAccused: [],
+  usedBaitIds: [],
 
   initCase: async (caseId: string, reset = false) => {
-    set({ isLoading: true, error: null, caseId, lastVerdict: null });
+    set({ isLoading: true, error: null, caseId, lastVerdict: null, usedBaitIds: [] });
     const { playerId } = get();
 
     const startRes = await api.startCase(playerId, caseId, reset);
@@ -186,6 +188,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       chatHistory: [],
       inspectorEvents: [],
       lastSearchResults: null,
+      usedBaitIds: [],
     });
 
     await get().refreshBoard();
@@ -231,13 +234,20 @@ export const useGameStore = create<GameState>((set, get) => ({
       );
     }
 
-    set({
+    const derivedSlipBaits = boardRes.ok
+      ? boardRes.data.statements
+          .filter((s) => s.claimId.startsWith('slip:') || s.id.startsWith('stmt_slip_'))
+          .map((s) => s.claimId.replace('slip:', '').replace('stmt_slip_', ''))
+      : [];
+
+    set((s) => ({
       board: boardRes.ok ? boardRes.data : null,
       contradictions: contraRes.ok ? contraRes.data.pairs : [],
       rehearsed: rehRes.ok ? rehRes.data.groups : [],
       impossible: impRes.ok ? impRes.data.moves : [],
       clearedSuspects,
-    });
+      usedBaitIds: Array.from(new Set([...s.usedBaitIds, ...derivedSlipBaits])),
+    }));
   },
 
   selectSuspect: (suspectId) => set({ selectedSuspectId: suspectId }),
@@ -345,6 +355,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       }));
     }
 
+    set((s) => ({
+      usedBaitIds: Array.from(new Set([...s.usedBaitIds, baitId])),
+      board: s.board ? { ...s.board, baitsLeft: res.data.baitsLeft } : s.board,
+    }));
+
     await get().refreshBoard();
     return res.data;
   },
@@ -363,6 +378,14 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     const data = res.data;
     set({ lastVerdict: data });
+
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(`alibi_verdict_${caseId}`, JSON.stringify(data));
+      } catch {
+        // ignore localStorage errors
+      }
+    }
 
     // Update level progress if level is over or solved
     if (data.result === 'full' || data.levelOver) {

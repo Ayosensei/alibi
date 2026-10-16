@@ -471,6 +471,145 @@ export default function StyleguidePage() {
           <InspectorPanel />
         </div>
       </section>
+
+      {/* 13. Bait Announcements & Psychological Gambits */}
+      <section className="space-y-6">
+        <div className="space-y-1">
+          <div className="font-mono text-xs text-brass uppercase tracking-wider">Psychological Gambits</div>
+          <h2 className="font-serif text-2xl font-semibold">Bait Announcements (Task U6)</h2>
+          <p className="text-text-secondary text-sm max-w-2xl">
+            Prepared public announcements designed to elicit slips of the tongue from suspects with guilty knowledge.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Active Prepared Announcement Card */}
+          <div className="p-4 rounded-lg bg-surface-2 border border-border hover:border-brass/70 cursor-pointer shadow-card space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-xs font-semibold tracking-wider text-brass uppercase">
+                ANNOUNCEMENT A
+              </span>
+              <Chip variant="brass" className="text-xs">
+                Prepared
+              </Chip>
+            </div>
+            <p className="font-mono text-xs text-text-primary leading-relaxed">
+              &ldquo;We have found Penhallow&apos;s missing signet ring in the courtyard planter.&rdquo;
+            </p>
+          </div>
+
+          {/* Announced State with Slip */}
+          <div className="p-4 rounded-lg bg-surface-2/60 border border-border shadow-card space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-xs font-semibold tracking-wider text-text-secondary uppercase">
+                ANNOUNCEMENT B
+              </span>
+              <Stamp status="slip" label="SLIP DETECTED" />
+            </div>
+            <p className="font-mono text-xs text-text-secondary leading-relaxed line-through">
+              &ldquo;The courtyard gate camera was switched off all evening.&rdquo;
+            </p>
+            <div className="pt-2 border-t border-border/60 text-xs font-serif italic text-thread">
+              * Suspect slipped: &ldquo;Switched off? It was on, I would swear to it.&rdquo; *
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 14. Accusation & Verdict Showcase */}
+      <section className="space-y-6">
+        <div className="space-y-1">
+          <div className="font-mono text-xs text-brass uppercase tracking-wider">Case Inquest & Inquest Resolution</div>
+          <h2 className="font-serif text-2xl font-semibold">Accusation & Verdict States (Task U6)</h2>
+          <p className="text-text-secondary text-sm max-w-2xl">
+            Formal indictment outcomes, 3-star mastery ratings, step-by-step case replay, and ground truth reveal cards.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* 3 Stars Mastery Display */}
+          <div className="p-5 rounded-xl bg-surface-1 border border-border shadow-card space-y-3">
+            <span className="font-mono text-xs uppercase tracking-wider text-brass block">
+              3-Star Inquest Mastery
+            </span>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 p-1 rounded-lg bg-surface-2 border border-border">
+                <span className="text-brass text-lg">★</span>
+                <span className="text-brass text-lg">★</span>
+                <span className="text-brass text-lg">★</span>
+              </div>
+              <Stamp status="cleared" label="3 STARS" />
+            </div>
+            <p className="text-xs text-text-secondary">
+              Flawless solve on first accusation with all proof items derived on the graph.
+            </p>
+          </div>
+
+          {/* Accusation Outcome: Partial */}
+          <div className="p-5 rounded-xl bg-surface-1 border border-border shadow-card space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-xs uppercase tracking-wider text-thread block">
+                Outcome: Partial
+              </span>
+              <Stamp status="impossible" label="PARTIAL" />
+            </div>
+            <p className="font-serif text-sm font-semibold text-text-primary">
+              &ldquo;You have the hand, not the head.&rdquo;
+            </p>
+            <p className="text-xs text-text-secondary">
+              1 participant identified; co-conspirator or mastermind remains unnamed.
+            </p>
+          </div>
+
+          {/* Accusation Outcome: Full / Case Closed */}
+          <div className="p-5 rounded-xl bg-surface-1 border border-border shadow-card space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-xs uppercase tracking-wider text-status-cleared block">
+                Outcome: Full
+              </span>
+              <Stamp status="cleared" label="CASE CLOSED" />
+            </div>
+            <p className="font-serif text-sm font-semibold text-text-primary">
+              &ldquo;Accusation confirmed.&rdquo;
+            </p>
+            <p className="text-xs text-text-secondary">
+              All conspirators brought to justice. Truth revealed on verdict screen.
+            </p>
+          </div>
+        </div>
+
+        {/* Replay Step Card Showcase */}
+        <div className="p-5 rounded-xl bg-surface-1 border border-brass/50 shadow-card space-y-3 max-w-2xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-brass text-on-brass">
+                STEP 02
+              </span>
+              <h3 className="font-medium text-sm text-text-primary">
+                Fabricated Alibis Exposed
+              </h3>
+            </div>
+            <Chip variant="default" className="text-xs">
+              3 proofs
+            </Chip>
+          </div>
+          <p className="text-xs text-text-secondary leading-relaxed">
+            Kofi and Hana claim they were in the prop store together at slot 5. The door access log places Okoye in the green room alone, proving Dee, Kofi, and Hana rehearsed identical details.
+          </p>
+          <div className="flex items-center gap-2 font-mono text-xs text-brass">
+            <span className="px-2 py-0.5 rounded bg-brass/10 border border-brass/30">
+              c1_dee_loc5
+            </span>
+            <span className="px-2 py-0.5 rounded bg-brass/10 border border-brass/30">
+              c1_kofi_loc5
+            </span>
+            <span className="px-2 py-0.5 rounded bg-brass/10 border border-brass/30">
+              e1_doorlog
+            </span>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
+

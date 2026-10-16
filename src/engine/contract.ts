@@ -277,6 +277,9 @@ export const ACTIONS = {
       publicWindow: z.array(Slot),
       baitsAllowed: z.number().int(),
       arcClue: z.string().nullable(),
+      baits: z
+        .array(z.object({ id: z.string(), announcement: z.string() }))
+        .default([]),
     }),
   },
   ask: {

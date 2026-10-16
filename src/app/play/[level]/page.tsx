@@ -10,6 +10,8 @@ import { InterrogationPanel } from '@/components/shell/InterrogationPanel';
 import { FileTabsPanel } from '@/components/shell/FileTabsPanel';
 import { BriefingModal } from '@/components/modals/BriefingModal';
 import { SearchModal } from '@/components/modals/SearchModal';
+import { BaitModal } from '@/components/modals/BaitModal';
+import { AccuseModal } from '@/components/modals/AccuseModal';
 import { ErrorBanner } from '@/components/atoms';
 import { Loader2 } from 'lucide-react';
 
@@ -74,9 +76,11 @@ function PlayPageContent({ level }: { level: string }) {
         <FileTabsPanel />
       </main>
 
-      {/* Case Briefing & Search Modals */}
+      {/* Case Briefing, Search, Bait & Accuse Modals */}
       <BriefingModal />
       <SearchModal />
+      <BaitModal />
+      <AccuseModal />
     </div>
   );
 }

@@ -121,6 +121,10 @@ export async function startPlay(input: StartInput): Promise<Envelope<StartOutput
     publicWindow: caseData.publicWindow ?? [caseData.truth.murder.slot],
     baitsAllowed: caseData.baitsAllowed,
     arcClue: caseData.arcClue ?? null,
+    baits: (caseData.baits ?? []).map((b) => ({
+      id: b.id,
+      announcement: b.announcement,
+    })),
   };
 
   return { ok: true, data, trace };
