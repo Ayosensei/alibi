@@ -17,11 +17,13 @@ import {
   ShieldAlert,
   Loader2,
   Sparkles,
+  CheckCircle2,
 } from 'lucide-react';
 
 export function InterrogationPanel() {
   const {
     caseData,
+    board,
     selectedSuspectId,
     chatHistory,
     isAsking,
@@ -37,6 +39,15 @@ export function InterrogationPanel() {
 
   const suspect = caseData?.people.find((p) => p.id === selectedSuspectId);
   const victim = caseData?.people.find((p) => p.victim);
+
+  // Active murder window & lead calculation
+  const activeWindow = board?.window ?? caseData?.publicWindow ?? [5];
+  const murderSlot = activeWindow[0] ?? 5;
+  const murderTime = caseData?.slots[murderSlot - 1] ?? `Slot ${murderSlot}`;
+
+  const existingMurderStatement = board?.statements.find(
+    (s) => s.by === suspect?.id && s.slot === murderSlot && s.kind === 'location'
+  );
 
   // Filter messages for current suspect
   const suspectMessages = chatHistory.filter(
@@ -275,33 +286,72 @@ export function InterrogationPanel() {
       )}
 
       {/* 4. Question Topic Chips */}
-      <div className="p-3 bg-surface-1 border-t border-border space-y-2">
-        <span className="font-mono text-xs text-text-tertiary uppercase tracking-wider block">
-          Direct Inquiries
-        </span>
-
-        <div className="flex flex-wrap gap-1.5">
-          <Button
-            variant={activePicker === 'where' ? 'brass' : 'secondary'}
-            size="sm"
-            disabled={isAsking}
-            onClick={() => setActivePicker(activePicker === 'where' ? 'none' : 'where')}
-            className="text-xs"
-          >
-            <Clock className="size-3 mr-1" />
-            Where were you?
-          </Button>
+      <div className="p-3 bg-surface-1 border-t border-border space-y-3">
+        {/* 1-Click Primary Murder Lead Question */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider">
+            <span className="text-brass font-semibold">Crucial Lead</span>
+            <span className="text-text-secondary">Time of Murder: {murderTime}</span>
+          </div>
 
           <Button
-            variant={activePicker === 'saw' ? 'brass' : 'secondary'}
-            size="sm"
+            variant={existingMurderStatement ? 'secondary' : 'brass'}
+            size="default"
             disabled={isAsking}
-            onClick={() => setActivePicker(activePicker === 'saw' ? 'none' : 'saw')}
-            className="text-xs"
+            onClick={() => handleAsk('whereabouts', murderSlot)}
+            className="w-full justify-between h-auto py-2.5 px-3 border border-border text-left transition-all"
           >
-            <UserCheck className="size-3 mr-1" />
-            Who did you see?
+            <div className="flex items-center gap-2.5 min-w-0">
+              {existingMurderStatement ? (
+                <CheckCircle2 className="size-4 text-brass shrink-0" />
+              ) : (
+                <Clock className="size-4 text-brass shrink-0 animate-pulse" />
+              )}
+              <div className="flex flex-col min-w-0">
+                <span className="font-semibold text-xs md:text-sm text-text-primary truncate">
+                  Where were you at {murderTime}?
+                </span>
+                <span className="text-xs text-text-secondary truncate">
+                  {existingMurderStatement
+                    ? `Claimed: ${existingMurderStatement.room?.replace(/_/g, ' ')}`
+                    : 'Ask whereabouts during the time of murder'}
+                </span>
+              </div>
+            </div>
+            <span className="font-mono text-xs px-2 py-0.5 rounded bg-surface-1 text-brass border border-border shrink-0 ml-2">
+              {existingMurderStatement ? 'Re-Ask' : '1-Click Ask'}
+            </span>
           </Button>
+        </div>
+
+        {/* Other Inquiries */}
+        <div className="space-y-1.5 pt-2 border-t border-border">
+          <span className="font-mono text-xs text-text-tertiary uppercase tracking-wider block">
+            Other Inquiries & History
+          </span>
+
+          <div className="flex flex-wrap gap-1.5">
+            <Button
+              variant={activePicker === 'where' ? 'brass' : 'secondary'}
+              size="sm"
+              disabled={isAsking}
+              onClick={() => setActivePicker(activePicker === 'where' ? 'none' : 'where')}
+              className="text-xs"
+            >
+              <Clock className="size-3 mr-1" />
+              Other Times
+            </Button>
+
+            <Button
+              variant={activePicker === 'saw' ? 'brass' : 'secondary'}
+              size="sm"
+              disabled={isAsking}
+              onClick={() => setActivePicker(activePicker === 'saw' ? 'none' : 'saw')}
+              className="text-xs"
+            >
+              <UserCheck className="size-3 mr-1" />
+              Who did you see?
+            </Button>
 
           {victim && (
             <Button
@@ -361,6 +411,7 @@ export function InterrogationPanel() {
           </Button>
         </div>
       </div>
-    </section>
-  );
+    </div>
+  </section>
+);
 }
