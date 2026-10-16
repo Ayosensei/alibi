@@ -1,0 +1,2 @@
+// Alibi support query checking location statements against witness saw statements and hard assertions
+MATCH (c:Statement {kind: 'location', by: $person, slot: $slot}) OPTIONAL MATCH (sup:Statement {kind: 'saw', subject: $person, slot: $slot, room: c.room}) OPTIONAL MATCH (h:Assertion {hard: true, subject: sup.by, slot: $slot}) WHERE h.room <> sup.room RETURN c.room AS claimed, sup.claimId AS claimId, sup.by AS supporter, count(h) > 0 AS contradicted
