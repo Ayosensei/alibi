@@ -76,7 +76,10 @@ export async function ro<T>(options: {
     data = (reply.data ?? []) as T[];
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    if (message.includes('ERR Invalid graph operation on empty key')) {
+    if (
+      message.includes('ERR Invalid graph operation on empty key') ||
+      message.includes('Encountered an empty key when opened key')
+    ) {
       // Non-existent graph key in FalkorDB behaves as empty
       data = [];
     } else {
