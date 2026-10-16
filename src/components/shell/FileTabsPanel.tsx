@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Chip, Stamp, EmptyState, TraceRow } from '@/components/atoms';
 import { TimelineGrid } from '@/components/timeline/TimelineGrid';
+import { EvidenceBoard } from '@/components/board/EvidenceBoard';
 import { useGameStore } from '@/lib/store';
 import {
   CalendarDays,
@@ -151,33 +152,8 @@ export function FileTabsPanel() {
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-surface-2 border border-border shadow-card space-y-3">
-              <span className="font-mono text-xs text-brass uppercase tracking-wider block">
-                Evidence Exhibits ({board?.evidence.length ?? 0})
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {board?.evidence.map((ev) => (
-                  <div
-                    key={ev.id}
-                    className="p-3 rounded-lg bg-paper text-ink shadow-polaroid space-y-1 select-text"
-                  >
-                    <div className="flex items-center justify-between border-b border-ink/15 pb-1">
-                      <span className="font-mono text-xs font-semibold uppercase text-ink/70">
-                        {ev.id}
-                      </span>
-                      <Pin className="size-3 text-ink/50" />
-                    </div>
-                    <div className="font-semibold text-xs text-ink/90">{ev.title}</div>
-                    <p className="text-xs text-ink/80 leading-normal line-clamp-3">
-                      {ev.text}
-                    </p>
-                    <div className="font-mono text-xs text-ink/60 pt-1">
-                      Room: {ev.room.replace(/_/g, ' ')}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Hero Evidence Board Canvas */}
+            <EvidenceBoard />
           </div>
         )}
 

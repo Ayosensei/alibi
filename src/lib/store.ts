@@ -70,6 +70,15 @@ export interface GameState {
     focusedCell: { person: string; slot: number } | null;
   };
 
+  // Board layout & filters
+  boardPositions: Record<string, { x: number; y: number }>;
+  boardFilter: {
+    statements: boolean;
+    evidence: boolean;
+    flags: boolean;
+    inspector: boolean;
+  };
+
   // Cross-level progress
   progress: Record<string, LevelProgress>;
 
@@ -98,6 +107,9 @@ export interface GameState {
   setFocusedCard: (id: string | null) => void;
   setFocusedCell: (cell: { person: string; slot: number } | null) => void;
   clearHighlights: () => void;
+  setBoardPosition: (id: string, pos: { x: number; y: number }) => void;
+  toggleBoardFilter: (key: 'statements' | 'evidence' | 'flags' | 'inspector') => void;
+  resetBoardFilters: () => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -132,6 +144,14 @@ export const useGameStore = create<GameState>((set, get) => ({
     refs: [],
     highlightedCardId: null,
     focusedCell: null,
+  },
+
+  boardPositions: {},
+  boardFilter: {
+    statements: true,
+    evidence: true,
+    flags: true,
+    inspector: true,
   },
 
   progress: {
@@ -401,4 +421,17 @@ export const useGameStore = create<GameState>((set, get) => ({
     set((s) => ({ highlights: { ...s.highlights, focusedCell: cell } })),
   clearHighlights: () =>
     set({ highlights: { refs: [], highlightedCardId: null, focusedCell: null } }),
+
+  setBoardPosition: (id, pos) =>
+    set((s) => ({
+      boardPositions: { ...s.boardPositions, [id]: pos },
+    })),
+  toggleBoardFilter: (key) =>
+    set((s) => ({
+      boardFilter: { ...s.boardFilter, [key]: !s.boardFilter[key] },
+    })),
+  resetBoardFilters: () =>
+    set({
+      boardFilter: { statements: true, evidence: true, flags: true, inspector: true },
+    }),
 }));

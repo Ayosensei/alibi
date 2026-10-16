@@ -25,6 +25,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { TimelineGrid } from '@/components/timeline/TimelineGrid';
+import { EvidenceBoard } from '@/components/board/EvidenceBoard';
 import { useGameStore } from '@/lib/store';
 
 const COLOR_CLASSES: Record<keyof typeof colors, { bg: string; text: string; border?: string }> = {
@@ -433,6 +434,23 @@ export default function StyleguidePage() {
         {/* Live TimelineGrid Component */}
         <div className="p-6 rounded-xl bg-surface-1 border border-border shadow-card">
           <TimelineGrid />
+        </div>
+      </section>
+
+      {/* 11. Evidence Board (React Flow) */}
+      <section className="space-y-6">
+        <div className="space-y-1">
+          <div className="font-mono text-xs text-brass uppercase tracking-wider">Visual Graph Canvas</div>
+          <h2 className="font-serif text-2xl font-semibold">Evidence Board (React Flow)</h2>
+          <p className="text-text-secondary text-sm max-w-2xl">
+            Interactive 2D graph canvas of suspects, soft statements, physical exhibits, flags, and hypotheses.
+            Drawn with red threads of contradiction, dashed orange impossible journeys, and brass rehearsal edges.
+          </p>
+        </div>
+
+        {/* Live EvidenceBoard Component */}
+        <div className="p-4 rounded-xl bg-surface-1 border border-border shadow-card">
+          <EvidenceBoard />
         </div>
       </section>
     </div>
