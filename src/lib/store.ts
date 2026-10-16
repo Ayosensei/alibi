@@ -102,7 +102,9 @@ export interface GameState {
   searchRoomAction: (roomId: string) => Promise<SearchOutput | null>;
   useBaitAction: (baitId: string) => Promise<UseBaitOutput | null>;
   accuseSuspectsAction: (persons: string[]) => Promise<AccuseOutput | null>;
-  runInspectorAction: (mode?: 'assist' | 'cold_case') => void;
+  prefilledAccused: string[];
+  setPrefilledAccused: (persons: string[]) => void;
+  runInspectorAction: (mode?: 'assist' | 'cold_case', question?: string) => void;
   setHighlightRefs: (refs: string[]) => void;
   setFocusedCard: (id: string | null) => void;
   setFocusedCell: (cell: { person: string; slot: number } | null) => void;
@@ -161,6 +163,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   lastVerdict: null,
+  prefilledAccused: [],
 
   initCase: async (caseId: string, reset = false) => {
     set({ isLoading: true, error: null, caseId, lastVerdict: null });
@@ -379,7 +382,9 @@ export const useGameStore = create<GameState>((set, get) => ({
     return data;
   },
 
-  runInspectorAction: (mode = 'assist') => {
+  setPrefilledAccused: (persons) => set({ prefilledAccused: persons }),
+
+  runInspectorAction: (mode = 'assist', question?: string) => {
     const { playerId, caseId } = get();
     set({
       isInspectorStreaming: true,
@@ -388,7 +393,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
 
     api.streamInspector(
-      { playerId, caseId, mode },
+      { playerId, caseId, mode, question },
       (event) => {
         set((s) => ({ inspectorEvents: [...s.inspectorEvents, event] }));
         if (event.type === 'tool_result' && event.highlight?.length) {

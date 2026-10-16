@@ -382,6 +382,7 @@ export const InspectorEvent = z.discriminatedUnion('type', [
     hypothesisId: z.string(),
     text: z.string(),
     confidence: z.number(),
+    person: PersonId.optional(),
   }),
   z.object({ type: z.literal('message'), text: z.string() }),
   z.object({

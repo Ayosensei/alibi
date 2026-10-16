@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Chip, Stamp, EmptyState, TraceRow } from '@/components/atoms';
 import { TimelineGrid } from '@/components/timeline/TimelineGrid';
 import { EvidenceBoard } from '@/components/board/EvidenceBoard';
+import { InspectorPanel } from '@/components/inspector/InspectorPanel';
 import { useGameStore } from '@/lib/store';
 import {
   CalendarDays,
@@ -166,93 +167,13 @@ export function FileTabsPanel() {
                   AI <span className="italic font-normal text-inspector">Inspector</span> Feed
                 </h3>
                 <p className="text-xs text-text-secondary">
-                  Autonomous reasoning queries run against the FalkorDB play graph.
+                  Autonomous graph reasoning queries with real-time SSE execution and live board highlights.
                 </p>
               </div>
-
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={isInspectorStreaming}
-                onClick={() => runInspectorAction('assist')}
-                className="text-xs"
-              >
-                <Sparkles className="size-3 mr-1 text-inspector" />
-                Run Assist
-              </Button>
             </div>
 
-            {inspectorEvents.length === 0 ? (
-              <EmptyState
-                titlePrefix="Ask the "
-                titleItalic="Inspector"
-                titleSuffix=" to reason."
-                description="The inspector executes up to 8 reasoning graph queries to detect contradictions and impossible travel."
-                icon={<Sparkles className="size-6 text-inspector" />}
-                action={
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={() => runInspectorAction('assist')}
-                  >
-                    Start Investigation Assist
-                  </Button>
-                }
-              />
-            ) : (
-              <div className="space-y-2">
-                {inspectorEvents.map((e, idx) => {
-                  if (e.type === 'tool_result') {
-                    return (
-                      <TraceRow
-                        key={idx}
-                        agent="inspector"
-                        tool={e.tool}
-                        rows={e.rows}
-                        ms={e.ms}
-                      />
-                    );
-                  }
-                  if (e.type === 'message') {
-                    return (
-                      <div
-                        key={idx}
-                        className="p-3 rounded-lg bg-surface-2 border-l-2 border-inspector text-xs text-text-primary leading-relaxed"
-                      >
-                        {e.text}
-                      </div>
-                    );
-                  }
-                  if (e.type === 'flag') {
-                    return (
-                      <div
-                        key={idx}
-                        className="p-2.5 rounded-lg bg-surface-2 border border-border flex items-center justify-between gap-2"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Stamp status="contradiction" label={e.kind} />
-                          <span className="text-xs text-text-secondary">{e.note}</span>
-                        </div>
-                      </div>
-                    );
-                  }
-                  if (e.type === 'hypothesis') {
-                    return (
-                      <div
-                        key={idx}
-                        className="p-3 rounded-lg bg-surface-3 border border-inspector/50 space-y-1"
-                      >
-                        <div className="flex items-center justify-between text-xs font-mono text-inspector">
-                          <span>Hypothesis ({Math.round(e.confidence * 100)}% confidence)</span>
-                        </div>
-                        <p className="text-xs text-text-primary">{e.text}</p>
-                      </div>
-                    );
-                  }
-                  return null;
-                })}
-              </div>
-            )}
+            {/* Hero Inspector Panel Component */}
+            <InspectorPanel />
           </div>
         )}
 

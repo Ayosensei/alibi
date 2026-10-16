@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { TimelineGrid } from '@/components/timeline/TimelineGrid';
 import { EvidenceBoard } from '@/components/board/EvidenceBoard';
+import { InspectorPanel } from '@/components/inspector/InspectorPanel';
 import { useGameStore } from '@/lib/store';
 
 const COLOR_CLASSES: Record<keyof typeof colors, { bg: string; text: string; border?: string }> = {
@@ -451,6 +452,23 @@ export default function StyleguidePage() {
         {/* Live EvidenceBoard Component */}
         <div className="p-4 rounded-xl bg-surface-1 border border-border shadow-card">
           <EvidenceBoard />
+        </div>
+      </section>
+
+      {/* 12. AI Inspector Reasoning Panel */}
+      <section className="space-y-6">
+        <div className="space-y-1">
+          <div className="font-mono text-xs text-brass uppercase tracking-wider">AI Copilot Feed</div>
+          <h2 className="font-serif text-2xl font-semibold">AI Inspector Reasoning Stream</h2>
+          <p className="text-text-secondary text-sm max-w-2xl">
+            Streams real-time SSE tool calls, result rows, flags, hypotheses, and narrative conclusions.
+            Supports deterministic assist, live cold case re-execution, and accusation pre-fill.
+          </p>
+        </div>
+
+        {/* Live InspectorPanel Component */}
+        <div className="p-4 rounded-xl bg-surface-1 border border-border shadow-card">
+          <InspectorPanel />
         </div>
       </section>
     </div>

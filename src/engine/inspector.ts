@@ -417,6 +417,7 @@ export async function runInspector(
           hypothesisId: res.data.hypothesisId,
           text: args.text,
           confidence: args.confidence,
+          person: args.person,
         });
       }
     }
