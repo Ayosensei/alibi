@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { EmptyState, TraceRow, Stamp, Chip } from '@/components/atoms';
 import { useGameStore } from '@/lib/store';
+import { cn } from '@/lib/utils';
 import {
   Sparkles,
   HelpCircle,
@@ -16,7 +17,19 @@ import {
   ShieldCheck,
   History,
   Scale,
+  Database,
 } from 'lucide-react';
+
+const TOOL_FRIENDLY_NAMES: Record<string, string> = {
+  findContradictions: 'Contradiction Detection',
+  checkFeasibility: 'Travel Alibi Validation',
+  findRehearsedAlibis: 'Rehearsed Story Scan',
+  findImpossibleMoves: 'Impossible Journeys Check',
+  whoCouldHave: 'Candidate Elimination',
+  motivePaths: 'Motive Chain Traversal',
+  alibiSupport: 'Witness Reliability Check',
+  getBoard: 'Case Board Sync',
+};
 
 export function InspectorPanel() {
   const {
@@ -29,6 +42,7 @@ export function InspectorPanel() {
     setPrefilledAccused,
   } = useGameStore();
 
+  const [viewMode, setViewMode] = React.useState<'detective' | 'judge'>('detective');
   const [selectedSuspectId, setSelectedSuspectId] = React.useState<string | null>(null);
   const [isPickerOpen, setIsPickerOpen] = React.useState(false);
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -85,12 +99,45 @@ export function InspectorPanel() {
             )}
           </div>
 
-          {isInspectorStreaming && (
-            <div className="flex items-center gap-1.5 font-mono text-xs text-inspector animate-pulse">
-              <Loader2 className="size-3 animate-spin" />
-              <span>Querying graph...</span>
+          <div className="flex items-center gap-2">
+            {isInspectorStreaming && (
+              <div className="flex items-center gap-1.5 font-mono text-xs text-inspector animate-pulse">
+                <Loader2 className="size-3 animate-spin" />
+                <span className="hidden sm:inline">Querying graph...</span>
+              </div>
+            )}
+
+            {/* View Mode Switcher */}
+            <div className="flex items-center rounded-lg bg-surface-3 p-0.5 border border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setViewMode('detective')}
+                className={cn(
+                  'h-6 px-2.5 rounded-md text-xs font-mono transition-colors',
+                  viewMode === 'detective'
+                    ? 'bg-surface-1 text-text-primary shadow-xs font-medium'
+                    : 'text-text-tertiary hover:text-text-primary'
+                )}
+              >
+                Detective
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setViewMode('judge')}
+                className={cn(
+                  'h-6 px-2.5 rounded-md text-xs font-mono transition-colors flex items-center gap-1',
+                  viewMode === 'judge'
+                    ? 'bg-surface-1 text-inspector shadow-xs font-medium'
+                    : 'text-text-tertiary hover:text-text-primary'
+                )}
+              >
+                <Database className="size-3" />
+                Cypher Trace
+              </Button>
             </div>
-          )}
+          </div>
         </div>
 
         {/* Action Button Row */}
@@ -199,27 +246,115 @@ export function InspectorPanel() {
           inspectorEvents.map((e, idx) => {
             // 1. Tool Call
             if (e.type === 'tool_call') {
+              if (viewMode === 'detective') {
+                // If it's the latest event and inspector is streaming, show an active scanning indicator
+                if (isInspectorStreaming && idx === inspectorEvents.length - 1) {
+                  return (
+                    <div
+                      key={idx}
+                      className="p-2.5 rounded-lg bg-surface-2 border border-border flex items-center gap-2 text-xs font-mono text-inspector animate-pulse"
+                    >
+                      <Loader2 className="size-3 animate-spin" />
+                      <span>
+                        Scanning graph: {TOOL_FRIENDLY_NAMES[e.tool] ?? e.tool}...
+                      </span>
+                    </div>
+                  );
+                }
+                return null;
+              }
+
+              // In Judge mode, show the full technical tool call
               return (
                 <div
                   key={idx}
                   className="p-2.5 rounded-lg bg-surface-2 border border-border/80 flex items-center justify-between text-xs font-mono"
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="size-2 rounded-full bg-inspector" />
-                    <span className="text-text-primary font-semibold">{e.tool}</span>
-                    <span className="text-text-tertiary truncate max-w-xs">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="size-2 rounded-full bg-inspector shrink-0" />
+                    <span className="text-text-primary font-semibold shrink-0">{e.tool}</span>
+                    <span className="text-text-tertiary truncate">
                       {JSON.stringify(e.args)}
                     </span>
                   </div>
-                  <span className="text-text-tertiary text-xs">calling...</span>
+                  <span className="text-text-tertiary text-xs shrink-0 pl-2">calling...</span>
                 </div>
               );
             }
 
             // 2. Tool Result Trace Row
             if (e.type === 'tool_result') {
+              const friendlyName = TOOL_FRIENDLY_NAMES[e.tool] ?? e.tool;
+
+              if (viewMode === 'detective') {
+                return (
+                  <details
+                    key={idx}
+                    className="group rounded-lg border border-border bg-surface-2 overflow-hidden text-xs select-none"
+                  >
+                    <summary className="flex items-center justify-between px-3 py-2 cursor-pointer list-none hover:bg-surface-3 transition-colors">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Database className="size-3 text-inspector shrink-0" />
+                        <span className="font-semibold text-text-primary truncate">
+                          {friendlyName}
+                        </span>
+                        {e.summary && (
+                          <span className="text-text-tertiary truncate hidden sm:inline">
+                            — {e.summary}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="font-mono text-xs text-text-tertiary tabular-nums">
+                          {e.rows} {e.rows === 1 ? 'row' : 'rows'} · {e.ms.toFixed(1)}ms
+                        </span>
+                        <span className="font-mono text-xs text-inspector group-open:rotate-180 transition-transform">
+                          ▾
+                        </span>
+                      </div>
+                    </summary>
+                    <div className="p-3 border-t border-border bg-surface-1 space-y-2 select-text">
+                      <TraceRow
+                        agent="inspector"
+                        tool={e.tool}
+                        rows={e.rows}
+                        ms={e.ms}
+                      />
+                      {e.summary && (
+                        <p className="font-mono text-xs text-text-secondary pl-2 border-l-2 border-inspector">
+                          {e.summary}
+                        </p>
+                      )}
+                      {e.highlight && e.highlight.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                          <span className="font-mono text-xs text-text-tertiary">Entities:</span>
+                          {e.highlight.map((h, hIdx) => (
+                            <span
+                              key={hIdx}
+                              className="font-mono text-xs px-2 py-0.5 rounded bg-surface-3 text-brass border border-border"
+                            >
+                              {h}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </details>
+                );
+              }
+
+              // In Judge mode, display full graph read details
               return (
-                <div key={idx} className="space-y-1">
+                <div key={idx} className="space-y-1.5 p-3 rounded-lg bg-surface-2 border border-border">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 font-mono text-xs text-inspector">
+                      <Database className="size-3" />
+                      <span className="font-semibold">FalkorDB OpenCypher Read</span>
+                    </div>
+                    <span className="font-mono text-xs px-2 py-0.5 rounded bg-surface-3 text-text-secondary border border-border">
+                      roQuery
+                    </span>
+                  </div>
                   <TraceRow
                     agent="inspector"
                     tool={e.tool}
@@ -227,9 +362,22 @@ export function InspectorPanel() {
                     ms={e.ms}
                   />
                   {e.summary && (
-                    <p className="font-mono text-xs text-text-tertiary pl-4">
+                    <p className="font-mono text-xs text-text-tertiary pl-2 border-l border-inspector/50">
                       ↳ {e.summary}
                     </p>
+                  )}
+                  {e.highlight && e.highlight.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                      <span className="font-mono text-xs text-text-tertiary">Affected Entities:</span>
+                      {e.highlight.map((h, hIdx) => (
+                        <span
+                          key={hIdx}
+                          className="font-mono text-xs px-2 py-0.5 rounded bg-surface-3 text-brass border border-border"
+                        >
+                          {h}
+                        </span>
+                      ))}
+                    </div>
                   )}
                 </div>
               );
@@ -244,7 +392,7 @@ export function InspectorPanel() {
                 >
                   <div className="flex items-center gap-1.5 font-mono text-xs text-inspector font-semibold mb-1">
                     <Sparkles className="size-3" />
-                    Inspector Conclusion
+                    Inspector Deduction
                   </div>
                   <p className="leading-relaxed">{e.text}</p>
                 </div>
@@ -263,7 +411,7 @@ export function InspectorPanel() {
                     <span className="text-xs text-text-secondary">{e.note}</span>
                   </div>
                   <span className="font-mono text-xs text-thread uppercase tracking-wider shrink-0">
-                    Flag Pinned
+                    Flag Pinned to Board
                   </span>
                 </div>
               );
@@ -274,12 +422,12 @@ export function InspectorPanel() {
               return (
                 <div
                   key={idx}
-                  className="p-3.5 rounded-xl bg-surface-2 border border-inspector/60 space-y-2 shadow-card animate-in fade-in"
+                  className="p-3.5 rounded-xl bg-surface-2 border border-inspector/60 space-y-2.5 shadow-card animate-in fade-in"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5 text-xs font-mono text-inspector font-semibold">
                       <Sparkles className="size-3.5" />
-                      <span>Formal Hypothesis</span>
+                      <span>Formal Accusation Hypothesis</span>
                     </div>
                     <span className="font-mono text-xs px-2 py-0.5 rounded-full bg-surface-3 text-text-primary border border-border">
                       {Math.round(e.confidence * 100)}% Confidence
