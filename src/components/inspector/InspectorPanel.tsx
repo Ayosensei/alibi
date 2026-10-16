@@ -169,7 +169,13 @@ export function InspectorPanel() {
       </div>
 
       {/* Events Stream Feed */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 select-text">
+      <div
+        ref={scrollRef}
+        role="region"
+        aria-live="polite"
+        aria-label="AI Inspector Reasoning Stream"
+        className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 select-text"
+      >
         {inspectorEvents.length === 0 ? (
           <div className="h-full flex items-center justify-center">
             <EmptyState

@@ -60,6 +60,15 @@ function PlayPageContent({ level }: { level: string }) {
     );
   }
 
+  React.useEffect(() => {
+    if (isPresentMode) {
+      document.documentElement.classList.add('present-mode');
+      return () => {
+        document.documentElement.classList.remove('present-mode');
+      };
+    }
+  }, [isPresentMode]);
+
   return (
     <div
       className={`min-h-screen flex flex-col bg-background text-text-primary ${
@@ -68,6 +77,11 @@ function PlayPageContent({ level }: { level: string }) {
     >
       {/* 56px Header */}
       <CaseHeader />
+
+      {/* Screen size recommendation notice */}
+      <div className="xl:hidden py-1 px-4 bg-surface-2 border-b border-border text-center text-xs font-mono text-text-secondary">
+        Best on a larger screen (1440×900 or 1920×1080)
+      </div>
 
       {/* Main 3-Column Layout */}
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-[calc(100vh-3.5rem)]">

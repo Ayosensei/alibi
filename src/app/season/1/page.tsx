@@ -57,10 +57,25 @@ const CASES: CaseMeta[] = [
   },
 ];
 
-export default function Season1Page() {
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+
+function Season1Content() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isPresentMode = searchParams.get('present') === '1';
+
   const { progress } = useGameStore();
   const [skipLock, setSkipLock] = React.useState(false);
+
+  React.useEffect(() => {
+    if (isPresentMode) {
+      document.documentElement.classList.add('present-mode');
+      return () => {
+        document.documentElement.classList.remove('present-mode');
+      };
+    }
+  }, [isPresentMode]);
 
   const isUnlocked = (lvlIndex: number) => {
     if (skipLock) return true;
@@ -70,12 +85,15 @@ export default function Season1Page() {
   };
 
   const handlePlay = (caseId: string, cold = false) => {
-    const url = cold ? `/play/${caseId}?mode=cold_case` : `/play/${caseId}`;
-    router.push(url);
+    const query = new URLSearchParams();
+    if (cold) query.set('mode', 'cold_case');
+    if (isPresentMode) query.set('present', '1');
+    const qStr = query.toString() ? `?${query.toString()}` : '';
+    router.push(`/play/${caseId}${qStr}`);
   };
 
   return (
-    <div className="min-h-screen bg-background text-text-primary p-6 md:p-12 max-w-6xl mx-auto space-y-12">
+    <div className={`min-h-screen bg-background text-text-primary p-6 md:p-12 max-w-6xl mx-auto space-y-12 ${isPresentMode ? 'text-lg' : ''}`}>
       {/* Header */}
       <header className="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-border pb-6 gap-4">
         <div className="space-y-1.5">
@@ -90,18 +108,20 @@ export default function Season1Page() {
           </p>
         </div>
 
-        {/* Dev Mode Skip Toggle */}
-        <div className="flex items-center gap-2 p-2 rounded-lg bg-surface-2 border border-border text-xs text-text-secondary">
-          <label className="flex items-center gap-2 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={skipLock}
-              onChange={(e) => setSkipLock(e.target.checked)}
-              className="rounded border-border text-primary focus:ring-thread accent-primary"
-            />
-            <span>Skip locks (Dev)</span>
-          </label>
-        </div>
+        {/* Dev Mode Skip Toggle (Hidden in Present Mode) */}
+        {!isPresentMode && (
+          <div className="flex items-center gap-2 p-2 rounded-lg bg-surface-2 border border-border text-xs text-text-secondary">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={skipLock}
+                onChange={(e) => setSkipLock(e.target.checked)}
+                className="rounded border-border text-primary focus:ring-thread accent-primary"
+              />
+              <span>Skip locks (Dev)</span>
+            </label>
+          </div>
+        )}
       </header>
 
       {/* Case Folders Grid */}
@@ -248,5 +268,13 @@ export default function Season1Page() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function Season1Page() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+      <Season1Content />
+    </Suspense>
   );
 }

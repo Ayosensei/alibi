@@ -95,3 +95,18 @@
 .shadow-thread-glow {
   box-shadow: 0 0 0 1px rgba(255, 122, 112, 0.4), 0 0 32px -6px rgba(255, 122, 112, 0.35);
 }
+
+/* Present mode scaling per docs/07-ui-spec.md */
+html.present-mode {
+  font-size: 115%;
+}
+
+/* Reduced motion preference per DESIGN.md */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

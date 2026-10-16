@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { use, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Stamp, Chip, Polaroid } from '@/components/atoms';
 import { useGameStore } from '@/lib/store';
@@ -15,7 +15,7 @@ import {
   ArrowRight,
   ArrowLeft,
   ShieldCheck,
-  Skull,
+  ShieldAlert,
   Crosshair,
   Sparkles,
   Search,
@@ -77,12 +77,25 @@ const DEFAULT_DEMO_VERDICT: AccuseOutput = {
 
 function VerdictContent({ level }: { level: string }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isPresentMode = searchParams.get('present') === '1';
+
   const { caseData, initCase, lastVerdict } = useGameStore();
 
   const [verdictData, setVerdictData] = React.useState<AccuseOutput>(
     () => lastVerdict ?? DEFAULT_DEMO_VERDICT
   );
   const [activeStepIndex, setActiveStepIndex] = React.useState<number>(0);
+
+  // Present mode class toggle
+  React.useEffect(() => {
+    if (isPresentMode) {
+      document.documentElement.classList.add('present-mode');
+      return () => {
+        document.documentElement.classList.remove('present-mode');
+      };
+    }
+  }, [isPresentMode]);
 
   // Initialize case data if needed
   React.useEffect(() => {
@@ -120,7 +133,11 @@ function VerdictContent({ level }: { level: string }) {
       .join(', ') ?? 'Conspirators Unrevealed';
 
   return (
-    <div className="min-h-screen bg-background text-text-primary p-4 md:p-8 lg:p-12 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-300">
+    <div
+      className={`min-h-screen bg-background text-text-primary p-4 md:p-8 lg:p-12 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-300 ${
+        isPresentMode ? 'text-lg' : ''
+      }`}
+    >
       {/* Top Bar Navigation & Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-border pb-6">
         <div className="flex items-center gap-3">
@@ -327,7 +344,7 @@ function VerdictContent({ level }: { level: string }) {
             <div className="p-5 rounded-xl bg-surface-2 border border-brass/50 shadow-card space-y-4">
               <div className="flex items-center justify-between border-b border-border/80 pb-3">
                 <div className="flex items-center gap-2 text-brass">
-                  <Skull className="size-4" />
+                  <ShieldAlert className="size-4" />
                   <span className="font-mono text-xs uppercase tracking-widest font-semibold">
                     Ground Truth Revealed
                   </span>

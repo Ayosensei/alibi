@@ -609,6 +609,62 @@ export default function StyleguidePage() {
           </div>
         </div>
       </section>
+
+      {/* 15. Accessibility, States, & Present Mode (Task U7) */}
+      <section className="space-y-6">
+        <div className="space-y-1">
+          <div className="font-mono text-xs text-brass uppercase tracking-wider">Quality & Ergonomics</div>
+          <h2 className="font-serif text-2xl font-semibold">Accessibility & Present Mode (Task U7)</h2>
+          <p className="text-text-secondary text-sm max-w-2xl">
+            Strict WCAG 2.1 AA text contrast (4.5:1+), visible 2px thread focus indicators, aria-live stream regions, and 1.15 font scaling for recording.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Focus Ring Specimen */}
+          <div className="p-5 rounded-xl bg-surface-1 border border-border shadow-card space-y-3">
+            <span className="font-mono text-xs uppercase tracking-wider text-thread block">
+              2px Thread Focus Ring
+            </span>
+            <p className="text-xs text-text-secondary">
+              Interactive controls feature high-contrast keyboard navigation rings with 2px offset.
+            </p>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="ring-2 ring-thread ring-offset-2 ring-offset-background"
+            >
+              Focused Control Specimen
+            </Button>
+          </div>
+
+          {/* Present Mode Feature */}
+          <div className="p-5 rounded-xl bg-surface-1 border border-border shadow-card space-y-3">
+            <span className="font-mono text-xs uppercase tracking-wider text-brass block">
+              Present Mode (?present=1)
+            </span>
+            <p className="text-xs text-text-secondary">
+              Recording mode scales the root font by 1.15×, hides development toggles, and maximizes label legibility.
+            </p>
+            <div className="font-mono text-xs px-2.5 py-1 rounded bg-surface-2 border border-border text-brass inline-block">
+              HTML.present-mode font-size: 115%
+            </div>
+          </div>
+
+          {/* Screen Size Adaptability */}
+          <div className="p-5 rounded-xl bg-surface-1 border border-border shadow-card space-y-3">
+            <span className="font-mono text-xs uppercase tracking-wider text-inspector block">
+              Responsive Breakpoints
+            </span>
+            <p className="text-xs text-text-secondary">
+              Targeted for 1920×1080 and 1440×900 display viewports with graceful stacking below 1180px.
+            </p>
+            <div className="font-mono text-xs text-text-tertiary">
+              Target: 1440×900 / 1920×1080
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
