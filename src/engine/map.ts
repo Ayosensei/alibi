@@ -52,28 +52,36 @@ export function buildAdjacency(
   return adj;
 }
 
-export function dist(adj: Map<string, string[]>, from: string, to: string): number {
-  if (from === to) return 0;
+export function shortestPath(
+  adj: Map<string, string[]>,
+  from: string,
+  to: string
+): { distance: number; path: string[] } {
+  if (from === to) return { distance: 0, path: [from] };
   const seen = new Set<string>([from]);
-  let frontier = [from];
+  let frontier: Array<{ node: string; path: string[] }> = [{ node: from, path: [from] }];
   let d = 0;
 
   while (frontier.length > 0) {
     d++;
-    const next: string[] = [];
-    for (const n of frontier) {
-      for (const m of adj.get(n) ?? []) {
-        if (m === to) return d;
+    const next: Array<{ node: string; path: string[] }> = [];
+    for (const item of frontier) {
+      for (const m of adj.get(item.node) ?? []) {
+        if (m === to) return { distance: d, path: [...item.path, m] };
         if (!seen.has(m)) {
           seen.add(m);
-          next.push(m);
+          next.push({ node: m, path: [...item.path, m] });
         }
       }
     }
     frontier = next;
   }
 
-  return Infinity;
+  return { distance: Infinity, path: [] };
+}
+
+export function dist(adj: Map<string, string[]>, from: string, to: string): number {
+  return shortestPath(adj, from, to).distance;
 }
 
 export function checkFeasibility(
@@ -94,7 +102,7 @@ export function checkFeasibility(
   }
 
   for (const a of hardAnchors.filter((x) => x.subject === person)) {
-    const d = dist(adj, a.room, room);
+    const { distance: d, path } = shortestPath(adj, a.room, room);
     const available = Math.abs(slot - a.slot);
     if (d > available) {
       violations.push({
@@ -103,6 +111,7 @@ export function checkFeasibility(
         room: a.room,
         needed: d,
         available,
+        path,
       });
     }
   }
