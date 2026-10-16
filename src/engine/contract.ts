@@ -87,6 +87,16 @@ export const TOOLS = {
       evidence: z.array(
         z.object({ id: z.string(), room: RoomId, title: z.string(), text: z.string() })
       ),
+      hardAnchors: z
+        .array(
+          z.object({
+            src: z.string(),
+            subject: PersonId,
+            slot: Slot,
+            room: RoomId,
+          })
+        )
+        .optional(),
       flags: z.array(
         z.object({
           id: z.string(),

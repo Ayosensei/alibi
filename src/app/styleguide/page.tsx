@@ -21,7 +21,11 @@ import {
   Feather,
   Pin,
   Sparkles,
+  CheckCircle,
+  ArrowRight,
 } from 'lucide-react';
+import { TimelineGrid } from '@/components/timeline/TimelineGrid';
+import { useGameStore } from '@/lib/store';
 
 const COLOR_CLASSES: Record<keyof typeof colors, { bg: string; text: string; border?: string }> = {
   background: { bg: 'bg-background', text: 'text-text-primary', border: 'border-border' },
@@ -53,6 +57,14 @@ const COLOR_CLASSES: Record<keyof typeof colors, { bg: string; text: string; bor
 };
 
 export default function StyleguidePage() {
+  const { caseData, initCase } = useGameStore();
+
+  React.useEffect(() => {
+    if (!caseData) {
+      initCase('l1-quiet-pact');
+    }
+  }, [caseData, initCase]);
+
   return (
     <div className="min-h-screen bg-background text-text-primary p-8 md:p-12 lg:p-16 max-w-7xl mx-auto space-y-16">
       {/* Header */}
@@ -363,6 +375,64 @@ export default function StyleguidePage() {
             rows={3}
             ms={2.1}
           />
+        </div>
+      </section>
+
+      {/* 10. Timeline Grid & Hero Screen Primitives */}
+      <section className="space-y-6">
+        <div className="space-y-1">
+          <div className="font-mono text-xs text-brass uppercase tracking-wider">Hero Screen</div>
+          <h2 className="font-serif text-2xl font-semibold">Chronological Timeline Grid</h2>
+          <p className="text-text-secondary text-sm max-w-2xl">
+            Cross-references statements and hard exhibits over 8 slots. Flags contradictory rooms with a
+            thread ring, highlights rehearsed alibis with brass brackets, and displays cleared suspect badges.
+          </p>
+        </div>
+
+        {/* Specimen Showcase */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-6 rounded-xl bg-surface-1 border border-border shadow-card">
+          <div className="space-y-2 p-3 rounded-lg bg-surface-2 border border-border">
+            <span className="font-mono text-xs text-text-tertiary uppercase block">Soft Statement</span>
+            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-paper text-ink border border-ink/20 shadow-xs font-mono text-xs">
+              <Feather className="size-3 text-ink/70" />
+              <span>Green room</span>
+            </div>
+          </div>
+
+          <div className="space-y-2 p-3 rounded-lg bg-surface-2 border border-border">
+            <span className="font-mono text-xs text-text-tertiary uppercase block">Hard Evidence</span>
+            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-3 text-text-primary border border-border shadow-xs font-mono text-xs">
+              <Pin className="size-3 text-brass" />
+              <span>Prop store (E1)</span>
+            </div>
+          </div>
+
+          <div className="space-y-2 p-3 rounded-lg bg-surface-2 border border-border">
+            <span className="font-mono text-xs text-text-tertiary uppercase block">Inferred Single Survivor</span>
+            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-inspector/15 text-inspector border border-dashed border-inspector/60 font-mono text-xs">
+              <Sparkles className="size-3 text-inspector" />
+              <span>Study (Inferred)</span>
+            </div>
+          </div>
+
+          <div className="space-y-2 p-3 rounded-lg bg-surface-2 border border-border">
+            <span className="font-mono text-xs text-text-tertiary uppercase block">Row Status Badges</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-mono font-medium bg-success/15 text-status-cleared border border-status-cleared/30">
+                <CheckCircle className="size-3" />
+                Cleared
+              </span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-mono font-medium bg-surface-3 text-text-tertiary border border-border">
+                <HelpCircle className="size-3" />
+                Unclear
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Live TimelineGrid Component */}
+        <div className="p-6 rounded-xl bg-surface-1 border border-border shadow-card">
+          <TimelineGrid />
         </div>
       </section>
     </div>

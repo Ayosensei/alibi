@@ -8,6 +8,7 @@ import { calculateWindow } from './search';
 import {
   Q21_get_tick,
   Q58_searched_rooms,
+  Q66b_all_hard_anchors,
   Q84a_get_statements,
   Q84b_get_evidence,
   Q84c_get_flags,
@@ -105,6 +106,14 @@ export async function getBoard(input: GetBoardInput): Promise<Envelope<GetBoardO
   });
   if (evRes.step) trace.push(evRes.step);
 
+  // Hard Anchors
+  const anchorsRes = await ro<{ src: string; subject: string; slot: number; room: string }>({
+    graphName: playGraph,
+    query: Q66b_all_hard_anchors,
+    traceCtx: { agent: 'engine', tool: 'getBoard', queryId: 'Q66b_all_hard_anchors' },
+  });
+  if (anchorsRes.step) trace.push(anchorsRes.step);
+
   // Flags
   const flagsRes = await ro<{
     id: string;
@@ -190,6 +199,7 @@ export async function getBoard(input: GetBoardInput): Promise<Envelope<GetBoardO
       window,
       statements,
       evidence: evRes.data,
+      hardAnchors: anchorsRes.data,
       flags: flagsRes.data,
       hypotheses,
       knownRelations: relRes.data,

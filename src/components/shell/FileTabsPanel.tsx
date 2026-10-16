@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Chip, Stamp, EmptyState, TraceRow } from '@/components/atoms';
+import { TimelineGrid } from '@/components/timeline/TimelineGrid';
 import { useGameStore } from '@/lib/store';
 import {
   CalendarDays,
@@ -131,44 +132,8 @@ export function FileTabsPanel() {
               </div>
             </div>
 
-            {/* Empty or Loaded state guidance */}
-            {(board?.statements.length ?? 0) === 0 ? (
-              <EmptyState
-                titlePrefix="Ask someone where they "
-                titleItalic="were"
-                titleSuffix="."
-                description="The timeline populates as suspects make location assertions and evidence is gathered."
-                icon={<Clock className="size-6 text-text-tertiary" />}
-              />
-            ) : (
-              <div className="space-y-2">
-                <span className="font-mono text-xs text-text-tertiary uppercase tracking-wider block">
-                  Discovered Statements ({board?.statements.length})
-                </span>
-                <div className="space-y-1.5">
-                  {board?.statements.map((stmt) => (
-                    <div
-                      key={stmt.id}
-                      className="p-2.5 rounded-lg bg-surface-2 border border-border/80 flex items-start justify-between gap-3 text-xs"
-                    >
-                      <div className="space-y-0.5 min-w-0">
-                        <span className="font-semibold text-text-primary capitalize block">
-                          {stmt.by}: "{stmt.text}"
-                        </span>
-                        {stmt.room && stmt.slot && (
-                          <span className="font-mono text-xs text-text-tertiary block">
-                            Room: {stmt.room.replace(/_/g, ' ')} · Slot {stmt.slot}
-                          </span>
-                        )}
-                      </div>
-                      <span className="font-mono text-xs text-brass shrink-0">
-                        Tick {stmt.tick}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Hero Timeline Grid */}
+            <TimelineGrid />
           </div>
         )}
 

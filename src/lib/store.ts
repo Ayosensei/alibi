@@ -40,6 +40,7 @@ export interface GameState {
   contradictions: ContradictionsOutput['pairs'];
   rehearsed: RehearsedOutput['groups'];
   impossible: ImpossibleMovesOutput['moves'];
+  clearedSuspects: Record<string, boolean>;
   isLoading: boolean;
   error: string | null;
 
@@ -107,6 +108,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   contradictions: [],
   rehearsed: [],
   impossible: [],
+  clearedSuspects: {},
   isLoading: false,
   error: null,
 
@@ -168,7 +170,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   refreshBoard: async () => {
-    const { playerId, caseId } = get();
+    const { playerId, caseId, caseData } = get();
     const [boardRes, contraRes, rehRes, impRes] = await Promise.all([
       api.getBoard(playerId, caseId),
       api.findContradictions(playerId, caseId),
@@ -176,11 +178,42 @@ export const useGameStore = create<GameState>((set, get) => ({
       api.findImpossibleMoves(playerId, caseId),
     ]);
 
+    let clearedSuspects: Record<string, boolean> = {};
+    if (caseData) {
+      const activeWindow =
+        boardRes.ok && boardRes.data.window && boardRes.data.window.length > 0
+          ? boardRes.data.window
+          : caseData.publicWindow ?? [4, 5];
+      const targetSlot = activeWindow[0];
+      const crimeScene = caseData.crimeScene;
+
+      const suspects = caseData.people.filter((p) => !p.victim);
+      const feasChecks = await Promise.all(
+        suspects.map(async (s) => {
+          const res = await api.checkFeasibility(
+            playerId,
+            caseId,
+            s.id,
+            targetSlot,
+            crimeScene
+          );
+          return {
+            id: s.id,
+            cleared: res.ok ? !res.data.feasible : false,
+          };
+        })
+      );
+      clearedSuspects = Object.fromEntries(
+        feasChecks.map((f) => [f.id, f.cleared])
+      );
+    }
+
     set({
       board: boardRes.ok ? boardRes.data : null,
       contradictions: contraRes.ok ? contraRes.data.pairs : [],
       rehearsed: rehRes.ok ? rehRes.data.groups : [],
       impossible: impRes.ok ? impRes.data.moves : [],
+      clearedSuspects,
     });
   },
 
