@@ -1,0 +1,105 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --color-background: #0a0908;
+  --color-surface-1: #110f0d;
+  --color-surface-2: #181513;
+  --color-surface-3: #211d1a;
+  --color-border: #2b2622;
+  --color-border-strong: #3a332d;
+  --color-text-primary: #f3eee6;
+  --color-text-secondary: #b3aa9e;
+  --color-text-tertiary: #968d81;
+  --color-primary: #d13636;
+  --color-primary-hover: #e24a4a;
+  --color-primary-pressed: #b82c2c;
+  --color-on-primary: #ffffff;
+  --color-thread: #ff7a70;
+  --color-brass: #c9a45c;
+  --color-on-brass: #1a1405;
+  --color-paper: #e9e1d3;
+  --color-ink: #1b1713;
+  --color-inspector: #86b6c9;
+  --color-danger: #f2555a;
+  --color-success: #5ccb8b;
+  --color-status-contradiction: #ff7a70;
+  --color-status-rehearsed: #c9a45c;
+  --color-status-impossible: #e58f3a;
+  --color-status-cleared: #5ccb8b;
+  --color-status-inferred: #86b6c9;
+
+  --font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --font-sans: var(--font-inter), "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-mono), "IBM Plex Mono", Menlo, Monaco, Consolas, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 48px;
+  --spacing-4xl: 64px;
+}
+
+:root {
+  --background: #0a0908;
+  --foreground: #f3eee6;
+  --card: #181513;
+  --card-foreground: #f3eee6;
+  --popover: #211d1a;
+  --popover-foreground: #f3eee6;
+  --primary: #d13636;
+  --primary-foreground: #ffffff;
+  --secondary: #211d1a;
+  --secondary-foreground: #f3eee6;
+  --muted: #181513;
+  --muted-foreground: #b3aa9e;
+  --accent: #211d1a;
+  --accent-foreground: #f3eee6;
+  --destructive: #f2555a;
+  --destructive-foreground: #ffffff;
+  --border: #2b2622;
+  --input: #2b2622;
+  --ring: #ff7a70;
+  --radius: 10px;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background-color: #0a0908;
+    color: #f3eee6;
+    font-family: var(--font-sans);
+    background-image: radial-gradient(circle at 0% 0%, rgba(209, 54, 54, 0.05), transparent 45%);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Custom shadows per DESIGN.md */
+.shadow-card {
+  box-shadow: 0 0 0 1px rgba(243, 238, 230, 0.06), 0 1px 1px rgba(0, 0, 0, 0.5), 0 12px 32px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(243, 238, 230, 0.04);
+}
+
+.shadow-polaroid {
+  box-shadow: 0 0 0 1px rgba(243, 238, 230, 0.06), 0 1px 1px rgba(0, 0, 0, 0.5), 0 18px 28px -14px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(243, 238, 230, 0.04);
+}
+
+.shadow-floating {
+  box-shadow: 0 0 0 1px rgba(243, 238, 230, 0.10), 0 8px 24px -4px rgba(0, 0, 0, 0.8);
+}
+
+.shadow-thread-glow {
+  box-shadow: 0 0 0 1px rgba(255, 122, 112, 0.4), 0 0 32px -6px rgba(255, 122, 112, 0.35);
+}

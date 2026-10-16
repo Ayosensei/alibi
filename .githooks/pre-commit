@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+pnpm -s typecheck
+if [ -f scripts/check-design.mjs ]; then node scripts/check-design.mjs; fi
+# validate cases when they change
+if git diff --cached --name-only | grep -q '^cases/'; then node scripts/validate-cases.mjs cases; fi
+# lint the design system when DESIGN.md changes (needs network the first time)
+if git diff --cached --name-only | grep -qx 'DESIGN.md'; then npx -y @google/design.md lint DESIGN.md; fi
+# block obvious secrets in staged changes
+if git diff --cached -U0 -- ':(exclude).githooks/*' | grep -E 'AIza[0-9A-Za-z_-]{20,}|FALKORDB_PASSWORD=\S+|GEMINI_API_KEY=\S+' >/dev/null; then
+  echo "Possible secret staged. Remove it and use .env."; exit 1
+fi

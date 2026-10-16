@@ -1,0 +1,261 @@
+{
+  "caseId": "l1-quiet-pact",
+  "label": "Recorded run, re-executed live against the graph",
+  "board": {
+    "claims": [
+      "c1_dee_loc5",
+      "c1_dee_saw_kofi",
+      "c1_dee_saw_hana",
+      "c1_dee_loc3",
+      "c1_dee_rel",
+      "c1_dee_fact",
+      "c1_kofi_loc5",
+      "c1_kofi_saw_dee",
+      "c1_kofi_saw_hana",
+      "c1_kofi_loc2",
+      "c1_kofi_rel",
+      "c1_hana_loc5",
+      "c1_hana_saw_dee",
+      "c1_hana_saw_kofi",
+      "c1_hana_loc2",
+      "c1_hana_rel",
+      "c1_okoye_loc4",
+      "c1_okoye_loc6",
+      "c1_okoye_saw_walter",
+      "c1_okoye_rel"
+    ],
+    "evidence": [
+      "e1_doorlog",
+      "e1_till",
+      "e1_lamp"
+    ]
+  },
+  "steps": [
+    {
+      "tool": "getBoard",
+      "args": {},
+      "say": "Let me see what the Consultant has gathered so far."
+    },
+    {
+      "tool": "findContradictions",
+      "args": {},
+      "say": "Looking for statements that cannot both be true. I find 9."
+    },
+    {
+      "tool": "findRehearsedAlibis",
+      "args": {},
+      "say": "Some alibis share identical details. That is rehearsal, not memory."
+    },
+    {
+      "tool": "findImpossibleMoves",
+      "args": {},
+      "say": "Nobody has to teleport."
+    },
+    {
+      "tool": "checkFeasibility",
+      "args": {
+        "person": "dee",
+        "slot": 5,
+        "room": "prop_store"
+      },
+      "say": "Could Dee Marsh have been in the crime scene at the window slot?"
+    },
+    {
+      "tool": "checkFeasibility",
+      "args": {
+        "person": "kofi",
+        "slot": 5,
+        "room": "prop_store"
+      },
+      "say": "Could Kofi Mensah have been in the crime scene at the window slot?"
+    },
+    {
+      "tool": "checkFeasibility",
+      "args": {
+        "person": "hana",
+        "slot": 5,
+        "room": "prop_store"
+      },
+      "say": "Could Hana Petrov have been in the crime scene at the window slot?"
+    },
+    {
+      "tool": "checkFeasibility",
+      "args": {
+        "person": "okoye",
+        "slot": 5,
+        "room": "prop_store"
+      },
+      "say": "Could Mr. Okoye have been in the crime scene at the window slot?"
+    },
+    {
+      "tool": "alibiSupport",
+      "args": {
+        "person": "dee",
+        "slot": 5
+      },
+      "say": "Who vouches for Dee Marsh at slot 5, and can they be trusted?"
+    },
+    {
+      "tool": "alibiSupport",
+      "args": {
+        "person": "kofi",
+        "slot": 5
+      },
+      "say": "Who vouches for Kofi Mensah at slot 5, and can they be trusted?"
+    },
+    {
+      "tool": "alibiSupport",
+      "args": {
+        "person": "hana",
+        "slot": 5
+      },
+      "say": "Who vouches for Hana Petrov at slot 5, and can they be trusted?"
+    },
+    {
+      "tool": "motivePaths",
+      "args": {
+        "person": "dee"
+      },
+      "say": "Does Dee Marsh have a known path to Walter Ames?"
+    },
+    {
+      "tool": "motivePaths",
+      "args": {
+        "person": "kofi"
+      },
+      "say": "Does Kofi Mensah have a known path to Walter Ames?"
+    },
+    {
+      "tool": "motivePaths",
+      "args": {
+        "person": "hana"
+      },
+      "say": "Does Hana Petrov have a known path to Walter Ames?"
+    }
+  ],
+  "expect": {
+    "caseId": "l1-quiet-pact",
+    "window": [
+      5
+    ],
+    "crimeScene": "prop_store",
+    "contradictions": [
+      [
+        "c1_dee_loc5",
+        "e1_doorlog"
+      ],
+      [
+        "c1_dee_saw_kofi",
+        "e1_doorlog"
+      ],
+      [
+        "c1_dee_saw_hana",
+        "e1_doorlog"
+      ],
+      [
+        "c1_kofi_loc5",
+        "e1_doorlog"
+      ],
+      [
+        "c1_kofi_saw_dee",
+        "e1_doorlog"
+      ],
+      [
+        "c1_kofi_saw_hana",
+        "e1_doorlog"
+      ],
+      [
+        "c1_hana_loc5",
+        "e1_doorlog"
+      ],
+      [
+        "c1_hana_saw_dee",
+        "e1_doorlog"
+      ],
+      [
+        "c1_hana_saw_kofi",
+        "e1_doorlog"
+      ]
+    ],
+    "rehearsed": [
+      [
+        "c1_dee_loc5",
+        "c1_hana_loc5",
+        "c1_kofi_loc5"
+      ]
+    ],
+    "impossible": [],
+    "feasibility": {
+      "dee": true,
+      "kofi": true,
+      "hana": true,
+      "okoye": false
+    },
+    "acts": {},
+    "inferred": [],
+    "alibiSupport": {
+      "dee@5": {
+        "claimed": "green_room",
+        "supporters": [
+          {
+            "by": "kofi",
+            "claim": "c1_kofi_saw_dee",
+            "reliable": false
+          },
+          {
+            "by": "hana",
+            "claim": "c1_hana_saw_dee",
+            "reliable": false
+          }
+        ],
+        "supported": false
+      },
+      "kofi@5": {
+        "claimed": "green_room",
+        "supporters": [
+          {
+            "by": "dee",
+            "claim": "c1_dee_saw_kofi",
+            "reliable": false
+          },
+          {
+            "by": "hana",
+            "claim": "c1_hana_saw_kofi",
+            "reliable": false
+          }
+        ],
+        "supported": false
+      },
+      "hana@5": {
+        "claimed": "green_room",
+        "supporters": [
+          {
+            "by": "dee",
+            "claim": "c1_dee_saw_hana",
+            "reliable": false
+          },
+          {
+            "by": "kofi",
+            "claim": "c1_kofi_saw_hana",
+            "reliable": false
+          }
+        ],
+        "supported": false
+      }
+    },
+    "motivePaths": {
+      "dee": [
+        "r1_dee"
+      ],
+      "kofi": [
+        "r1_kofi"
+      ],
+      "hana": [
+        "r1_hana"
+      ],
+      "okoye": [
+        "r1_okoye"
+      ]
+    }
+  }
+}

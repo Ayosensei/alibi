@@ -1,0 +1,604 @@
+{
+  "schema": 1,
+  "id": "l1-quiet-pact",
+  "level": 1,
+  "title": "The Quiet Pact",
+  "tagline": "Three stories. One rehearsal.",
+  "briefing": "The Lantern Playhouse, dress rehearsal night. Walter Ames, who owns the building and looks after it, is found dead in the prop store, struck with a brass lamp stand. Four people were backstage. The medical examiner puts the death at about 8:20. Everyone has a story. Start by learning where each of them says they were at 8:20.",
+  "publicWindow": [
+    5
+  ],
+  "hints": [
+    "Ask each suspect where they were at 8:20 (slot 5). Then open the Timeline.",
+    "Search the prop store. Hard evidence beats anything a suspect says.",
+    "Ask the Inspector: does anything sound rehearsed? Could Mr. Okoye have reached the prop store?"
+  ],
+  "arcClue": "Walter's keyring holds a brass tag stamped 1/3. It fits no lock in the building.",
+  "baitsAllowed": 0,
+  "slots": [
+    "7:00",
+    "7:20",
+    "7:40",
+    "8:00",
+    "8:20",
+    "8:40",
+    "9:00",
+    "9:20"
+  ],
+  "rooms": [
+    {
+      "id": "foyer",
+      "name": "Foyer"
+    },
+    {
+      "id": "box_office",
+      "name": "Box Office"
+    },
+    {
+      "id": "stage",
+      "name": "Stage"
+    },
+    {
+      "id": "green_room",
+      "name": "Green Room"
+    },
+    {
+      "id": "prop_store",
+      "name": "Prop Store"
+    },
+    {
+      "id": "lighting_booth",
+      "name": "Lighting Booth"
+    }
+  ],
+  "edges": [
+    {
+      "a": "foyer",
+      "b": "box_office",
+      "state": "open"
+    },
+    {
+      "a": "foyer",
+      "b": "stage",
+      "state": "open"
+    },
+    {
+      "a": "stage",
+      "b": "green_room",
+      "state": "open"
+    },
+    {
+      "a": "stage",
+      "b": "lighting_booth",
+      "state": "open"
+    },
+    {
+      "a": "green_room",
+      "b": "prop_store",
+      "state": "open"
+    }
+  ],
+  "people": [
+    {
+      "id": "walter",
+      "name": "Walter Ames",
+      "role": "Owner and caretaker",
+      "victim": true,
+      "persona": ""
+    },
+    {
+      "id": "dee",
+      "name": "Dee Marsh",
+      "role": "Stage manager",
+      "persona": "Brisk, organised, speaks in clipped sentences and never admits to being flustered."
+    },
+    {
+      "id": "kofi",
+      "name": "Kofi Mensah",
+      "role": "Lighting technician",
+      "persona": "Easygoing and wry, jokes when nervous, loyal to his crew."
+    },
+    {
+      "id": "hana",
+      "name": "Hana Petrov",
+      "role": "Set builder",
+      "persona": "Quiet and literal, avoids eye contact, hates confrontation."
+    },
+    {
+      "id": "okoye",
+      "name": "Mr. Okoye",
+      "role": "Box-office manager",
+      "persona": "Fussy and defensive, polishes his glasses when pressed, talks too much."
+    }
+  ],
+  "truth": {
+    "murder": {
+      "slot": 5,
+      "room": "prop_store",
+      "weapon": "Brass lamp stand",
+      "method": "A blow to the head during an argument about the sale of the playhouse."
+    },
+    "presence": {
+      "walter": [
+        "foyer",
+        "stage",
+        "green_room",
+        "prop_store",
+        "prop_store",
+        "prop_store",
+        "prop_store",
+        "prop_store"
+      ],
+      "dee": [
+        "green_room",
+        "green_room",
+        "stage",
+        "green_room",
+        "prop_store",
+        "prop_store",
+        "green_room",
+        "stage"
+      ],
+      "kofi": [
+        "lighting_booth",
+        "lighting_booth",
+        "stage",
+        "green_room",
+        "prop_store",
+        "prop_store",
+        "green_room",
+        "stage"
+      ],
+      "hana": [
+        "prop_store",
+        "prop_store",
+        "prop_store",
+        "green_room",
+        "prop_store",
+        "prop_store",
+        "green_room",
+        "green_room"
+      ],
+      "okoye": [
+        "box_office",
+        "box_office",
+        "foyer",
+        "box_office",
+        "box_office",
+        "box_office",
+        "foyer",
+        "box_office"
+      ]
+    },
+    "culprits": [
+      "dee",
+      "kofi",
+      "hana"
+    ],
+    "motive": {
+      "dee": true,
+      "kofi": true,
+      "hana": true,
+      "okoye": true
+    }
+  },
+  "facts": [],
+  "relations": [
+    {
+      "id": "r1_dee",
+      "from": "walter",
+      "to": "dee",
+      "type": "THREATENED_JOB",
+      "text": "Walter told Dee the playhouse was being sold and her job with it."
+    },
+    {
+      "id": "r1_kofi",
+      "from": "walter",
+      "to": "kofi",
+      "type": "THREATENED_JOB",
+      "text": "Walter told Kofi the playhouse was being sold and his job with it."
+    },
+    {
+      "id": "r1_hana",
+      "from": "walter",
+      "to": "hana",
+      "type": "THREATENED_JOB",
+      "text": "Walter told Hana the playhouse was being sold and her job with it."
+    },
+    {
+      "id": "r1_okoye",
+      "from": "walter",
+      "to": "okoye",
+      "type": "REPORTED",
+      "text": "Walter reported Mr. Okoye for skimming ticket cash."
+    }
+  ],
+  "claims": [
+    {
+      "id": "c1_dee_loc5",
+      "by": "dee",
+      "kind": "location",
+      "text": "I was in the green room with Kofi and Hana, running lines. The interval bell rang twice. I remember counting.",
+      "subject": "dee",
+      "slot": 5,
+      "room": "green_room",
+      "detail": "bell-twice",
+      "topics": [
+        "whereabouts"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "c1_dee_saw_kofi",
+      "by": "dee",
+      "kind": "saw",
+      "text": "Kofi was right beside me the whole time.",
+      "subject": "kofi",
+      "slot": 5,
+      "room": "green_room",
+      "detail": "bell-twice",
+      "topics": [
+        "witness"
+      ]
+    },
+    {
+      "id": "c1_dee_saw_hana",
+      "by": "dee",
+      "kind": "saw",
+      "text": "And Hana was on the sofa. We never left the green room.",
+      "subject": "hana",
+      "slot": 5,
+      "room": "green_room",
+      "detail": "bell-twice",
+      "topics": [
+        "witness"
+      ]
+    },
+    {
+      "id": "c1_dee_loc3",
+      "by": "dee",
+      "kind": "location",
+      "text": "Before the doors opened I was on stage setting marks.",
+      "subject": "dee",
+      "slot": 3,
+      "room": "stage",
+      "topics": [
+        "whereabouts"
+      ]
+    },
+    {
+      "id": "c1_dee_rel",
+      "by": "dee",
+      "kind": "relation",
+      "text": "Yes, Walter said the playhouse was being sold. We were upset. That is not a motive.",
+      "relation": "r1_dee",
+      "truth": true,
+      "topics": [
+        "motive"
+      ]
+    },
+    {
+      "id": "c1_dee_fact",
+      "by": "dee",
+      "kind": "fact",
+      "text": "Nobody went near the prop store all evening.",
+      "truth": false,
+      "topics": [
+        "general",
+        "whereabouts"
+      ]
+    },
+    {
+      "id": "c1_kofi_loc5",
+      "by": "kofi",
+      "kind": "location",
+      "text": "Green room, with Dee and Hana. The bell rang twice, it made me jump.",
+      "subject": "kofi",
+      "slot": 5,
+      "room": "green_room",
+      "detail": "bell-twice",
+      "topics": [
+        "whereabouts"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "c1_kofi_saw_dee",
+      "by": "kofi",
+      "kind": "saw",
+      "text": "Dee was next to me, arguing with the script.",
+      "subject": "dee",
+      "slot": 5,
+      "room": "green_room",
+      "detail": "bell-twice",
+      "topics": [
+        "witness"
+      ]
+    },
+    {
+      "id": "c1_kofi_saw_hana",
+      "by": "kofi",
+      "kind": "saw",
+      "text": "Hana was there too, stitching something.",
+      "subject": "hana",
+      "slot": 5,
+      "room": "green_room",
+      "detail": "bell-twice",
+      "topics": [
+        "witness"
+      ]
+    },
+    {
+      "id": "c1_kofi_loc2",
+      "by": "kofi",
+      "kind": "location",
+      "text": "Early on I was up in the lighting booth, focusing lamps.",
+      "subject": "kofi",
+      "slot": 2,
+      "room": "lighting_booth",
+      "topics": [
+        "whereabouts"
+      ]
+    },
+    {
+      "id": "c1_kofi_rel",
+      "by": "kofi",
+      "kind": "relation",
+      "text": "Walter told us he was selling. Everyone was angry. Nobody was that angry.",
+      "relation": "r1_kofi",
+      "truth": true,
+      "topics": [
+        "motive"
+      ]
+    },
+    {
+      "id": "c1_hana_loc5",
+      "by": "hana",
+      "kind": "location",
+      "text": "I was in the green room with the others. The bell rang twice.",
+      "subject": "hana",
+      "slot": 5,
+      "room": "green_room",
+      "detail": "bell-twice",
+      "topics": [
+        "whereabouts"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "c1_hana_saw_dee",
+      "by": "hana",
+      "kind": "saw",
+      "text": "Dee was there. We were all together.",
+      "subject": "dee",
+      "slot": 5,
+      "room": "green_room",
+      "detail": "bell-twice",
+      "topics": [
+        "witness"
+      ]
+    },
+    {
+      "id": "c1_hana_saw_kofi",
+      "by": "hana",
+      "kind": "saw",
+      "text": "Kofi too. All of us.",
+      "subject": "kofi",
+      "slot": 5,
+      "room": "green_room",
+      "detail": "bell-twice",
+      "topics": [
+        "witness"
+      ]
+    },
+    {
+      "id": "c1_hana_loc2",
+      "by": "hana",
+      "kind": "location",
+      "text": "Earlier I was building a flat in the prop store, until about half seven.",
+      "subject": "hana",
+      "slot": 2,
+      "room": "prop_store",
+      "topics": [
+        "whereabouts"
+      ]
+    },
+    {
+      "id": "c1_hana_rel",
+      "by": "hana",
+      "kind": "relation",
+      "text": "He said the building was going. My job went with it. I cried in the car park.",
+      "relation": "r1_hana",
+      "truth": true,
+      "topics": [
+        "motive"
+      ]
+    },
+    {
+      "id": "c1_okoye_loc4",
+      "by": "okoye",
+      "kind": "location",
+      "text": "I was in the box office counting the float at eight.",
+      "subject": "okoye",
+      "slot": 4,
+      "room": "box_office",
+      "topics": [
+        "whereabouts"
+      ]
+    },
+    {
+      "id": "c1_okoye_loc6",
+      "by": "okoye",
+      "kind": "location",
+      "text": "And at twenty to nine I was still there, doing the receipts.",
+      "subject": "okoye",
+      "slot": 6,
+      "room": "box_office",
+      "topics": [
+        "whereabouts"
+      ]
+    },
+    {
+      "id": "c1_okoye_saw_walter",
+      "by": "okoye",
+      "kind": "saw",
+      "text": "Walter was in the foyer at seven, grumbling about the heating.",
+      "subject": "walter",
+      "slot": 1,
+      "room": "foyer",
+      "topics": [
+        "witness"
+      ]
+    },
+    {
+      "id": "c1_okoye_rel",
+      "by": "okoye",
+      "kind": "relation",
+      "text": "Walter reported me for skimming. Not my finest hour. I did not kill him.",
+      "relation": "r1_okoye",
+      "truth": true,
+      "topics": [
+        "motive"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "e1_doorlog",
+      "room": "prop_store",
+      "title": "Prop store door log",
+      "text": "The keycard reader logged three cards entering the prop store by 8:20: Dee, Kofi, Hana. Walter's card entered at 8:00.",
+      "asserts": [
+        {
+          "subject": "dee",
+          "slot": 5,
+          "room": "prop_store"
+        },
+        {
+          "subject": "kofi",
+          "slot": 5,
+          "room": "prop_store"
+        },
+        {
+          "subject": "hana",
+          "slot": 5,
+          "room": "prop_store"
+        },
+        {
+          "subject": "walter",
+          "slot": 4,
+          "room": "prop_store"
+        }
+      ]
+    },
+    {
+      "id": "e1_lamp",
+      "room": "prop_store",
+      "title": "Brass lamp stand",
+      "text": "A heavy brass lamp stand with a cracked base, wiped clean. It matches the wound."
+    },
+    {
+      "id": "e1_till",
+      "room": "box_office",
+      "title": "Till receipts",
+      "text": "Ticket-machine receipts stamped 8:00 and 8:40, both printed in the box office.",
+      "asserts": [
+        {
+          "subject": "okoye",
+          "slot": 4,
+          "room": "box_office"
+        },
+        {
+          "subject": "okoye",
+          "slot": 6,
+          "room": "box_office"
+        }
+      ]
+    },
+    {
+      "id": "e1_bell",
+      "room": "stage",
+      "title": "Bell schedule",
+      "text": "The interval bell is on a timer. It rang once at 8:20. The cat is not in the building."
+    },
+    {
+      "id": "e1_keyring",
+      "room": "foyer",
+      "title": "Walter's keyring",
+      "text": "Among the keys hangs a brass tag stamped 1/3. It fits no lock here."
+    }
+  ],
+  "baits": [],
+  "tells": [
+    {
+      "claim": "c1_dee_loc5",
+      "text": "Touches her lanyard while mentioning the bell.",
+      "reliable": true
+    },
+    {
+      "claim": "c1_kofi_loc5",
+      "text": "Laughs a little too quickly.",
+      "reliable": true
+    },
+    {
+      "claim": "c1_hana_saw_dee",
+      "text": "Looks at the floor.",
+      "reliable": false
+    },
+    {
+      "claim": "c1_okoye_rel",
+      "text": "Polishes his glasses.",
+      "reliable": false
+    }
+  ],
+  "solution": {
+    "culprits": [
+      "dee",
+      "kofi",
+      "hana"
+    ],
+    "windowFinal": [
+      5
+    ],
+    "proof": {
+      "contradictions": [
+        [
+          "c1_dee_loc5",
+          "e1_doorlog"
+        ],
+        [
+          "c1_kofi_loc5",
+          "e1_doorlog"
+        ],
+        [
+          "c1_hana_loc5",
+          "e1_doorlog"
+        ]
+      ],
+      "rehearsed": [
+        [
+          "c1_dee_loc5",
+          "c1_kofi_loc5",
+          "c1_hana_loc5"
+        ]
+      ],
+      "impossible": [],
+      "sharpBaits": [],
+      "eliminations": []
+    },
+    "cleared": {
+      "okoye": {
+        "slot": 5,
+        "room": "prop_store",
+        "anchors": [
+          "e1_till"
+        ]
+      }
+    },
+    "motive": {
+      "dee": "r1_dee",
+      "kofi": "r1_kofi",
+      "hana": "r1_hana"
+    }
+  }
+}

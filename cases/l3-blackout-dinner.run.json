@@ -1,0 +1,288 @@
+{
+  "caseId": "l3-blackout-dinner",
+  "label": "Recorded run, re-executed live against the graph",
+  "board": {
+    "claims": [
+      "c3_cl_loc2",
+      "c3_cl_loc4",
+      "c3_cl_loc6",
+      "c3_cl_rel",
+      "c3_cl_rel2",
+      "c3_ro_loc4",
+      "c3_ro_saw_cl4",
+      "c3_ro_rel",
+      "c3_ro_truth",
+      "c3_im_loc4",
+      "c3_im_saw_roz",
+      "c3_im_rel",
+      "c3_im_truth",
+      "c3_gi_loc4",
+      "c3_gi_saw_cl1",
+      "c3_gi_saw_cl6",
+      "c3_gi_fact",
+      "c3_gi_rel",
+      "c3_fe_loc4",
+      "c3_fe_saw_cl2",
+      "c3_fe_rel",
+      "c3_fe_secret",
+      "c3_to_loc4",
+      "c3_to_loc5",
+      "c3_to_fact",
+      "c3_to_rel"
+    ],
+    "evidence": [
+      "e3_studylock",
+      "e3_wifi",
+      "e3_recording",
+      "e3_meter",
+      "e3_hinge",
+      "e3_libdoor",
+      "e3_message",
+      "e3_plan",
+      "e3_ledger",
+      "e3_alarm"
+    ]
+  },
+  "steps": [
+    {
+      "tool": "getBoard",
+      "args": {},
+      "say": "Let me see what the Consultant has gathered so far."
+    },
+    {
+      "tool": "findContradictions",
+      "args": {},
+      "say": "Looking for statements that cannot both be true. I find 11."
+    },
+    {
+      "tool": "findRehearsedAlibis",
+      "args": {},
+      "say": "No identical details across suspects."
+    },
+    {
+      "tool": "findImpossibleMoves",
+      "args": {},
+      "say": "Nobody has to teleport."
+    },
+    {
+      "tool": "whoCouldHave",
+      "args": {
+        "evidenceId": "e3_meter"
+      },
+      "say": "Who could have done what \"Smart-meter log\" records? Checking each candidate against the map and the hard evidence."
+    },
+    {
+      "tool": "whoCouldHave",
+      "args": {
+        "evidenceId": "e3_alarm"
+      },
+      "say": "Who could have done what \"Study alarm log\" records? Checking each candidate against the map and the hard evidence."
+    },
+    {
+      "tool": "checkFeasibility",
+      "args": {
+        "person": "clara",
+        "slot": 5,
+        "room": "study"
+      },
+      "say": "Could Clara Vale have been in the crime scene at the window slot?"
+    },
+    {
+      "tool": "checkFeasibility",
+      "args": {
+        "person": "tobias",
+        "slot": 5,
+        "room": "study"
+      },
+      "say": "Could Tobias Finch have been in the crime scene at the window slot?"
+    },
+    {
+      "tool": "checkFeasibility",
+      "args": {
+        "person": "roz",
+        "slot": 5,
+        "room": "study"
+      },
+      "say": "Could Roz Vale have been in the crime scene at the window slot?"
+    },
+    {
+      "tool": "checkFeasibility",
+      "args": {
+        "person": "imani",
+        "slot": 5,
+        "room": "study"
+      },
+      "say": "Could Dr. Imani Okafor have been in the crime scene at the window slot?"
+    },
+    {
+      "tool": "checkFeasibility",
+      "args": {
+        "person": "gideon",
+        "slot": 5,
+        "room": "study"
+      },
+      "say": "Could Gideon Marsh have been in the crime scene at the window slot?"
+    },
+    {
+      "tool": "checkFeasibility",
+      "args": {
+        "person": "felix",
+        "slot": 5,
+        "room": "study"
+      },
+      "say": "Could Felix Vale have been in the crime scene at the window slot?"
+    },
+    {
+      "tool": "alibiSupport",
+      "args": {
+        "person": "clara",
+        "slot": 4
+      },
+      "say": "Who vouches for Clara Vale at slot 4, and can they be trusted?"
+    },
+    {
+      "tool": "motivePaths",
+      "args": {
+        "person": "clara"
+      },
+      "say": "Does Clara Vale have a known path to Edmund Vale?"
+    },
+    {
+      "tool": "motivePaths",
+      "args": {
+        "person": "tobias"
+      },
+      "say": "Does Tobias Finch have a known path to Edmund Vale?"
+    }
+  ],
+  "expect": {
+    "caseId": "l3-blackout-dinner",
+    "window": [
+      5
+    ],
+    "crimeScene": "study",
+    "contradictions": [
+      [
+        "c3_cl_loc2",
+        "c3_fe_saw_cl2"
+      ],
+      [
+        "c3_cl_loc4",
+        "inferred:e3_meter"
+      ],
+      [
+        "c3_ro_loc4",
+        "c3_ro_truth"
+      ],
+      [
+        "c3_im_saw_roz",
+        "c3_ro_loc4"
+      ],
+      [
+        "c3_ro_loc4",
+        "e3_wifi"
+      ],
+      [
+        "c3_ro_saw_cl4",
+        "inferred:e3_meter"
+      ],
+      [
+        "c3_im_saw_roz",
+        "c3_ro_truth"
+      ],
+      [
+        "c3_im_loc4",
+        "c3_im_truth"
+      ],
+      [
+        "c3_im_loc4",
+        "e3_wifi"
+      ],
+      [
+        "c3_im_saw_roz",
+        "e3_wifi"
+      ],
+      [
+        "c3_to_loc5",
+        "inferred:e3_alarm"
+      ]
+    ],
+    "rehearsed": [],
+    "impossible": [],
+    "feasibility": {
+      "clara": false,
+      "tobias": true,
+      "roz": false,
+      "imani": false,
+      "gideon": false,
+      "felix": false
+    },
+    "acts": {
+      "e3_meter": [
+        "clara"
+      ],
+      "e3_alarm": [
+        "tobias"
+      ]
+    },
+    "inferred": [
+      {
+        "subject": "clara",
+        "slot": 4,
+        "room": "kitchen",
+        "src": "inferred:e3_meter"
+      },
+      {
+        "subject": "tobias",
+        "slot": 5,
+        "room": "study",
+        "src": "inferred:e3_alarm"
+      }
+    ],
+    "alibiSupport": {
+      "clara@4": {
+        "claimed": "dining_hall",
+        "supporters": [
+          {
+            "by": "roz",
+            "claim": "c3_ro_saw_cl4",
+            "reliable": false
+          }
+        ],
+        "supported": false
+      },
+      "clara@6": {
+        "claimed": "dining_hall",
+        "supporters": [
+          {
+            "by": "gideon",
+            "claim": "c3_gi_saw_cl6",
+            "reliable": true
+          }
+        ],
+        "supported": true
+      }
+    },
+    "motivePaths": {
+      "clara": [
+        "r3_clara_firm",
+        "r3_edmund_firm"
+      ],
+      "tobias": [
+        "r3_tobias"
+      ],
+      "roz": [
+        "r3_roz"
+      ],
+      "imani": [
+        "r3_imani"
+      ],
+      "gideon": [
+        "r3_gideon"
+      ],
+      "felix": [
+        "r3_felix"
+      ]
+    }
+  }
+}

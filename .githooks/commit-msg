@@ -1,0 +1,8 @@
+#!/bin/sh
+msg=$(head -n1 "$1")
+case "$msg" in Merge*|Revert*) exit 0 ;; esac
+echo "$msg" | grep -Eq '^(engine|agents|web|mcp|cases|docs|infra|test|chore|wip)(\([A-Za-z0-9_.-]+\))?: .{3,72}$' || {
+  echo "Commit message must look like: area(task): summary"
+  echo "  e.g. engine(A4): add contradictions query"
+  exit 1
+}

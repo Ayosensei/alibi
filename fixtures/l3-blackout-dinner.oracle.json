@@ -1,0 +1,130 @@
+{
+  "caseId": "l3-blackout-dinner",
+  "window": [
+    5
+  ],
+  "crimeScene": "study",
+  "contradictions": [
+    [
+      "c3_cl_loc2",
+      "c3_fe_saw_cl2"
+    ],
+    [
+      "c3_cl_loc4",
+      "inferred:e3_meter"
+    ],
+    [
+      "c3_ro_loc4",
+      "c3_ro_truth"
+    ],
+    [
+      "c3_im_saw_roz",
+      "c3_ro_loc4"
+    ],
+    [
+      "c3_ro_loc4",
+      "e3_wifi"
+    ],
+    [
+      "c3_ro_saw_cl4",
+      "inferred:e3_meter"
+    ],
+    [
+      "c3_im_saw_roz",
+      "c3_ro_truth"
+    ],
+    [
+      "c3_im_loc4",
+      "c3_im_truth"
+    ],
+    [
+      "c3_im_loc4",
+      "e3_wifi"
+    ],
+    [
+      "c3_im_saw_roz",
+      "e3_wifi"
+    ],
+    [
+      "c3_to_loc5",
+      "inferred:e3_alarm"
+    ]
+  ],
+  "rehearsed": [],
+  "impossible": [],
+  "feasibility": {
+    "clara": false,
+    "tobias": true,
+    "roz": false,
+    "imani": false,
+    "gideon": false,
+    "felix": false
+  },
+  "acts": {
+    "e3_meter": [
+      "clara"
+    ],
+    "e3_alarm": [
+      "tobias"
+    ]
+  },
+  "inferred": [
+    {
+      "subject": "clara",
+      "slot": 4,
+      "room": "kitchen",
+      "src": "inferred:e3_meter"
+    },
+    {
+      "subject": "tobias",
+      "slot": 5,
+      "room": "study",
+      "src": "inferred:e3_alarm"
+    }
+  ],
+  "alibiSupport": {
+    "clara@4": {
+      "claimed": "dining_hall",
+      "supporters": [
+        {
+          "by": "roz",
+          "claim": "c3_ro_saw_cl4",
+          "reliable": false
+        }
+      ],
+      "supported": false
+    },
+    "clara@6": {
+      "claimed": "dining_hall",
+      "supporters": [
+        {
+          "by": "gideon",
+          "claim": "c3_gi_saw_cl6",
+          "reliable": true
+        }
+      ],
+      "supported": true
+    }
+  },
+  "motivePaths": {
+    "clara": [
+      "r3_clara_firm",
+      "r3_edmund_firm"
+    ],
+    "tobias": [
+      "r3_tobias"
+    ],
+    "roz": [
+      "r3_roz"
+    ],
+    "imani": [
+      "r3_imani"
+    ],
+    "gideon": [
+      "r3_gideon"
+    ],
+    "felix": [
+      "r3_felix"
+    ]
+  }
+}

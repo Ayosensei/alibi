@@ -1,0 +1,663 @@
+{
+  "schema": 1,
+  "id": "l2-stopped-watch",
+  "level": 2,
+  "title": "The Stopped Watch",
+  "tagline": "The obvious time is the wrong time.",
+  "briefing": "Merrow & Finch Auctioneers, preview night. Collector Alistair Penhallow is found in the cabinet room, his wristwatch smashed and stopped at 9:40. Everyone has an opinion about who was where at twenty to ten. Be careful: the first fact you are handed is not always the true one.",
+  "hints": [
+    "The watch says 9:40. Is that the whole story? Look for a second opinion on the time of death.",
+    "When two statements cannot both be true, the board will flag them. When one person's own statements cannot both be true, that is an impossible move.",
+    "You may plant one false announcement. Choose the one only the guilty person could correct."
+  ],
+  "arcClue": "A catalogue note in Penhallow's papers mentions lot 2 of a sale called 'The Auditor's Collection'.",
+  "baitsAllowed": 1,
+  "slots": [
+    "8:20",
+    "8:40",
+    "9:00",
+    "9:20",
+    "9:40",
+    "10:00",
+    "10:20",
+    "10:40"
+  ],
+  "rooms": [
+    {
+      "id": "foyer",
+      "name": "Foyer"
+    },
+    {
+      "id": "main_hall",
+      "name": "Main Hall"
+    },
+    {
+      "id": "cabinet_room",
+      "name": "Cabinet Room"
+    },
+    {
+      "id": "catalogue_office",
+      "name": "Catalogue Office"
+    },
+    {
+      "id": "vault",
+      "name": "Vault"
+    },
+    {
+      "id": "cloakroom",
+      "name": "Cloakroom"
+    },
+    {
+      "id": "courtyard",
+      "name": "Courtyard"
+    }
+  ],
+  "edges": [
+    {
+      "a": "foyer",
+      "b": "main_hall",
+      "state": "open"
+    },
+    {
+      "a": "main_hall",
+      "b": "cabinet_room",
+      "state": "open"
+    },
+    {
+      "a": "main_hall",
+      "b": "catalogue_office",
+      "state": "open"
+    },
+    {
+      "a": "catalogue_office",
+      "b": "vault",
+      "state": "open"
+    },
+    {
+      "a": "foyer",
+      "b": "cloakroom",
+      "state": "open"
+    },
+    {
+      "a": "main_hall",
+      "b": "courtyard",
+      "state": "open"
+    }
+  ],
+  "people": [
+    {
+      "id": "alistair",
+      "name": "Alistair Penhallow",
+      "role": "Collector",
+      "victim": true,
+      "persona": ""
+    },
+    {
+      "id": "beatrix",
+      "name": "Beatrix Lorne",
+      "role": "Cataloguer",
+      "persona": "Precise, cool and helpful in a way that closes questions rather than opening them."
+    },
+    {
+      "id": "dorian",
+      "name": "Dorian Quill",
+      "role": "Rival dealer",
+      "persona": "Theatrical, sarcastic, fond of cigars and of being the cleverest person in the room."
+    },
+    {
+      "id": "rufus",
+      "name": "Rufus Tull",
+      "role": "Porter",
+      "persona": "Gruff and evasive, smells faintly of whisky, hates being looked at."
+    },
+    {
+      "id": "imogen",
+      "name": "Imogen Sato",
+      "role": "Auctioneer",
+      "persona": "Poised and warm, speaks in full paragraphs, protective of the house's reputation."
+    }
+  ],
+  "truth": {
+    "murder": {
+      "slot": 3,
+      "room": "cabinet_room",
+      "weapon": "Bronze bookend",
+      "method": "Struck from behind at nine; the watch was smashed and set to 9:40 afterwards."
+    },
+    "presence": {
+      "alistair": [
+        "main_hall",
+        "main_hall",
+        "cabinet_room",
+        "cabinet_room",
+        "cabinet_room",
+        "cabinet_room",
+        "cabinet_room",
+        "cabinet_room"
+      ],
+      "beatrix": [
+        "catalogue_office",
+        "main_hall",
+        "cabinet_room",
+        "cabinet_room",
+        "main_hall",
+        "main_hall",
+        "main_hall",
+        "foyer"
+      ],
+      "dorian": [
+        "foyer",
+        "main_hall",
+        "courtyard",
+        "main_hall",
+        "cabinet_room",
+        "main_hall",
+        "foyer",
+        "foyer"
+      ],
+      "rufus": [
+        "cloakroom",
+        "foyer",
+        "main_hall",
+        "main_hall",
+        "main_hall",
+        "main_hall",
+        "foyer",
+        "foyer"
+      ],
+      "imogen": [
+        "main_hall",
+        "catalogue_office",
+        "vault",
+        "catalogue_office",
+        "main_hall",
+        "main_hall",
+        "main_hall",
+        "main_hall"
+      ]
+    },
+    "culprits": [
+      "beatrix"
+    ],
+    "motive": {
+      "beatrix": true,
+      "dorian": true,
+      "rufus": true,
+      "imogen": true
+    }
+  },
+  "facts": [
+    {
+      "id": "f2_ring",
+      "text": "Penhallow's signet ring is hidden in the cloakroom lost-property box.",
+      "knownBy": [
+        "beatrix"
+      ]
+    },
+    {
+      "id": "f2_gate",
+      "text": "The courtyard gate camera was working all evening.",
+      "knownBy": [
+        "dorian",
+        "rufus"
+      ]
+    },
+    {
+      "id": "f2_second",
+      "text": "A second watch was found in the vault.",
+      "knownBy": []
+    }
+  ],
+  "relations": [
+    {
+      "id": "r2_dorian",
+      "from": "alistair",
+      "to": "dorian",
+      "type": "HUMILIATED",
+      "text": "Penhallow humiliated Dorian in the salesroom last spring."
+    },
+    {
+      "id": "r2_rufus",
+      "from": "alistair",
+      "to": "rufus",
+      "type": "WARNED_DISMISSAL",
+      "text": "Penhallow warned he would have Rufus dismissed over the drinking."
+    },
+    {
+      "id": "r2_imogen",
+      "from": "alistair",
+      "to": "imogen",
+      "type": "THREATENED_COLLECTION",
+      "text": "Penhallow threatened to pull his collection from the house, costing Imogen her commission."
+    },
+    {
+      "id": "r2_beatrix",
+      "from": "alistair",
+      "to": "beatrix",
+      "type": "DISCOVERED_FORGERY",
+      "text": "Penhallow discovered Beatrix had forged a provenance letter."
+    }
+  ],
+  "claims": [
+    {
+      "id": "c2_b_loc3",
+      "by": "beatrix",
+      "kind": "location",
+      "text": "I was at my desk in the catalogue office, finishing the lot notes.",
+      "subject": "beatrix",
+      "slot": 3,
+      "room": "catalogue_office",
+      "topics": [
+        "whereabouts"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "c2_b_loc5",
+      "by": "beatrix",
+      "kind": "location",
+      "text": "At twenty to ten I was on the floor with Ms. Sato. Ask anyone.",
+      "subject": "beatrix",
+      "slot": 5,
+      "room": "main_hall",
+      "topics": [
+        "whereabouts"
+      ]
+    },
+    {
+      "id": "c2_b_fact",
+      "by": "beatrix",
+      "kind": "fact",
+      "text": "There was never any quarrel between Mr. Penhallow and me.",
+      "truth": false,
+      "topics": [
+        "motive",
+        "general"
+      ]
+    },
+    {
+      "id": "c2_d_loc5",
+      "by": "dorian",
+      "kind": "location",
+      "text": "I was in the cloakroom fetching my coat at twenty to ten.",
+      "subject": "dorian",
+      "slot": 5,
+      "room": "cloakroom",
+      "topics": [
+        "whereabouts"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "c2_d_loc3",
+      "by": "dorian",
+      "kind": "location",
+      "text": "At nine I was in the courtyard with a cigar. The gate camera will tell you.",
+      "subject": "dorian",
+      "slot": 3,
+      "room": "courtyard",
+      "topics": [
+        "whereabouts"
+      ]
+    },
+    {
+      "id": "c2_d_rel",
+      "by": "dorian",
+      "kind": "relation",
+      "text": "He humiliated me in the salesroom last spring. I am not sorry he is dead. I did not kill him.",
+      "relation": "r2_dorian",
+      "truth": true,
+      "topics": [
+        "motive"
+      ]
+    },
+    {
+      "id": "c2_d_saw_rufus",
+      "by": "dorian",
+      "kind": "saw",
+      "text": "Rufus was propping up the bar again at twenty past nine.",
+      "subject": "rufus",
+      "slot": 4,
+      "room": "main_hall",
+      "topics": [
+        "witness"
+      ]
+    },
+    {
+      "id": "c2_r_loc3",
+      "by": "rufus",
+      "kind": "location",
+      "text": "At nine I was in the vault moving crates.",
+      "subject": "rufus",
+      "slot": 3,
+      "room": "vault",
+      "topics": [
+        "whereabouts"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "c2_r_loc4",
+      "by": "rufus",
+      "kind": "location",
+      "text": "By twenty past I was back on the main floor.",
+      "subject": "rufus",
+      "slot": 4,
+      "room": "main_hall",
+      "topics": [
+        "whereabouts"
+      ]
+    },
+    {
+      "id": "c2_r_saw_dorian",
+      "by": "rufus",
+      "kind": "saw",
+      "text": "I saw Mr. Quill slip into the cabinet room at twenty to ten.",
+      "subject": "dorian",
+      "slot": 5,
+      "room": "cabinet_room",
+      "topics": [
+        "witness"
+      ]
+    },
+    {
+      "id": "c2_r_rel",
+      "by": "rufus",
+      "kind": "relation",
+      "text": "He told me he would have me dismissed over the drink. I held my tongue.",
+      "relation": "r2_rufus",
+      "truth": true,
+      "topics": [
+        "motive"
+      ]
+    },
+    {
+      "id": "c2_r_truth",
+      "by": "rufus",
+      "kind": "location",
+      "text": "All right. I was not in the vault. I was at the bar in the main hall at nine, with a glass I should not have had.",
+      "subject": "rufus",
+      "slot": 3,
+      "room": "main_hall",
+      "topics": [
+        "whereabouts"
+      ],
+      "requires": [
+        "e2_tab"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "c2_r_saw_beatrix",
+      "by": "rufus",
+      "kind": "saw",
+      "text": "And from the bar I saw Ms. Lorne go into the cabinet room just after nine.",
+      "subject": "beatrix",
+      "slot": 3,
+      "room": "cabinet_room",
+      "topics": [
+        "witness"
+      ],
+      "requires": [
+        "e2_tab"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "c2_i_loc3",
+      "by": "imogen",
+      "kind": "location",
+      "text": "At nine I was in the vault with the insurer's list.",
+      "subject": "imogen",
+      "slot": 3,
+      "room": "vault",
+      "topics": [
+        "whereabouts"
+      ]
+    },
+    {
+      "id": "c2_i_loc5",
+      "by": "imogen",
+      "kind": "location",
+      "text": "At twenty to ten I was on the rostrum opening the sale.",
+      "subject": "imogen",
+      "slot": 5,
+      "room": "main_hall",
+      "topics": [
+        "whereabouts"
+      ]
+    },
+    {
+      "id": "c2_i_saw_beatrix",
+      "by": "imogen",
+      "kind": "saw",
+      "text": "Ms. Lorne stood beside me at twenty to ten. She never left the floor.",
+      "subject": "beatrix",
+      "slot": 5,
+      "room": "main_hall",
+      "topics": [
+        "witness"
+      ]
+    },
+    {
+      "id": "c2_i_rel",
+      "by": "imogen",
+      "kind": "relation",
+      "text": "He threatened to pull his collection. That would have cost me dearly. I did not touch him.",
+      "relation": "r2_imogen",
+      "truth": true,
+      "topics": [
+        "motive"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "e2_watch",
+      "room": "cabinet_room",
+      "title": "Smashed wristwatch",
+      "text": "Penhallow's watch is smashed and stopped at 9:40.",
+      "window": [
+        5
+      ],
+      "windowKind": "suggests"
+    },
+    {
+      "id": "e2_coroner",
+      "room": "cabinet_room",
+      "title": "Medical examiner's note",
+      "text": "Body temperature and the cold tea indicate death between 8:55 and 9:15, not later.",
+      "window": [
+        3
+      ],
+      "windowKind": "revises"
+    },
+    {
+      "id": "e2_bookend",
+      "room": "cabinet_room",
+      "title": "Bronze bookend",
+      "text": "A bronze bookend with a dent and a smear of blood, pushed behind a cabinet."
+    },
+    {
+      "id": "e2_cabinetlog",
+      "room": "main_hall",
+      "title": "Cabinet room door log",
+      "text": "The cabinet room door controller logged a staff card at 9:00: B. Lorne.",
+      "asserts": [
+        {
+          "subject": "beatrix",
+          "slot": 3,
+          "room": "cabinet_room"
+        }
+      ]
+    },
+    {
+      "id": "e2_tab",
+      "room": "main_hall",
+      "title": "Bar tab",
+      "text": "A bar receipt for a double whisky, signed R. Tull, printed at 9:00 at the main hall bar.",
+      "asserts": [
+        {
+          "subject": "rufus",
+          "slot": 3,
+          "room": "main_hall"
+        }
+      ]
+    },
+    {
+      "id": "e2_gate",
+      "room": "courtyard",
+      "title": "Gate camera still",
+      "text": "A time-stamped still shows Dorian Quill smoking by the courtyard gate at 9:00.",
+      "asserts": [
+        {
+          "subject": "dorian",
+          "slot": 3,
+          "room": "courtyard"
+        }
+      ]
+    },
+    {
+      "id": "e2_vaultlog",
+      "room": "vault",
+      "title": "Vault access log",
+      "text": "Keycard log: I. Sato entered the vault at 9:00.",
+      "asserts": [
+        {
+          "subject": "imogen",
+          "slot": 3,
+          "room": "vault"
+        }
+      ]
+    },
+    {
+      "id": "e2_provenance",
+      "room": "catalogue_office",
+      "title": "Provenance letter",
+      "text": "A provenance letter for lot 9 carries a forged signature. Penhallow's pencil note: 'B.L. - explain. Monday.'",
+      "relation": "r2_beatrix"
+    },
+    {
+      "id": "e2_cloakroom",
+      "room": "cloakroom",
+      "title": "Lost-property box",
+      "text": "A box of umbrellas, scarves and one odd glove. Nothing of interest. Yet."
+    }
+  ],
+  "baits": [
+    {
+      "id": "b2_ring",
+      "announcement": "We have found Penhallow's missing signet ring in the courtyard planter.",
+      "fact": "f2_ring",
+      "slip": "In the planter? Nonsense. Nobody would leave it out in the rain. It would be in the... I mean, somewhere dry.",
+      "neutral": "A ring in the planter? How odd."
+    },
+    {
+      "id": "b2_gate",
+      "announcement": "The courtyard gate camera was switched off all evening.",
+      "fact": "f2_gate",
+      "slip": "Switched off? It was on, I would swear to it.",
+      "neutral": "The camera? I could not say."
+    },
+    {
+      "id": "b2_second",
+      "announcement": "A second watch has been found in the vault.",
+      "fact": "f2_second",
+      "slip": "",
+      "neutral": "A second watch? How strange."
+    }
+  ],
+  "tells": [
+    {
+      "claim": "c2_b_loc3",
+      "text": "Straightens a pen that is already straight.",
+      "reliable": true
+    },
+    {
+      "claim": "c2_d_loc5",
+      "text": "Smiles too broadly.",
+      "reliable": true
+    },
+    {
+      "claim": "c2_r_loc3",
+      "text": "Rubs the back of his neck.",
+      "reliable": true
+    },
+    {
+      "claim": "c2_i_loc3",
+      "text": "Pauses before answering.",
+      "reliable": false
+    }
+  ],
+  "solution": {
+    "culprits": [
+      "beatrix"
+    ],
+    "windowFinal": [
+      3
+    ],
+    "proof": {
+      "contradictions": [
+        [
+          "c2_b_loc3",
+          "e2_cabinetlog"
+        ],
+        [
+          "c2_b_loc3",
+          "c2_r_saw_beatrix"
+        ],
+        [
+          "c2_d_loc5",
+          "c2_r_saw_dorian"
+        ],
+        [
+          "c2_r_loc3",
+          "e2_tab"
+        ]
+      ],
+      "rehearsed": [],
+      "impossible": [
+        {
+          "person": "rufus",
+          "claims": [
+            "c2_r_loc3",
+            "c2_r_loc4"
+          ]
+        }
+      ],
+      "sharpBaits": [
+        {
+          "bait": "b2_ring",
+          "person": "beatrix"
+        }
+      ],
+      "eliminations": []
+    },
+    "cleared": {
+      "dorian": {
+        "slot": 3,
+        "room": "cabinet_room",
+        "anchors": [
+          "e2_gate"
+        ]
+      },
+      "rufus": {
+        "slot": 3,
+        "room": "cabinet_room",
+        "anchors": [
+          "e2_tab"
+        ]
+      },
+      "imogen": {
+        "slot": 3,
+        "room": "cabinet_room",
+        "anchors": [
+          "e2_vaultlog"
+        ]
+      }
+    },
+    "motive": {
+      "beatrix": "r2_beatrix"
+    }
+  }
+}

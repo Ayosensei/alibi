@@ -1,0 +1,205 @@
+{
+  "caseId": "l2-stopped-watch",
+  "label": "Recorded run, re-executed live against the graph",
+  "board": {
+    "claims": [
+      "c2_b_loc3",
+      "c2_b_loc5",
+      "c2_b_fact",
+      "c2_d_loc5",
+      "c2_d_loc3",
+      "c2_d_rel",
+      "c2_d_saw_rufus",
+      "c2_r_loc3",
+      "c2_r_loc4",
+      "c2_r_saw_dorian",
+      "c2_r_rel",
+      "c2_r_truth",
+      "c2_r_saw_beatrix",
+      "c2_i_loc3",
+      "c2_i_loc5",
+      "c2_i_saw_beatrix",
+      "c2_i_rel"
+    ],
+    "evidence": [
+      "e2_watch",
+      "e2_coroner",
+      "e2_cabinetlog",
+      "e2_tab",
+      "e2_gate",
+      "e2_vaultlog",
+      "e2_provenance"
+    ]
+  },
+  "steps": [
+    {
+      "tool": "getBoard",
+      "args": {},
+      "say": "Let me see what the Consultant has gathered so far."
+    },
+    {
+      "tool": "findContradictions",
+      "args": {},
+      "say": "Looking for statements that cannot both be true. I find 5."
+    },
+    {
+      "tool": "findRehearsedAlibis",
+      "args": {},
+      "say": "No identical details across suspects."
+    },
+    {
+      "tool": "findImpossibleMoves",
+      "args": {},
+      "say": "4 placements need faster travel than the map allows."
+    },
+    {
+      "tool": "checkFeasibility",
+      "args": {
+        "person": "beatrix",
+        "slot": 3,
+        "room": "cabinet_room"
+      },
+      "say": "Could Beatrix Lorne have been in the crime scene at the window slot?"
+    },
+    {
+      "tool": "checkFeasibility",
+      "args": {
+        "person": "dorian",
+        "slot": 3,
+        "room": "cabinet_room"
+      },
+      "say": "Could Dorian Quill have been in the crime scene at the window slot?"
+    },
+    {
+      "tool": "checkFeasibility",
+      "args": {
+        "person": "rufus",
+        "slot": 3,
+        "room": "cabinet_room"
+      },
+      "say": "Could Rufus Tull have been in the crime scene at the window slot?"
+    },
+    {
+      "tool": "checkFeasibility",
+      "args": {
+        "person": "imogen",
+        "slot": 3,
+        "room": "cabinet_room"
+      },
+      "say": "Could Imogen Sato have been in the crime scene at the window slot?"
+    },
+    {
+      "tool": "motivePaths",
+      "args": {
+        "person": "beatrix"
+      },
+      "say": "Does Beatrix Lorne have a known path to Alistair Penhallow?"
+    }
+  ],
+  "expect": {
+    "caseId": "l2-stopped-watch",
+    "window": [
+      3
+    ],
+    "crimeScene": "cabinet_room",
+    "contradictions": [
+      [
+        "c2_b_loc3",
+        "c2_r_saw_beatrix"
+      ],
+      [
+        "c2_b_loc3",
+        "e2_cabinetlog"
+      ],
+      [
+        "c2_d_loc5",
+        "c2_r_saw_dorian"
+      ],
+      [
+        "c2_r_loc3",
+        "c2_r_truth"
+      ],
+      [
+        "c2_r_loc3",
+        "e2_tab"
+      ]
+    ],
+    "rehearsed": [],
+    "impossible": [
+      {
+        "person": "dorian",
+        "from": "c2_d_loc3",
+        "to": "c2_d_loc5",
+        "needed": 3,
+        "available": 2
+      },
+      {
+        "person": "rufus",
+        "from": "c2_r_loc3",
+        "to": "c2_d_saw_rufus",
+        "needed": 2,
+        "available": 1
+      },
+      {
+        "person": "rufus",
+        "from": "c2_r_loc3",
+        "to": "c2_r_loc4",
+        "needed": 2,
+        "available": 1
+      },
+      {
+        "person": "dorian",
+        "from": "e2_gate",
+        "to": "c2_d_loc5",
+        "needed": 3,
+        "available": 2
+      }
+    ],
+    "feasibility": {
+      "beatrix": true,
+      "dorian": false,
+      "rufus": false,
+      "imogen": false
+    },
+    "acts": {},
+    "inferred": [],
+    "alibiSupport": {
+      "beatrix@5": {
+        "claimed": "main_hall",
+        "supporters": [
+          {
+            "by": "imogen",
+            "claim": "c2_i_saw_beatrix",
+            "reliable": true
+          }
+        ],
+        "supported": true
+      },
+      "rufus@4": {
+        "claimed": "main_hall",
+        "supporters": [
+          {
+            "by": "dorian",
+            "claim": "c2_d_saw_rufus",
+            "reliable": true
+          }
+        ],
+        "supported": true
+      }
+    },
+    "motivePaths": {
+      "beatrix": [
+        "r2_beatrix"
+      ],
+      "dorian": [
+        "r2_dorian"
+      ],
+      "rufus": [
+        "r2_rufus"
+      ],
+      "imogen": [
+        "r2_imogen"
+      ]
+    }
+  }
+}

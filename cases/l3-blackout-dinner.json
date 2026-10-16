@@ -1,0 +1,923 @@
+{
+  "schema": 1,
+  "id": "l3-blackout-dinner",
+  "level": 3,
+  "title": "The Blackout Dinner",
+  "tagline": "Nobody could have reached the study. Somebody did.",
+  "briefing": "Ashgrove House, a storm-bound dinner. At 9:15 the power fails. When the lights return, Edmund Vale is dead in his study, the door locked from the inside and the key in his pocket. Six guests, one locked room, and a house with more history than anyone admits. The medical examiner agrees on the time: during the blackout, around 9:30.",
+  "publicWindow": [
+    5
+  ],
+  "hints": [
+    "Nobody can reach a locked study. Look for what the map is missing.",
+    "Ask the Inspector who could have thrown the breaker. Some questions are answered by elimination.",
+    "A rehearsed alibi is only as strong as the person vouching for it. Check who vouches for whom."
+  ],
+  "arcClue": "Edmund's study safe holds a ledger page headed 'The Auditor' with three crossed-out names. One of them is Walter Ames.",
+  "baitsAllowed": 2,
+  "slots": [
+    "8:30",
+    "8:45",
+    "9:00",
+    "9:15",
+    "9:30",
+    "9:45",
+    "10:00",
+    "10:15"
+  ],
+  "rooms": [
+    {
+      "id": "dining_hall",
+      "name": "Dining Hall"
+    },
+    {
+      "id": "hall",
+      "name": "Great Hall"
+    },
+    {
+      "id": "kitchen",
+      "name": "Kitchen"
+    },
+    {
+      "id": "library",
+      "name": "Library"
+    },
+    {
+      "id": "study",
+      "name": "Study"
+    },
+    {
+      "id": "drawing_room",
+      "name": "Drawing Room"
+    },
+    {
+      "id": "conservatory",
+      "name": "Conservatory"
+    }
+  ],
+  "edges": [
+    {
+      "a": "dining_hall",
+      "b": "hall",
+      "state": "open"
+    },
+    {
+      "a": "hall",
+      "b": "kitchen",
+      "state": "open"
+    },
+    {
+      "a": "hall",
+      "b": "library",
+      "state": "open"
+    },
+    {
+      "a": "hall",
+      "b": "drawing_room",
+      "state": "open"
+    },
+    {
+      "a": "drawing_room",
+      "b": "conservatory",
+      "state": "open"
+    },
+    {
+      "a": "hall",
+      "b": "study",
+      "state": "locked"
+    },
+    {
+      "a": "library",
+      "b": "study",
+      "state": "hidden",
+      "discoveredBy": "e3_hinge"
+    }
+  ],
+  "people": [
+    {
+      "id": "edmund",
+      "name": "Edmund Vale",
+      "role": "Host, founder of Vale Shipping",
+      "victim": true,
+      "persona": ""
+    },
+    {
+      "id": "clara",
+      "name": "Clara Vale",
+      "role": "Daughter, finance director",
+      "persona": "Polished, controlled, answers questions with better questions."
+    },
+    {
+      "id": "tobias",
+      "name": "Tobias Finch",
+      "role": "Bookkeeper",
+      "persona": "Anxious and apologetic, over-explains, sweats when the subject is money."
+    },
+    {
+      "id": "roz",
+      "name": "Roz Vale",
+      "role": "Edmund's second wife",
+      "persona": "Glamorous and sharp, deflects with charm, hides hurt behind jokes."
+    },
+    {
+      "id": "imani",
+      "name": "Dr. Imani Okafor",
+      "role": "Family physician",
+      "persona": "Measured and clinical, uncomfortable with lies and bad at them."
+    },
+    {
+      "id": "gideon",
+      "name": "Gideon Marsh",
+      "role": "Business partner",
+      "persona": "Bluff and blunt, loud, honest to a fault, bad at subtlety."
+    },
+    {
+      "id": "felix",
+      "name": "Felix Vale",
+      "role": "Son, pianist",
+      "persona": "Moody and wounded, speaks softly, bitter about being cut off."
+    }
+  ],
+  "truth": {
+    "murder": {
+      "slot": 5,
+      "room": "study",
+      "weapon": "Fire poker",
+      "method": "Struck during the blackout by someone who entered through the hidden passage from the library."
+    },
+    "presence": {
+      "edmund": [
+        "dining_hall",
+        "hall",
+        "study",
+        "study",
+        "study",
+        "study",
+        "study",
+        "study"
+      ],
+      "clara": [
+        "dining_hall",
+        "hall",
+        "kitchen",
+        "kitchen",
+        "hall",
+        "dining_hall",
+        "dining_hall",
+        "dining_hall"
+      ],
+      "tobias": [
+        "library",
+        "library",
+        "library",
+        "library",
+        "study",
+        "library",
+        "library",
+        "library"
+      ],
+      "roz": [
+        "dining_hall",
+        "hall",
+        "drawing_room",
+        "conservatory",
+        "conservatory",
+        "conservatory",
+        "drawing_room",
+        "hall"
+      ],
+      "imani": [
+        "dining_hall",
+        "hall",
+        "drawing_room",
+        "conservatory",
+        "conservatory",
+        "conservatory",
+        "drawing_room",
+        "hall"
+      ],
+      "gideon": [
+        "dining_hall",
+        "dining_hall",
+        "dining_hall",
+        "dining_hall",
+        "dining_hall",
+        "dining_hall",
+        "dining_hall",
+        "dining_hall"
+      ],
+      "felix": [
+        "dining_hall",
+        "hall",
+        "drawing_room",
+        "drawing_room",
+        "drawing_room",
+        "drawing_room",
+        "hall",
+        "dining_hall"
+      ]
+    },
+    "culprits": [
+      "clara",
+      "tobias"
+    ],
+    "motive": {
+      "clara": true,
+      "tobias": true,
+      "roz": true,
+      "imani": true,
+      "gideon": true,
+      "felix": true
+    }
+  },
+  "facts": [
+    {
+      "id": "f3_breaker",
+      "text": "The main breaker was thrown by hand.",
+      "knownBy": [
+        "clara"
+      ]
+    },
+    {
+      "id": "f3_window",
+      "text": "The study window was latched from the inside.",
+      "knownBy": [
+        "tobias"
+      ]
+    },
+    {
+      "id": "f3_passage",
+      "text": "The hidden passage opens behind the library shelves.",
+      "knownBy": [
+        "clara",
+        "felix",
+        "tobias"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "r3_clara_firm",
+      "from": "clara",
+      "to": "vale_firm",
+      "type": "CONTROLS",
+      "text": "Clara runs the finances of Vale Shipping."
+    },
+    {
+      "id": "r3_edmund_firm",
+      "from": "edmund",
+      "to": "vale_firm",
+      "type": "PLANNED_TO_SELL",
+      "text": "Edmund planned to sell Vale Shipping."
+    },
+    {
+      "id": "r3_felix",
+      "from": "edmund",
+      "to": "felix",
+      "type": "DISINHERITED",
+      "text": "Edmund cut Felix out of his will last month."
+    },
+    {
+      "id": "r3_roz",
+      "from": "edmund",
+      "to": "roz",
+      "type": "REWROTE_WILL",
+      "text": "Edmund was rewriting his will to Roz's disadvantage."
+    },
+    {
+      "id": "r3_gideon",
+      "from": "edmund",
+      "to": "gideon",
+      "type": "BLOCKED_BUYOUT",
+      "text": "Edmund refused Gideon's buyout offer."
+    },
+    {
+      "id": "r3_imani",
+      "from": "edmund",
+      "to": "imani",
+      "type": "THREATENED_TO_REPORT",
+      "text": "Edmund threatened to report Imani over a prescribing error."
+    },
+    {
+      "id": "r3_tobias",
+      "from": "tobias",
+      "to": "edmund",
+      "type": "EMBEZZLED_FROM",
+      "text": "Tobias had been embezzling from Edmund's accounts."
+    },
+    {
+      "id": "r3_coerce",
+      "from": "clara",
+      "to": "tobias",
+      "type": "COERCES",
+      "text": "Clara coerced Tobias with his own ledger secret."
+    }
+  ],
+  "claims": [
+    {
+      "id": "c3_cl_loc2",
+      "by": "clara",
+      "kind": "location",
+      "text": "At quarter to nine I was at the table, as everyone will tell you.",
+      "subject": "clara",
+      "slot": 2,
+      "room": "dining_hall",
+      "topics": [
+        "whereabouts"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "c3_cl_loc4",
+      "by": "clara",
+      "kind": "location",
+      "text": "When the lights went I never left my chair. It was pitch black, I sat very still.",
+      "subject": "clara",
+      "slot": 4,
+      "room": "dining_hall",
+      "topics": [
+        "whereabouts"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "c3_cl_loc6",
+      "by": "clara",
+      "kind": "location",
+      "text": "When the lights came back I was still at the table.",
+      "subject": "clara",
+      "slot": 6,
+      "room": "dining_hall",
+      "topics": [
+        "whereabouts"
+      ]
+    },
+    {
+      "id": "c3_cl_rel",
+      "by": "clara",
+      "kind": "relation",
+      "text": "We argued about the business, as families do. I run the numbers. Father wanted to sell.",
+      "relation": "r3_edmund_firm",
+      "truth": true,
+      "topics": [
+        "motive"
+      ]
+    },
+    {
+      "id": "c3_cl_rel2",
+      "by": "clara",
+      "kind": "relation",
+      "text": "I run the finances. A sale would have ended my role. Everyone knows that, so I will say it first.",
+      "relation": "r3_clara_firm",
+      "truth": true,
+      "topics": [
+        "motive"
+      ]
+    },
+    {
+      "id": "c3_ro_loc4",
+      "by": "roz",
+      "kind": "location",
+      "text": "In the dark I was in the dining hall, holding Clara's hand across the table.",
+      "subject": "roz",
+      "slot": 4,
+      "room": "dining_hall",
+      "topics": [
+        "whereabouts"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "c3_ro_saw_cl4",
+      "by": "roz",
+      "kind": "saw",
+      "text": "Clara never moved from her chair. I would have felt her go.",
+      "subject": "clara",
+      "slot": 4,
+      "room": "dining_hall",
+      "topics": [
+        "witness"
+      ]
+    },
+    {
+      "id": "c3_ro_rel",
+      "by": "roz",
+      "kind": "relation",
+      "text": "He was rewriting his will. I will not pretend it did not sting.",
+      "relation": "r3_roz",
+      "truth": true,
+      "topics": [
+        "motive"
+      ]
+    },
+    {
+      "id": "c3_ro_truth",
+      "by": "roz",
+      "kind": "location",
+      "text": "Fine. I was in the conservatory with Imani. That is all it was, and it is nobody's business.",
+      "subject": "roz",
+      "slot": 4,
+      "room": "conservatory",
+      "topics": [
+        "whereabouts"
+      ],
+      "requires": [
+        "e3_wifi"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "c3_im_loc4",
+      "by": "imani",
+      "kind": "location",
+      "text": "I was with the guests in the drawing room when the power failed.",
+      "subject": "imani",
+      "slot": 4,
+      "room": "drawing_room",
+      "topics": [
+        "whereabouts"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "c3_im_saw_roz",
+      "by": "imani",
+      "kind": "saw",
+      "text": "Roz was beside me in the drawing room.",
+      "subject": "roz",
+      "slot": 4,
+      "room": "drawing_room",
+      "topics": [
+        "witness"
+      ]
+    },
+    {
+      "id": "c3_im_rel",
+      "by": "imani",
+      "kind": "relation",
+      "text": "Edmund threatened to report a prescribing error. It was an honest mistake.",
+      "relation": "r3_imani",
+      "truth": true,
+      "topics": [
+        "motive"
+      ]
+    },
+    {
+      "id": "c3_im_truth",
+      "by": "imani",
+      "kind": "location",
+      "text": "I was in the conservatory with Roz. I am sorry, I am a poor liar.",
+      "subject": "imani",
+      "slot": 4,
+      "room": "conservatory",
+      "topics": [
+        "whereabouts"
+      ],
+      "requires": [
+        "e3_wifi"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "c3_gi_loc4",
+      "by": "gideon",
+      "kind": "location",
+      "text": "I never left the dining hall. Not for a moment.",
+      "subject": "gideon",
+      "slot": 4,
+      "room": "dining_hall",
+      "topics": [
+        "whereabouts"
+      ]
+    },
+    {
+      "id": "c3_gi_saw_cl1",
+      "by": "gideon",
+      "kind": "saw",
+      "text": "Clara was at the table when the soup came, I remember that.",
+      "subject": "clara",
+      "slot": 1,
+      "room": "dining_hall",
+      "topics": [
+        "witness"
+      ]
+    },
+    {
+      "id": "c3_gi_saw_cl6",
+      "by": "gideon",
+      "kind": "saw",
+      "text": "She was back in her chair when the lights returned.",
+      "subject": "clara",
+      "slot": 6,
+      "room": "dining_hall",
+      "topics": [
+        "witness"
+      ]
+    },
+    {
+      "id": "c3_gi_fact",
+      "by": "gideon",
+      "kind": "fact",
+      "text": "From a quarter past nine it was pitch black. I could not see my own hand.",
+      "truth": true,
+      "topics": [
+        "general",
+        "witness"
+      ]
+    },
+    {
+      "id": "c3_gi_rel",
+      "by": "gideon",
+      "kind": "relation",
+      "text": "Edmund refused my buyout offer. I shouted at him. I did not touch him.",
+      "relation": "r3_gideon",
+      "truth": true,
+      "topics": [
+        "motive"
+      ]
+    },
+    {
+      "id": "c3_fe_loc4",
+      "by": "felix",
+      "kind": "location",
+      "text": "I was at the piano in the drawing room. It was the only thing keeping me sane.",
+      "subject": "felix",
+      "slot": 4,
+      "room": "drawing_room",
+      "topics": [
+        "whereabouts"
+      ]
+    },
+    {
+      "id": "c3_fe_saw_cl2",
+      "by": "felix",
+      "kind": "saw",
+      "text": "I passed Clara in the great hall on my way to the piano, about quarter to nine.",
+      "subject": "clara",
+      "slot": 2,
+      "room": "hall",
+      "topics": [
+        "witness"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "c3_fe_rel",
+      "by": "felix",
+      "kind": "relation",
+      "text": "He cut me off last month. I did not kill him.",
+      "relation": "r3_felix",
+      "truth": true,
+      "topics": [
+        "motive"
+      ]
+    },
+    {
+      "id": "c3_fe_secret",
+      "by": "felix",
+      "kind": "fact",
+      "text": "Father showed me a secret way once, years ago. Behind the library shelves. Only family knew.",
+      "truth": true,
+      "topics": [
+        "general",
+        "evidence"
+      ],
+      "requires": [
+        "e3_hinge"
+      ]
+    },
+    {
+      "id": "c3_to_loc4",
+      "by": "tobias",
+      "kind": "location",
+      "text": "I was in the library doing the month's ledgers by candle.",
+      "subject": "tobias",
+      "slot": 4,
+      "room": "library",
+      "topics": [
+        "whereabouts"
+      ]
+    },
+    {
+      "id": "c3_to_loc5",
+      "by": "tobias",
+      "kind": "location",
+      "text": "And still in the library when the lights came back.",
+      "subject": "tobias",
+      "slot": 5,
+      "room": "library",
+      "topics": [
+        "whereabouts"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "c3_to_fact",
+      "by": "tobias",
+      "kind": "fact",
+      "text": "I never go into the study. Mr. Vale did not like it.",
+      "truth": false,
+      "topics": [
+        "general",
+        "whereabouts"
+      ]
+    },
+    {
+      "id": "c3_to_rel",
+      "by": "tobias",
+      "kind": "relation",
+      "text": "I... have made some mistakes with the books. I do not want to say more.",
+      "relation": "r3_tobias",
+      "truth": true,
+      "topics": [
+        "motive"
+      ],
+      "requires": [
+        "e3_ledger"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "e3_studylock",
+      "room": "hall",
+      "title": "Study door",
+      "text": "The study door was found locked from the inside; the key was in Edmund's pocket. A note on the lock log says it was locked at 9:00.",
+      "asserts": [
+        {
+          "subject": "edmund",
+          "slot": 3,
+          "room": "study"
+        }
+      ]
+    },
+    {
+      "id": "e3_wifi",
+      "room": "hall",
+      "title": "House network log",
+      "text": "The router log shows two phones on the conservatory node at 9:15: Roz's and Dr. Okafor's.",
+      "asserts": [
+        {
+          "subject": "roz",
+          "slot": 4,
+          "room": "conservatory"
+        },
+        {
+          "subject": "imani",
+          "slot": 4,
+          "room": "conservatory"
+        }
+      ]
+    },
+    {
+      "id": "e3_recording",
+      "room": "drawing_room",
+      "title": "Piano recorder",
+      "text": "The piano's recorder logged continuous playing from 9:00 to 9:45 in the drawing room.",
+      "asserts": [
+        {
+          "subject": "felix",
+          "slot": 3,
+          "room": "drawing_room"
+        },
+        {
+          "subject": "felix",
+          "slot": 4,
+          "room": "drawing_room"
+        },
+        {
+          "subject": "felix",
+          "slot": 5,
+          "room": "drawing_room"
+        }
+      ]
+    },
+    {
+      "id": "e3_meter",
+      "room": "kitchen",
+      "title": "Smart-meter log",
+      "text": "The main breaker was switched off by hand at 9:15, using the family keypad code. Only Edmund, Clara, Roz and Felix have it.",
+      "act": {
+        "slot": 4,
+        "room": "kitchen",
+        "restrictsTo": [
+          "edmund",
+          "clara",
+          "roz",
+          "felix"
+        ]
+      }
+    },
+    {
+      "id": "e3_hinge",
+      "room": "library",
+      "title": "Scratched hinge",
+      "text": "Fresh scratches on a bookcase hinge and a cold draught. A hidden passage runs from the library to the study.",
+      "revealsEdge": "library-study"
+    },
+    {
+      "id": "e3_libdoor",
+      "room": "library",
+      "title": "Library door log",
+      "text": "The library door log shows Tobias entering at 8:45 and no one leaving until 9:45.",
+      "asserts": [
+        {
+          "subject": "tobias",
+          "slot": 2,
+          "room": "library"
+        },
+        {
+          "subject": "tobias",
+          "slot": 4,
+          "room": "library"
+        }
+      ]
+    },
+    {
+      "id": "e3_message",
+      "room": "library",
+      "title": "A message in Tobias's coat",
+      "text": "A printed note: 'During the lights-out, use the old way. Do it, or the ledger goes to the police. C.'",
+      "relation": "r3_coerce"
+    },
+    {
+      "id": "e3_plan",
+      "room": "study",
+      "title": "Edmund's notebook",
+      "text": "A line in Edmund's hand: 'The old way: only family, and, I regret, Finch, who found it while shelving.'",
+      "knowers": [
+        "edmund",
+        "clara",
+        "felix",
+        "tobias"
+      ]
+    },
+    {
+      "id": "e3_ledger",
+      "room": "study",
+      "title": "Ledger",
+      "text": "A ledger with altered entries in Tobias's hand. Edmund's note: 'Confront T. after dinner.'",
+      "relation": "r3_tobias"
+    },
+    {
+      "id": "e3_poker",
+      "room": "study",
+      "title": "Fire poker",
+      "text": "The fire poker is wiped and returned to its stand. The window is latched."
+    },
+    {
+      "id": "e3_alarm",
+      "room": "study",
+      "title": "Study alarm log",
+      "text": "The study's battery-backed alarm logged a person in the room at 9:30, during the blackout. It does not say who.",
+      "act": {
+        "slot": 5,
+        "room": "study",
+        "restrictsTo": [
+          "clara",
+          "tobias",
+          "roz",
+          "imani",
+          "gideon",
+          "felix"
+        ]
+      }
+    }
+  ],
+  "baits": [
+    {
+      "id": "b3_breaker",
+      "announcement": "The electrician says the storm blew the main breaker. A simple accident.",
+      "fact": "f3_breaker",
+      "slip": "Blown? Nonsense. The switch does not just... I mean, old wiring does that, I suppose.",
+      "neutral": "The storm? Well, it was a dreadful night."
+    },
+    {
+      "id": "b3_window",
+      "announcement": "Police say the study window was found wide open.",
+      "fact": "f3_window",
+      "slip": "Open? It was latched, I... it is always latched. Mr. Vale was particular.",
+      "neutral": "The window? I could not say."
+    },
+    {
+      "id": "b3_passage",
+      "announcement": "The passage entrance has been found behind the hall clock.",
+      "fact": "f3_passage",
+      "slip": "The clock? No, that is not where... I mean, how would anyone know?",
+      "neutral": "A passage? How extraordinary."
+    }
+  ],
+  "tells": [
+    {
+      "claim": "c3_cl_loc4",
+      "text": "Her smile does not reach her eyes.",
+      "reliable": true
+    },
+    {
+      "claim": "c3_to_loc5",
+      "text": "Dabs his forehead with a handkerchief.",
+      "reliable": true
+    },
+    {
+      "claim": "c3_ro_loc4",
+      "text": "Twists her ring.",
+      "reliable": false
+    },
+    {
+      "claim": "c3_im_loc4",
+      "text": "Avoids eye contact.",
+      "reliable": false
+    }
+  ],
+  "solution": {
+    "culprits": [
+      "clara",
+      "tobias"
+    ],
+    "windowFinal": [
+      5
+    ],
+    "proof": {
+      "contradictions": [
+        [
+          "c3_cl_loc2",
+          "c3_fe_saw_cl2"
+        ],
+        [
+          "c3_ro_loc4",
+          "e3_wifi"
+        ],
+        [
+          "c3_im_loc4",
+          "e3_wifi"
+        ],
+        [
+          "c3_cl_loc4",
+          "inferred:e3_meter"
+        ],
+        [
+          "c3_ro_saw_cl4",
+          "inferred:e3_meter"
+        ],
+        [
+          "c3_to_loc5",
+          "inferred:e3_alarm"
+        ]
+      ],
+      "rehearsed": [],
+      "impossible": [],
+      "sharpBaits": [
+        {
+          "bait": "b3_breaker",
+          "person": "clara"
+        },
+        {
+          "bait": "b3_window",
+          "person": "tobias"
+        }
+      ],
+      "eliminations": [
+        {
+          "evidence": "e3_meter",
+          "survivor": "clara"
+        },
+        {
+          "evidence": "e3_alarm",
+          "survivor": "tobias"
+        }
+      ]
+    },
+    "cleared": {
+      "roz": {
+        "slot": 5,
+        "room": "study",
+        "anchors": [
+          "e3_wifi"
+        ]
+      },
+      "imani": {
+        "slot": 5,
+        "room": "study",
+        "anchors": [
+          "e3_wifi"
+        ]
+      },
+      "felix": {
+        "slot": 5,
+        "room": "study",
+        "anchors": [
+          "e3_recording"
+        ]
+      },
+      "gideon": {
+        "slot": 5,
+        "room": "study",
+        "anchors": []
+      }
+    },
+    "motive": {
+      "clara": "r3_clara_firm",
+      "tobias": "r3_tobias"
+    }
+  }
+}

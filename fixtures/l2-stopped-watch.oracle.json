@@ -1,0 +1,106 @@
+{
+  "caseId": "l2-stopped-watch",
+  "window": [
+    3
+  ],
+  "crimeScene": "cabinet_room",
+  "contradictions": [
+    [
+      "c2_b_loc3",
+      "c2_r_saw_beatrix"
+    ],
+    [
+      "c2_b_loc3",
+      "e2_cabinetlog"
+    ],
+    [
+      "c2_d_loc5",
+      "c2_r_saw_dorian"
+    ],
+    [
+      "c2_r_loc3",
+      "c2_r_truth"
+    ],
+    [
+      "c2_r_loc3",
+      "e2_tab"
+    ]
+  ],
+  "rehearsed": [],
+  "impossible": [
+    {
+      "person": "dorian",
+      "from": "c2_d_loc3",
+      "to": "c2_d_loc5",
+      "needed": 3,
+      "available": 2
+    },
+    {
+      "person": "rufus",
+      "from": "c2_r_loc3",
+      "to": "c2_d_saw_rufus",
+      "needed": 2,
+      "available": 1
+    },
+    {
+      "person": "rufus",
+      "from": "c2_r_loc3",
+      "to": "c2_r_loc4",
+      "needed": 2,
+      "available": 1
+    },
+    {
+      "person": "dorian",
+      "from": "e2_gate",
+      "to": "c2_d_loc5",
+      "needed": 3,
+      "available": 2
+    }
+  ],
+  "feasibility": {
+    "beatrix": true,
+    "dorian": false,
+    "rufus": false,
+    "imogen": false
+  },
+  "acts": {},
+  "inferred": [],
+  "alibiSupport": {
+    "beatrix@5": {
+      "claimed": "main_hall",
+      "supporters": [
+        {
+          "by": "imogen",
+          "claim": "c2_i_saw_beatrix",
+          "reliable": true
+        }
+      ],
+      "supported": true
+    },
+    "rufus@4": {
+      "claimed": "main_hall",
+      "supporters": [
+        {
+          "by": "dorian",
+          "claim": "c2_d_saw_rufus",
+          "reliable": true
+        }
+      ],
+      "supported": true
+    }
+  },
+  "motivePaths": {
+    "beatrix": [
+      "r2_beatrix"
+    ],
+    "dorian": [
+      "r2_dorian"
+    ],
+    "rufus": [
+      "r2_rufus"
+    ],
+    "imogen": [
+      "r2_imogen"
+    ]
+  }
+}
