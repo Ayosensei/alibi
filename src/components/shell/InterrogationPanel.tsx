@@ -295,11 +295,15 @@ export function InterrogationPanel() {
           </div>
 
           <Button
-            variant={existingMurderStatement ? 'secondary' : 'brass'}
+            variant="secondary"
             size="default"
             disabled={isAsking}
             onClick={() => handleAsk('whereabouts', murderSlot)}
-            className="w-full justify-between h-auto py-2.5 px-3 border border-border text-left transition-all"
+            className={`w-full justify-between h-auto py-2.5 px-3 text-left transition-all ${
+              existingMurderStatement
+                ? 'bg-surface-2 hover:bg-surface-3 border border-border'
+                : 'bg-surface-2 hover:bg-surface-3 border-2 border-brass shadow-sm'
+            }`}
           >
             <div className="flex items-center gap-2.5 min-w-0">
               {existingMurderStatement ? (
@@ -318,7 +322,13 @@ export function InterrogationPanel() {
                 </span>
               </div>
             </div>
-            <span className="font-mono text-xs px-2 py-0.5 rounded bg-surface-1 text-brass border border-border shrink-0 ml-2">
+            <span
+              className={`font-mono text-xs px-2.5 py-1 rounded font-medium shrink-0 ml-2 ${
+                existingMurderStatement
+                  ? 'bg-surface-3 text-text-secondary border border-border'
+                  : 'bg-brass text-on-brass'
+              }`}
+            >
               {existingMurderStatement ? 'Re-Ask' : '1-Click Ask'}
             </span>
           </Button>
