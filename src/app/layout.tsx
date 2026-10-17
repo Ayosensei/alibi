@@ -26,6 +26,11 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: 'Alibi — Every lie leaves a path',
   description: 'A detective game where reasoning runs on FalkorDB graphs.',
+  icons: {
+    icon: '/alibi-logo.jpg',
+    shortcut: '/alibi-logo.jpg',
+    apple: '/alibi-logo.jpg',
+  },
 };
 
 export default function RootLayout({

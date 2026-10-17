@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Chip, Stamp, Polaroid, TraceRow } from '@/components/atoms';
 import {
@@ -34,9 +35,16 @@ export default function TutorialPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="font-mono text-xs font-semibold tracking-widest text-brass uppercase hover:text-text-primary transition-colors"
+            className="flex items-center gap-2.5 font-mono text-xs font-semibold tracking-widest text-brass uppercase hover:text-text-primary transition-colors group"
           >
-            ALIBI
+            <Image
+              src="/alibi-logo.jpg"
+              alt="Alibi Logo"
+              width={28}
+              height={28}
+              className="size-7 rounded-full object-cover border border-brass/50 group-hover:border-brass transition-colors shadow-sm"
+            />
+            <span>ALIBI</span>
           </Link>
           <span className="text-border-strong">/</span>
           <span className="font-mono text-xs text-text-secondary uppercase tracking-wider">

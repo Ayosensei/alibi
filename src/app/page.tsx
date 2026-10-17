@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Chip, Stamp } from '@/components/atoms';
 import {
@@ -21,9 +22,18 @@ export default function Home() {
       {/* Top Banner Navigation */}
       <header className="h-16 border-b border-border px-6 md:px-12 flex items-center justify-between max-w-7xl mx-auto">
         <div className="flex items-center gap-3">
-          <span className="font-mono text-xs font-semibold tracking-widest text-brass uppercase">
-            ALIBI
-          </span>
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <Image
+              src="/alibi-logo.jpg"
+              alt="Alibi Logo"
+              width={32}
+              height={32}
+              className="size-8 rounded-full object-cover border border-brass/50 group-hover:border-brass transition-colors shadow-sm"
+            />
+            <span className="font-mono text-xs font-semibold tracking-widest text-brass uppercase group-hover:text-text-primary transition-colors">
+              ALIBI
+            </span>
+          </Link>
           <span className="text-border-strong">/</span>
           <span className="font-mono text-xs text-text-secondary uppercase tracking-wider hidden sm:inline">
             FalkorDB Detective Game
@@ -57,6 +67,19 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="py-16 md:py-24 px-6 md:px-12 max-w-5xl mx-auto text-center space-y-8">
+        <div className="flex justify-center -mb-2">
+          <div className="p-1 rounded-full border border-brass/40 bg-surface-2/80 shadow-card">
+            <Image
+              src="/alibi-logo.jpg"
+              alt="Alibi Detective Logo"
+              width={96}
+              height={96}
+              priority
+              className="size-20 md:size-24 rounded-full object-cover shadow-sm"
+            />
+          </div>
+        </div>
+
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-2 border border-border">
           <Sparkles className="size-3 text-brass" />
           <span className="font-mono text-xs uppercase tracking-widest text-brass">

@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Chip } from '@/components/atoms';
 import { useGameStore } from '@/lib/store';
@@ -45,10 +46,17 @@ export function CaseHeader() {
       <div className="flex items-center gap-3 min-w-0">
         <Link
           href="/season/1"
-          className="text-text-secondary hover:text-text-primary p-1 -ml-1 rounded transition-colors"
+          className="flex items-center gap-2 text-text-secondary hover:text-text-primary p-1 -ml-1 rounded transition-colors group shrink-0"
           title="Back to Dossiers"
         >
           <ArrowLeft className="size-4" />
+          <Image
+            src="/alibi-logo.jpg"
+            alt="Alibi Logo"
+            width={24}
+            height={24}
+            className="size-6 rounded-full object-cover border border-brass/50 group-hover:border-brass transition-colors shadow-sm"
+          />
         </Link>
 
         <div className="flex items-center gap-2.5 min-w-0">
