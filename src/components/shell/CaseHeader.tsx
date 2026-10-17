@@ -70,8 +70,8 @@ export function CaseHeader() {
         </div>
       </div>
 
-      {/* Center: Window & Tick Info */}
-      <div className="flex items-center gap-3">
+      {/* Center: Window & Tick Info (Visible on md+) */}
+      <div className="hidden md:flex items-center gap-3 shrink-0">
         <Chip
           variant="thread"
           icon={<Clock className="size-3 text-thread" />}
@@ -86,12 +86,12 @@ export function CaseHeader() {
       </div>
 
       {/* Right: Actions */}
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setResetModalOpen(true)}
-          className="text-xs text-text-secondary hover:text-text-primary hidden sm:inline-flex"
+          className="text-xs text-text-secondary hover:text-text-primary hidden sm:inline-flex h-8 px-2"
           title="Restart Case Investigation (Reset Progress)"
         >
           <RotateCcw className="size-3.5 mr-1 text-text-tertiary" />
@@ -102,7 +102,7 @@ export function CaseHeader() {
           variant="ghost"
           size="sm"
           onClick={() => setBriefingOpen(true)}
-          className="text-xs text-text-secondary hover:text-text-primary hidden md:inline-flex"
+          className="text-xs text-text-secondary hover:text-text-primary hidden md:inline-flex h-8 px-2"
           title="Case Briefing & Shortcuts (?)"
         >
           <HelpCircle className="size-3.5 mr-1" />
@@ -116,12 +116,12 @@ export function CaseHeader() {
             size="sm"
             disabled={baitsLeft <= 0}
             onClick={() => setBaitModalOpen(true)}
-            className="text-xs"
+            className="text-xs h-8 px-2 sm:px-3"
             title="Use Bait Announcement (B)"
           >
             <Sparkles className="size-3.5 mr-1" />
             Bait ({baitsLeft})
-            <kbd className="ml-1 px-1 py-0.5 rounded bg-surface-2 border border-border text-xs text-text-primary">B</kbd>
+            <kbd className="ml-1 px-1 py-0.5 rounded bg-surface-2 border border-border text-xs text-text-primary hidden sm:inline-block">B</kbd>
           </Button>
         )}
 
@@ -130,22 +130,22 @@ export function CaseHeader() {
           size="sm"
           disabled={isInspectorStreaming}
           onClick={() => runInspectorAction('assist')}
-          className="text-xs"
+          className="text-xs h-8 px-2 sm:px-3"
         >
           <Sparkles className="size-3.5 mr-1 text-inspector" />
-          <span className="hidden sm:inline">Ask</span> Inspector
+          <span className="hidden sm:inline">Ask </span>Inspector
         </Button>
 
         <Button
           variant="default"
           size="sm"
           onClick={() => setAccuseModalOpen(true)}
-          className="text-xs"
+          className="text-xs h-8 px-2.5 sm:px-3"
           title="File Formal Accusation (A)"
         >
           <ShieldAlert className="size-3.5 mr-1" />
           Accuse
-          <kbd className="ml-1.5 px-1 py-0.5 rounded bg-surface-2 border border-border text-xs text-text-primary">A</kbd>
+          <kbd className="ml-1.5 px-1 py-0.5 rounded bg-surface-2 border border-border text-xs text-text-primary hidden sm:inline-block">A</kbd>
         </Button>
       </div>
     </header>

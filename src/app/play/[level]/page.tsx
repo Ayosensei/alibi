@@ -15,7 +15,8 @@ import { BaitModal } from '@/components/modals/BaitModal';
 import { AccuseModal } from '@/components/modals/AccuseModal';
 import { ResetModal } from '@/components/modals/ResetModal';
 import { ErrorBanner } from '@/components/atoms';
-import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2, Users, MessageSquare, LayoutGrid } from 'lucide-react';
 
 
 function PlayPageContent({ level }: { level: string }) {
@@ -30,6 +31,7 @@ function PlayPageContent({ level }: { level: string }) {
     initCase,
     runInspectorAction,
     selectTab,
+    selectedSuspectId,
     setBriefingOpen,
     setBaitModalOpen,
     setAccuseModalOpen,
@@ -37,6 +39,14 @@ function PlayPageContent({ level }: { level: string }) {
     isBaitModalOpen,
     isAccuseModalOpen,
   } = useGameStore();
+
+  const [mobileTab, setMobileTab] = React.useState<'suspects' | 'interrogation' | 'tabs'>('suspects');
+
+  React.useEffect(() => {
+    if (selectedSuspectId) {
+      setMobileTab('interrogation');
+    }
+  }, [selectedSuspectId]);
 
   React.useEffect(() => {
     initCase(level).then(() => {
@@ -191,16 +201,72 @@ function PlayPageContent({ level }: { level: string }) {
       {/* Dynamic Detective Lead Banner */}
       <CaseObjectiveBanner />
 
-      {/* Screen size recommendation notice */}
-      <div className="xl:hidden py-1 px-4 bg-surface-2 border-b border-border text-center text-xs font-mono text-text-secondary">
-        Best on a larger screen (1440×900 or 1920×1080)
+      {/* Mobile Workspace Switcher (< lg) */}
+      <div className="lg:hidden flex items-center border-b border-border bg-surface-2 shrink-0">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setMobileTab('suspects')}
+          className={`flex-1 rounded-none h-11 text-xs font-mono border-b-2 transition-colors ${
+            mobileTab === 'suspects'
+              ? 'border-brass text-text-primary bg-surface-1 font-semibold'
+              : 'border-transparent text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          <Users className="size-3.5 mr-1.5" />
+          Dossier
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setMobileTab('interrogation')}
+          className={`flex-1 rounded-none h-11 text-xs font-mono border-b-2 transition-colors ${
+            mobileTab === 'interrogation'
+              ? 'border-brass text-text-primary bg-surface-1 font-semibold'
+              : 'border-transparent text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          <MessageSquare className="size-3.5 mr-1.5" />
+          Interrogate
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setMobileTab('tabs')}
+          className={`flex-1 rounded-none h-11 text-xs font-mono border-b-2 transition-colors ${
+            mobileTab === 'tabs'
+              ? 'border-brass text-text-primary bg-surface-1 font-semibold'
+              : 'border-transparent text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          <LayoutGrid className="size-3.5 mr-1.5" />
+          Board & Tabs
+        </Button>
       </div>
 
-      {/* Main 3-Column Layout */}
-      <main className="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-[calc(100vh-3.5rem)]">
-        <SuspectsPanel />
-        <InterrogationPanel />
-        <FileTabsPanel />
+      {/* Main Layout: On desktop all 3 side-by-side; on mobile only the active tab */}
+      <main className="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-[calc(100vh-7rem)] lg:min-h-[calc(100vh-3.5rem)]">
+        <div
+          className={`w-full lg:w-72 xl:w-80 shrink-0 h-full ${
+            mobileTab === 'suspects' ? 'flex flex-col' : 'hidden lg:flex lg:flex-col'
+          }`}
+        >
+          <SuspectsPanel />
+        </div>
+        <div
+          className={`flex-1 h-full min-w-0 ${
+            mobileTab === 'interrogation' ? 'flex flex-col' : 'hidden lg:flex lg:flex-col'
+          }`}
+        >
+          <InterrogationPanel />
+        </div>
+        <div
+          className={`flex-1 h-full min-w-0 ${
+            mobileTab === 'tabs' ? 'flex flex-col' : 'hidden lg:flex lg:flex-col'
+          }`}
+        >
+          <FileTabsPanel />
+        </div>
       </main>
 
       {/* Case Briefing, Search, Bait & Accuse Modals */}

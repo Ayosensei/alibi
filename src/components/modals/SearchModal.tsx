@@ -32,7 +32,7 @@ export function SearchModal() {
       <div
         role="dialog"
         aria-modal="true"
-        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl bg-surface-1 border border-border shadow-floating p-6 md:p-8 space-y-6 animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl bg-surface-1 border border-border shadow-floating p-4 sm:p-6 md:p-8 space-y-6 animate-in zoom-in-95 duration-200"
       >
         {/* Close icon */}
         <div className="absolute top-4 right-4">

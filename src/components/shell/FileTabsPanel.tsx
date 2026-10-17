@@ -44,8 +44,8 @@ export function FileTabsPanel() {
   return (
     <section className="flex-1 min-w-0 md:min-w-[480px] lg:min-w-[560px] flex flex-col bg-surface-1 h-full overflow-hidden select-none">
       {/* 1. Folder Tabs Bar */}
-      <div className="h-14 shrink-0 flex items-center justify-between px-4 border-b border-border bg-surface-2/60">
-        <div className="flex items-center gap-1">
+      <div className="h-14 shrink-0 flex items-center justify-between px-2 sm:px-4 border-b border-border bg-surface-2/60 overflow-x-auto scrollbar-none">
+        <div className="flex items-center gap-1 shrink-0">
           {tabs.map((tab) => {
             const isActive = selectedTab === tab.id;
             return (
@@ -54,17 +54,17 @@ export function FileTabsPanel() {
                 variant="ghost"
                 size="sm"
                 onClick={() => selectTab(tab.id)}
-                className={`relative h-10 px-3 text-xs font-medium rounded-none border-b-2 transition-all ${
+                className={`relative h-10 px-2.5 sm:px-3 text-xs font-medium rounded-none border-b-2 transition-all ${
                   isActive
                     ? 'border-primary text-text-primary bg-surface-2'
                     : 'border-transparent text-text-secondary hover:text-text-primary'
                 }`}
                 title={`Switch to ${tab.label} (${tab.num})`}
               >
-                <span className="flex items-center gap-1.5">
+                <span className="flex items-center gap-1 sm:gap-1.5">
                   {tab.icon}
                   <span>{tab.label}</span>
-                  <kbd className="px-1 py-0.5 rounded bg-surface-2 border border-border text-xs text-text-tertiary">
+                  <kbd className="hidden sm:inline-block px-1 py-0.5 rounded bg-surface-2 border border-border text-xs text-text-tertiary">
                     {tab.num}
                   </kbd>
                 </span>
@@ -73,8 +73,8 @@ export function FileTabsPanel() {
           })}
         </div>
 
-        {/* Quick count badges */}
-        <div className="flex items-center gap-1.5 hidden sm:flex">
+        {/* Quick count badges (Hidden on narrow screens) */}
+        <div className="hidden md:flex items-center gap-1.5 shrink-0">
           {contradictions.length > 0 && (
             <Chip variant="thread" className="text-xs">
               {contradictions.length} conflict{contradictions.length === 1 ? '' : 's'}

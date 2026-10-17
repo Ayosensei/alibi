@@ -137,7 +137,7 @@ function Season1Content() {
 
         {/* Actions (Hidden in Present Mode) */}
         {!isPresentMode && (
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <Link href="/tutorial">
               <Button
                 variant="ghost"

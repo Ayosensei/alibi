@@ -41,18 +41,18 @@ export default function Home() {
           </span>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Link href="/tutorial">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link href="/tutorial" className="hidden sm:inline-flex">
             <Button variant="ghost" size="sm" className="text-xs text-text-secondary hover:text-text-primary">
               Tutorial
             </Button>
           </Link>
-          <Link href="/docs">
+          <Link href="/docs" className="hidden md:inline-flex">
             <Button variant="ghost" size="sm" className="text-xs text-text-secondary hover:text-text-primary">
               Docs & Arch
             </Button>
           </Link>
-          <Link href="/styleguide">
+          <Link href="/styleguide" className="hidden lg:inline-flex">
             <Button variant="ghost" size="sm" className="text-xs text-text-secondary hover:text-text-primary">
               Styleguide
             </Button>

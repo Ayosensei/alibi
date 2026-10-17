@@ -30,7 +30,7 @@ export function SuspectsPanel() {
   const baitsLeft = board?.baitsLeft ?? caseData.baitsAllowed;
 
   return (
-    <aside className="w-full lg:w-72 xl:w-80 shrink-0 flex flex-col bg-surface-1 border-r border-border overflow-y-auto p-4 space-y-6 select-none">
+    <aside className="w-full h-full flex flex-col bg-surface-1 border-r border-border overflow-y-auto p-4 space-y-6 select-none">
       {/* 1. Suspects Section */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
