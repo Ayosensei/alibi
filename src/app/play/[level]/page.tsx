@@ -13,6 +13,7 @@ import { BriefingModal } from '@/components/modals/BriefingModal';
 import { SearchModal } from '@/components/modals/SearchModal';
 import { BaitModal } from '@/components/modals/BaitModal';
 import { AccuseModal } from '@/components/modals/AccuseModal';
+import { ResetModal } from '@/components/modals/ResetModal';
 import { ErrorBanner } from '@/components/atoms';
 import { Loader2 } from 'lucide-react';
 
@@ -207,6 +208,7 @@ function PlayPageContent({ level }: { level: string }) {
       <SearchModal />
       <BaitModal />
       <AccuseModal />
+      <ResetModal />
     </div>
   );
 }

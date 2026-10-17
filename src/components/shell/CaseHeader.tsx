@@ -12,6 +12,7 @@ import {
   Sparkles,
   ArrowLeft,
   Search,
+  RotateCcw,
 } from 'lucide-react';
 
 export function CaseHeader() {
@@ -22,6 +23,7 @@ export function CaseHeader() {
     setBaitModalOpen,
     runInspectorAction,
     setBriefingOpen,
+    setResetModalOpen,
     isInspectorStreaming,
   } = useGameStore();
 
@@ -77,6 +79,17 @@ export function CaseHeader() {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2.5">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setResetModalOpen(true)}
+          className="text-xs text-text-secondary hover:text-text-primary hidden sm:inline-flex"
+          title="Restart Case Investigation (Reset Progress)"
+        >
+          <RotateCcw className="size-3.5 mr-1 text-text-tertiary" />
+          Restart
+        </Button>
+
         <Button
           variant="ghost"
           size="sm"

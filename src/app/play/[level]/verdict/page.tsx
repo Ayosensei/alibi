@@ -24,6 +24,7 @@ import {
   Layers,
   HelpCircle,
   RefreshCw,
+  RotateCcw,
 } from 'lucide-react';
 
 const NEXT_LEVEL_MAP: Record<string, string> = {
@@ -80,12 +81,23 @@ function VerdictContent({ level }: { level: string }) {
   const searchParams = useSearchParams();
   const isPresentMode = searchParams.get('present') === '1';
 
-  const { caseData, initCase, lastVerdict } = useGameStore();
+  const { caseData, initCase, lastVerdict, resetCaseProgress } = useGameStore();
+  const [isReplaying, setIsReplaying] = React.useState(false);
 
   const [verdictData, setVerdictData] = React.useState<AccuseOutput>(
     () => lastVerdict ?? DEFAULT_DEMO_VERDICT
   );
   const [activeStepIndex, setActiveStepIndex] = React.useState<number>(0);
+
+  const handleReplayFromScratch = async () => {
+    setIsReplaying(true);
+    try {
+      await resetCaseProgress(level);
+      router.push(`/play/${level}`);
+    } finally {
+      setIsReplaying(false);
+    }
+  };
 
   // Present mode class toggle
   React.useEffect(() => {
@@ -468,12 +480,22 @@ function VerdictContent({ level }: { level: string }) {
         )}
 
         <div className="flex flex-wrap items-center justify-between gap-4 pt-4">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Link href={`/play/${level}`}>
               <Button variant="secondary" size="default">
                 Review Case Dossier
               </Button>
             </Link>
+            <Button
+              variant="outline"
+              size="default"
+              disabled={isReplaying}
+              onClick={handleReplayFromScratch}
+              className="text-text-primary hover:bg-surface-2 gap-1.5"
+            >
+              <RotateCcw className="size-4 text-brass" />
+              Replay From Scratch
+            </Button>
             <Link href="/season/1">
               <Button variant="ghost" size="default">
                 Return to Dossiers Map

@@ -12,6 +12,7 @@ import {
   Star,
   Play,
   RotateCw,
+  RotateCcw,
   Sparkles,
   ArrowRight,
   ShieldAlert,
@@ -65,8 +66,9 @@ function Season1Content() {
   const searchParams = useSearchParams();
   const isPresentMode = searchParams.get('present') === '1';
 
-  const { progress } = useGameStore();
+  const { progress, resetCaseProgress, resetAllProgress } = useGameStore();
   const [skipLock, setSkipLock] = React.useState(false);
+  const [isResetting, setIsResetting] = React.useState(false);
 
   React.useEffect(() => {
     if (isPresentMode) {
@@ -92,6 +94,28 @@ function Season1Content() {
     router.push(`/play/${caseId}${qStr}`);
   };
 
+  const handleResetSingle = async (caseId: string) => {
+    if (typeof window !== 'undefined' && window.confirm('Reset this case to start over fresh?')) {
+      setIsResetting(true);
+      try {
+        await resetCaseProgress(caseId);
+      } finally {
+        setIsResetting(false);
+      }
+    }
+  };
+
+  const handleResetAll = async () => {
+    if (typeof window !== 'undefined' && window.confirm('Reset all season progress and lock dossiers again?')) {
+      setIsResetting(true);
+      try {
+        await resetAllProgress();
+      } finally {
+        setIsResetting(false);
+      }
+    }
+  };
+
   return (
     <div className={`min-h-screen bg-background text-text-primary p-6 md:p-12 max-w-6xl mx-auto space-y-12 ${isPresentMode ? 'text-lg' : ''}`}>
       {/* Header */}
@@ -108,18 +132,32 @@ function Season1Content() {
           </p>
         </div>
 
-        {/* Dev Mode Skip Toggle (Hidden in Present Mode) */}
+        {/* Actions (Hidden in Present Mode) */}
         {!isPresentMode && (
-          <div className="flex items-center gap-2 p-2 rounded-lg bg-surface-2 border border-border text-xs text-text-secondary">
-            <label className="flex items-center gap-2 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={skipLock}
-                onChange={(e) => setSkipLock(e.target.checked)}
-                className="rounded border-border text-primary focus:ring-thread accent-primary"
-              />
-              <span>Skip locks (Dev)</span>
-            </label>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={isResetting}
+              onClick={handleResetAll}
+              className="text-xs text-text-tertiary hover:text-thread hover:bg-surface-2 gap-1.5"
+              title="Reset all season progress and lock dossiers"
+            >
+              <RotateCcw className="size-3.5" />
+              <span>Reset All Progress</span>
+            </Button>
+
+            <div className="flex items-center gap-2 p-2 rounded-lg bg-surface-2 border border-border text-xs text-text-secondary">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={skipLock}
+                  onChange={(e) => setSkipLock(e.target.checked)}
+                  className="rounded border-border text-primary focus:ring-thread accent-primary"
+                />
+                <span>Skip locks (Dev)</span>
+              </label>
+            </div>
           </div>
         )}
       </header>
@@ -190,15 +228,29 @@ function Season1Content() {
               <div className="pt-6 border-t border-border/60 mt-6 flex flex-col gap-2">
                 {unlocked ? (
                   <>
-                    <Button
-                      variant="default"
-                      size="default"
-                      onClick={() => handlePlay(caseMeta.id, false)}
-                      className="w-full justify-between"
-                    >
-                      <span>{prog.solved ? 'Replay Case' : 'Play Case'}</span>
-                      <ArrowRight className="size-4" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="default"
+                        size="default"
+                        onClick={() => handlePlay(caseMeta.id, false)}
+                        className="flex-1 justify-between"
+                      >
+                        <span>{prog.solved ? 'Review / Play' : 'Play Case'}</span>
+                        <ArrowRight className="size-4" />
+                      </Button>
+                      {prog.solved && (
+                        <Button
+                          variant="outline"
+                          size="default"
+                          disabled={isResetting}
+                          onClick={() => handleResetSingle(caseMeta.id)}
+                          className="px-3 text-text-secondary hover:text-thread hover:bg-surface-3"
+                          title="Reset this case graph and progress to solve from scratch"
+                        >
+                          <RotateCcw className="size-4" />
+                        </Button>
+                      )}
+                    </div>
                     <Button
                       variant="secondary"
                       size="sm"

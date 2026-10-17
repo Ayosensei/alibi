@@ -32,6 +32,34 @@ export interface LevelProgress {
   arcClue?: string | null;
 }
 
+const DEFAULT_PROGRESS: Record<string, LevelProgress> = {
+  'l1-quiet-pact': { stars: 0, solved: false, accusationsUsed: 0 },
+  'l2-stopped-watch': { stars: 0, solved: false, accusationsUsed: 0 },
+  'l3-blackout-dinner': { stars: 0, solved: false, accusationsUsed: 0 },
+};
+
+function loadStoredProgress(): Record<string, LevelProgress> {
+  if (typeof window === 'undefined') return DEFAULT_PROGRESS;
+  try {
+    const raw = localStorage.getItem('alibi_progress');
+    if (raw) {
+      return { ...DEFAULT_PROGRESS, ...JSON.parse(raw) };
+    }
+  } catch {
+    // fallback
+  }
+  return DEFAULT_PROGRESS;
+}
+
+function saveStoredProgress(progress: Record<string, LevelProgress>) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem('alibi_progress', JSON.stringify(progress));
+  } catch {
+    // ignore
+  }
+}
+
 export interface GameState {
   playerId: string;
   caseId: string;
@@ -51,6 +79,8 @@ export interface GameState {
   isBaitModalOpen: boolean;
   isAccuseModalOpen: boolean;
   isSearchModalOpen: boolean;
+  isResetModalOpen: boolean;
+  setResetModalOpen: (open: boolean) => void;
   activeSearchRoomId: string | null;
   lastSearchResults: SearchOutput | null;
 
@@ -88,6 +118,8 @@ export interface GameState {
 
   // Actions
   initCase: (caseId: string, reset?: boolean) => Promise<void>;
+  resetCaseProgress: (caseId: string) => Promise<void>;
+  resetAllProgress: () => Promise<void>;
   refreshBoard: () => Promise<void>;
   selectSuspect: (suspectId: string | null) => void;
   selectTab: (tab: 'timeline' | 'board' | 'inspector' | 'notes') => void;
@@ -133,6 +165,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   isBaitModalOpen: false,
   isAccuseModalOpen: false,
   isSearchModalOpen: false,
+  isResetModalOpen: false,
+  setResetModalOpen: (open) => set({ isResetModalOpen: open }),
   activeSearchRoomId: null,
   lastSearchResults: null,
 
@@ -157,11 +191,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     inspector: true,
   },
 
-  progress: {
-    'l1-quiet-pact': { stars: 0, solved: false, accusationsUsed: 0 },
-    'l2-stopped-watch': { stars: 0, solved: false, accusationsUsed: 0 },
-    'l3-blackout-dinner': { stars: 0, solved: false, accusationsUsed: 0 },
-  },
+  progress: loadStoredProgress(),
 
   lastVerdict: null,
   prefilledAccused: [],
@@ -170,6 +200,14 @@ export const useGameStore = create<GameState>((set, get) => ({
   initCase: async (caseId: string, reset = false) => {
     set({ isLoading: true, error: null, caseId, lastVerdict: null, usedBaitIds: [] });
     const { playerId } = get();
+
+    if (reset && typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(`alibi_verdict_${caseId}`);
+      } catch {
+        // ignore
+      }
+    }
 
     const startRes = await api.startCase(playerId, caseId, reset);
     if (!startRes.ok) {
@@ -189,10 +227,42 @@ export const useGameStore = create<GameState>((set, get) => ({
       inspectorEvents: [],
       lastSearchResults: null,
       usedBaitIds: [],
+      highlights: { refs: [], highlightedCardId: null, focusedCell: null },
+      boardPositions: reset ? {} : get().boardPositions,
     });
 
     await get().refreshBoard();
     set({ isLoading: false });
+  },
+
+  resetCaseProgress: async (caseId: string) => {
+    await get().initCase(caseId, true);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(`alibi_verdict_${caseId}`);
+      } catch {}
+    }
+    const nextProgress = {
+      ...get().progress,
+      [caseId]: { stars: 0, solved: false, accusationsUsed: 0 },
+    };
+    saveStoredProgress(nextProgress);
+    set({ progress: nextProgress, lastVerdict: null });
+  },
+
+  resetAllProgress: async () => {
+    const { playerId } = get();
+    for (const cid of ['l1-quiet-pact', 'l2-stopped-watch', 'l3-blackout-dinner']) {
+      await api.startCase(playerId, cid, true);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.removeItem(`alibi_verdict_${cid}`);
+        } catch {}
+      }
+    }
+    saveStoredProgress(DEFAULT_PROGRESS);
+    set({ progress: DEFAULT_PROGRESS, lastVerdict: null });
+    await get().initCase(get().caseId, true);
   },
 
   refreshBoard: async () => {
@@ -389,17 +459,17 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     // Update level progress if level is over or solved
     if (data.result === 'full' || data.levelOver) {
-      set((s) => ({
-        progress: {
-          ...s.progress,
-          [caseId]: {
-            stars: Math.max(s.progress[caseId]?.stars ?? 0, data.stars),
-            solved: data.result === 'full',
-            accusationsUsed: (s.progress[caseId]?.accusationsUsed ?? 0) + 1,
-            arcClue: get().caseData?.arcClue,
-          },
+      const nextProgress = {
+        ...get().progress,
+        [caseId]: {
+          stars: Math.max(get().progress[caseId]?.stars ?? 0, data.stars),
+          solved: data.result === 'full',
+          accusationsUsed: (get().progress[caseId]?.accusationsUsed ?? 0) + 1,
+          arcClue: get().caseData?.arcClue,
         },
-      }));
+      };
+      saveStoredProgress(nextProgress);
+      set({ progress: nextProgress });
     }
 
     return data;
