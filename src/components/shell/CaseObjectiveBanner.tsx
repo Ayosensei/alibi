@@ -62,7 +62,7 @@ export function CaseObjectiveBanner() {
           onClick={() => selectTab('timeline')}
           className="h-6 px-2 text-xs"
         >
-          View Timeline (1)
+          View Timeline
         </Button>
       );
     }
@@ -77,7 +77,7 @@ export function CaseObjectiveBanner() {
           onClick={() => selectTab('inspector')}
           className="h-6 px-2 text-xs"
         >
-          Consult Inspector (3)
+          Consult Inspector
         </Button>
       );
     }
@@ -91,7 +91,7 @@ export function CaseObjectiveBanner() {
         onClick={() => setAccuseModalOpen(true)}
         className="h-6 px-2.5 text-xs shadow-xs"
       >
-        File Accusation (A)
+        File Accusation
       </Button>
     );
   }

@@ -329,7 +329,7 @@ export function InterrogationPanel() {
                   : 'bg-brass text-on-brass'
               }`}
             >
-              {existingMurderStatement ? 'Re-Ask' : '1-Click Ask'}
+              {existingMurderStatement ? 'Re-Ask' : 'Ask'}
             </span>
           </Button>
         </div>

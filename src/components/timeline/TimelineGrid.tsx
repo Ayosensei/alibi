@@ -126,38 +126,29 @@ export function TimelineGrid() {
   return (
     <div className="space-y-4 select-text">
       {/* Table legend & controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs border-b border-border pb-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="font-mono text-text-tertiary uppercase">Legend:</span>
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs border-b border-border pb-2.5">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 font-mono text-xs">
           <div className="flex items-center gap-1.5">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-paper text-ink border border-ink/20 shadow-xs font-mono text-xs">
-              <Feather className="size-2.5" />
-              Spoken Claim
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-3 text-text-primary border border-border shadow-xs font-mono text-xs">
-              <Pin className="size-2.5 text-brass" />
-              Physical Proof
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-inspector/10 text-inspector border border-dashed border-inspector/50 font-mono text-xs">
-              <Sparkles className="size-2.5 text-inspector" />
-              Elimination
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full bg-thread" />
-            <span className="text-text-secondary text-xs">Contradiction</span>
+            <span className="size-2 rounded-full bg-paper border border-ink/40" />
+            <span className="text-text-secondary">Claim</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="size-2 rounded-full bg-brass" />
-            <span className="text-text-secondary text-xs">Murder Window</span>
+            <span className="text-text-secondary">Proof</span>
           </div>
+          <div className="flex items-center gap-1.5">
+            <span className="size-2 rounded-full bg-thread" />
+            <span className="text-text-secondary">Conflict</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="size-2 rounded-full bg-inspector" />
+            <span className="text-text-secondary">Eliminated</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 text-xs font-mono text-text-tertiary">
+          <span className="size-1.5 rounded-full bg-brass" />
+          <span>Murder Window</span>
         </div>
       </div>
 

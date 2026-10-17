@@ -105,12 +105,11 @@ export function CaseHeader() {
           variant="ghost"
           size="sm"
           onClick={() => setBriefingOpen(true)}
-          className="text-xs text-text-secondary hover:text-text-primary hidden md:inline-flex h-8 px-2"
+          className="text-xs text-text-secondary hover:text-text-primary hidden md:inline-flex h-8 px-2.5"
           title="Case Briefing & Shortcuts (?)"
         >
           <HelpCircle className="size-3.5 mr-1" />
           Briefing
-          <kbd className="ml-1.5 px-1 py-0.5 rounded bg-surface-2 border border-border text-xs text-text-tertiary">?</kbd>
         </Button>
 
         {caseData.baitsAllowed > 0 && (
@@ -124,7 +123,6 @@ export function CaseHeader() {
           >
             <Sparkles className="size-3.5 mr-1" />
             Bait ({baitsLeft})
-            <kbd className="ml-1 px-1 py-0.5 rounded bg-surface-2 border border-border text-xs text-text-primary hidden sm:inline-block">B</kbd>
           </Button>
         )}
 
@@ -148,7 +146,6 @@ export function CaseHeader() {
         >
           <ShieldAlert className="size-3.5 mr-1" />
           Accuse
-          <kbd className="ml-1.5 px-1 py-0.5 rounded bg-surface-2 border border-border text-xs text-text-primary hidden sm:inline-block">A</kbd>
         </Button>
       </div>
     </header>

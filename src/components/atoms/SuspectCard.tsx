@@ -86,22 +86,10 @@ export function SuspectCard({
       </div>
 
       {/* Badges / Chips */}
-      {!isVictim && (
-        <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-          <Chip
-            variant="default"
-            icon={<MessageSquareText className="size-3 text-text-tertiary" />}
-          >
-            <span className="tabular-nums">{statementsCount}</span> {statementsCount === 1 ? 'statement' : 'statements'}
-          </Chip>
-          {observationsCount > 0 && (
-            <Chip
-              variant="brass"
-              icon={<Eye className="size-3 text-brass" />}
-            >
-              <span className="tabular-nums">{observationsCount}</span> {observationsCount === 1 ? 'observation' : 'observations'}
-            </Chip>
-          )}
+      {!isVictim && statementsCount > 0 && (
+        <div className="flex items-center gap-1 text-xs font-mono text-text-tertiary pt-0.5">
+          <MessageSquareText className="size-3 text-brass/70" />
+          <span className="tabular-nums">{statementsCount}</span> {statementsCount === 1 ? 'claim logged' : 'claims logged'}
         </div>
       )}
     </div>

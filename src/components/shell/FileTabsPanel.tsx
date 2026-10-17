@@ -61,12 +61,9 @@ export function FileTabsPanel() {
                 }`}
                 title={`Switch to ${tab.label} (${tab.num})`}
               >
-                <span className="flex items-center gap-1 sm:gap-1.5">
+                <span className="flex items-center gap-1.5">
                   {tab.icon}
                   <span>{tab.label}</span>
-                  <kbd className="hidden sm:inline-block px-1 py-0.5 rounded bg-surface-2 border border-border text-xs text-text-tertiary">
-                    {tab.num}
-                  </kbd>
                 </span>
               </Button>
             );

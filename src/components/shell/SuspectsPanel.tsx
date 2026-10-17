@@ -146,8 +146,8 @@ export function SuspectsPanel() {
       </div>
 
       {/* 3. Bait Announcement Section */}
-      <div className="border-t border-border pt-4">
-        {caseData.baitsAllowed > 0 ? (
+      {caseData.baitsAllowed > 0 && (
+        <div className="border-t border-border pt-4">
           <Button
             variant="brass"
             size="default"
@@ -164,14 +164,8 @@ export function SuspectsPanel() {
               {baitsLeft} left
             </span>
           </Button>
-        ) : (
-          <div className="py-2.5 px-3 rounded bg-surface-2 border border-border text-center">
-            <span className="font-mono text-xs text-text-tertiary">
-              No Baits in Level 1 (unlocks in L2/L3)
-            </span>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </aside>
   );
 }
