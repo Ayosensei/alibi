@@ -6,7 +6,7 @@
 
 > **Track 01: Agents That Act on Connected Data**  
 > *Graph Hacks 2026 (WeMakeDevs & FalkorDB)*  
-> Built by **Ayo** · Team **Subaru Boys**
+> Built by **Ayo & Femi** · Team **Subaru Boys**
 
 [![FalkorDB](https://img.shields.io/badge/Graph_Database-FalkorDB-red?logo=redis&logoColor=white)](https://falkordb.com)
 [![Track 01](https://img.shields.io/badge/Track_01-Agents_on_Connected_Data-brass?color=c59b27)](https://wemakedevs.org)
@@ -235,7 +235,7 @@ To ensure fair mysteries without plot holes or mathematical ambiguity, Alibi imp
 
 Per hackathon guidelines, AI coding assistance is fully disclosed:
 - **Assistant:** Gemini 3.8 Flash via Google DeepMind Antigravity CLI.
-- **Human Author & Architect (Ayo):** Conceived the product architecture, designed the tripartite information barrier model, authored all three original mystery plots and clues, specified the design system (`DESIGN.md`), and authored the Cypher query catalog.
+- **Human Authors & Architects (Ayo & Femi · Team Subaru Boys):** Conceived the product architecture, designed the tripartite information barrier model, authored all three original mystery plots and clues, specified the design system (`DESIGN.md`), and authored the Cypher query catalog.
 - **AI Coding Agent:** Assisted with implementing TypeScript schemas, unit tests, parity test suites against the oracle, React components, and styling token enforcement.
 - **Commit History:** Every agent-assisted commit includes the mandatory `Assisted-by: Gemini` trailer.
 

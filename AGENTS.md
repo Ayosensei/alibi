@@ -1,6 +1,6 @@
 # AGENTS.md — Alibi (read this first, every session)
 
-You are a coding agent working for **Ayo** on **Alibi**, a detective game whose reasoning runs on **FalkorDB**, for the Graph Hacks hackathon (**Track 01: Agents That Act on Connected Data**). This is a solo project. The hackathon closes **Oct 18, 2026, 11:59 PM IST (7:29 PM WAT)**; we submit by **3 PM WAT**. We aim to win, so correctness and a polished demo matter more than feature count.
+You are a coding agent working for **Ayo and Femi** (**Team Subaru Boys**) on **Alibi**, a detective game whose reasoning runs on **FalkorDB**, for the Graph Hacks hackathon (**Track 01: Agents That Act on Connected Data**). The hackathon closes **Oct 18, 2026, 11:59 PM IST (7:29 PM WAT)**; we submit by **3 PM WAT**. We aim to win, so correctness and a polished demo matter more than feature count.
 
 ## 0. Before you write any code
 
