@@ -213,13 +213,16 @@ function PlayPageContent({ level }: { level: string }) {
   );
 }
 
+function PlayPageWrapper({ params }: { params: Promise<{ level: string }> }) {
+  const { level } = use(params);
+  return <PlayPageContent level={level} />;
+}
+
 export default function PlayPage({
   params,
 }: {
   params: Promise<{ level: string }>;
 }) {
-  const { level } = use(params);
-
   return (
     <Suspense
       fallback={
@@ -231,7 +234,7 @@ export default function PlayPage({
         </div>
       }
     >
-      <PlayPageContent level={level} />
+      <PlayPageWrapper params={params} />
     </Suspense>
   );
 }

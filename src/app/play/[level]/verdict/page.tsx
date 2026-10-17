@@ -524,13 +524,16 @@ function VerdictContent({ level }: { level: string }) {
   );
 }
 
+function VerdictWrapper({ params }: { params: Promise<{ level: string }> }) {
+  const { level } = use(params);
+  return <VerdictContent level={level} />;
+}
+
 export default function VerdictPage({
   params,
 }: {
   params: Promise<{ level: string }>;
 }) {
-  const { level } = use(params);
-
   return (
     <Suspense
       fallback={
@@ -542,7 +545,7 @@ export default function VerdictPage({
         </div>
       }
     >
-      <VerdictContent level={level} />
+      <VerdictWrapper params={params} />
     </Suspense>
   );
 }
