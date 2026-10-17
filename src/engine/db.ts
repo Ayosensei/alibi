@@ -56,7 +56,19 @@ export async function deleteGraph(graphName: string): Promise<boolean> {
 
 export async function copyGraph(sourceGraph: string, destGraph: string): Promise<void> {
   const src = await getGraph(sourceGraph);
-  await src.copy(destGraph);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      await src.copy(destGraph);
+      return;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes('could not fork') && attempt < 2) {
+        await new Promise((r) => setTimeout(r, 100));
+        continue;
+      }
+      throw err;
+    }
+  }
 }
 
 export async function ro<T>(options: {

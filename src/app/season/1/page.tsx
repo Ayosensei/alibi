@@ -16,6 +16,7 @@ import {
   Sparkles,
   ArrowRight,
   ShieldAlert,
+  Compass,
 } from 'lucide-react';
 
 interface CaseMeta {
@@ -135,6 +136,18 @@ function Season1Content() {
         {/* Actions (Hidden in Present Mode) */}
         {!isPresentMode && (
           <div className="flex items-center gap-3">
+            <Link href="/tutorial">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs text-text-secondary hover:text-text-primary gap-1.5"
+                title="Open detective field manual"
+              >
+                <Compass className="size-3.5 text-brass" />
+                <span>Field Manual</span>
+              </Button>
+            </Link>
+
             <Button
               variant="ghost"
               size="sm"

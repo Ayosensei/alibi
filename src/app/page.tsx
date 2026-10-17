@@ -31,6 +31,11 @@ export default function Home() {
         </div>
 
         <div className="flex items-center gap-3">
+          <Link href="/tutorial">
+            <Button variant="ghost" size="sm" className="text-xs text-text-secondary hover:text-text-primary">
+              Tutorial
+            </Button>
+          </Link>
           <Link href="/styleguide">
             <Button variant="ghost" size="sm" className="text-xs text-text-secondary hover:text-text-primary">
               Styleguide
@@ -70,8 +75,14 @@ export default function Home() {
               Begin Investigation (Season 1)
             </Button>
           </Link>
-          <Link href="/play/l1-quiet-pact?mode=cold_case">
+          <Link href="/tutorial">
             <Button variant="secondary" size="default" className="px-6 h-11 text-sm">
+              <Compass className="size-4 mr-2 text-brass" />
+              Detective Manual
+            </Button>
+          </Link>
+          <Link href="/play/l1-quiet-pact?mode=cold_case">
+            <Button variant="ghost" size="default" className="px-6 h-11 text-sm text-text-secondary hover:text-text-primary">
               <Eye className="size-4 mr-2 text-inspector" />
               Watch Recorded Cold Case
             </Button>

@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Chip } from '@/components/atoms';
 import { useGameStore } from '@/lib/store';
@@ -101,6 +102,14 @@ export function BriefingModal() {
             <span><kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-border text-text-secondary">B</kbd> Bait</span>
             <span><kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-border text-text-secondary">A</kbd> Accuse</span>
             <span><kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-border text-text-secondary">1-4</kbd> Tabs</span>
+            <Link
+              href="/tutorial"
+              target="_blank"
+              className="text-brass hover:underline flex items-center gap-1 font-sans"
+              title="Open Detective Field Manual in new tab"
+            >
+              Field Manual ↗
+            </Link>
           </div>
         </div>
       </div>
