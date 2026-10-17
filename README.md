@@ -1,20 +1,30 @@
 # Alibi — Every Lie Leaves a Path
 
+<p align="center">
+  <img src="public/alibi-banner.jpg" alt="Alibi — Every Lie Leaves a Path" width="100%" style="border-radius: 12px;" />
+</p>
+
 > **Track 01: Agents That Act on Connected Data**  
 > *Graph Hacks 2026 (WeMakeDevs & FalkorDB)*  
-> Built by **Ayo** (Solo Project)
+> Built by **Ayo** · Team **Subaru Boys**
+
+[![FalkorDB](https://img.shields.io/badge/Graph_Database-FalkorDB-red?logo=redis&logoColor=white)](https://falkordb.com)
+[![Track 01](https://img.shields.io/badge/Track_01-Agents_on_Connected_Data-brass?color=c59b27)](https://wemakedevs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-16_App_Router-black?logo=next.js)](https://nextjs.org)
+[![Vercel AI SDK](https://img.shields.io/badge/AI_SDK-Gemini_Flash-blue?logo=google)](https://sdk.vercel.ai)
+[![Model Context Protocol](https://img.shields.io/badge/MCP-Standard_stdio_Server-purple)](https://modelcontextprotocol.io)
+[![Test Suite](https://img.shields.io/badge/Tests-75%2F75_Passing_(Live_DB)-success)](file:///tests)
+[![Offline Capable](https://img.shields.io/badge/Offline_Mode-100%25_Deterministic-emerald)](#quickstart)
 
 ---
 
 ## 1. Pitch & Overview
 
-| Home page |
-|:---:|
-| ![Home Page](docs/screens/u0.png) |
+In classic detective fiction, investigators pace a room cross-referencing floor plans, train timetables, and witness sightings connected by red thread on a corkboard. In software, reasoning over interdependent claims, physical room topologies, and contradictory alibis is not a vector search or prompt-engineering problem—**it is a graph problem**.
 
-**Alibi** is an investigative detective game where every statement, every piece of evidence, and every alibi becomes nodes and edges in a **FalkorDB** graph.
+**Alibi** is an investigative detective game where every statement, every physical exhibit, and every alibi becomes nodes and edges in a **FalkorDB** graph. 
 
-The player interrogates AI suspects, searches crime scenes for physical evidence, and watches their deduction board build in real time. But suspects lie. To crack each case, the player collaborates with an autonomous **AI Inspector** that reasons over the graph using graph queries and path-finding algorithms. When an alibi collapses or a suspect makes an impossible journey across locked rooms, the graph catches the lie—and the Inspector explains the exact path that proved it.
+The player interrogates AI suspects, searches crime scenes for physical evidence, and watches their deduction board assemble in real time. But suspects lie. To crack each case, the player collaborates with an autonomous **AI Inspector** that reasons over the connected graph using graph queries and pathfinding algorithms. When an alibi collapses or a suspect makes an impossible journey across locked doors, the graph catches the lie—and the Inspector explains the exact path that proved it.
 
 | Case Board & Conflict Threads | Timeline Grid & Rehearsed Story |
 |:---:|:---:|
@@ -42,11 +52,11 @@ A relational database or vector store cannot efficiently solve the deduction mec
    RETURN a.src AS srcA, a.room AS roomA, b.src AS srcB, b.room AS roomB
    ```
 3. **Feasibility via Shortest Path Traversal**  
-   Moving between rooms takes 1 time slot per edge. Given hard anchors (camera stills, door logs), can a suspect physically traverse the map between slot $i$ in room $A$ and slot $j$ in room $B$? FalkorDB calculates the shortest path over active edges:
+   Moving between rooms takes 1 time slot per edge. Given hard anchors (camera stills, electronic keycard logs), can a suspect physically traverse the map between slot $i$ in room $A$ and slot $j$ in room $B$? FalkorDB calculates the shortest path over active edges:
    $$\text{feasible} \iff \text{shortestPath}(A, B) \le |j - i|$$
    If door locks or hidden passage access rules (`knowers`) block the path, the suspect is provably cleared or exposed.
-4. **Elimination Chains**  
-   Physical evidence records an act (e.g. breaker cut at slot 4). Graph feasibility eliminates impossible suspects one by one. When only a single candidate remains, an inferred anchor node `(:Assertion {hard: true, src: 'inferred:<id>'})` is written to the graph, immediately triggering downstream contradictions against their prior claims.
+4. **Single-Survivor Elimination Chains**  
+   Physical evidence records an act (e.g., circuit breaker tripped at slot 4). Graph feasibility eliminates impossible suspects one by one. When only a single candidate remains, an inferred anchor node `(:Assertion {hard: true, src: 'inferred:<id>'})` is written to the graph, immediately triggering downstream contradictions against their prior claims.
 5. **Alibi-Support Chains**  
    Witness sightings form a dependency tree: suspect $A$ claims to be in the lounge because witness $B$ claims to have seen them there. If graph contradictions place witness $B$ elsewhere, the entire alibi chain breaks.
 6. **Multi-Hop Motive Traversals**  
@@ -65,7 +75,7 @@ docker compose up -d falkordb
 # 2. Install dependencies & configure git hooks
 pnpm i
 
-# 3. Validate case graphs and mathematical solvability (offline check)
+# 3. Validate case graphs and mathematical solvability
 pnpm cases:validate
 
 # 4. Run the full test suite (75 tests against live FalkorDB)
@@ -78,13 +88,13 @@ pnpm dev
 Open [http://localhost:3001](http://localhost:3001) in your browser.
 
 - **FalkorDB Browser:** Available at [http://localhost:3000](http://localhost:3000) to inspect graph queries and node structures live.
-- **Offline / Free-Tier Mode (`ALIBI_LLM=off`):** The game runs 100% deterministically without an API key by falling back to pre-authored claim texts. To enable live Gemini synthesis, set `GEMINI_API_KEY` in `.env`.
+- **Zero API Key Needed (`ALIBI_LLM=off`):** The game runs 100% deterministically offline without an API key by falling back to pre-authored claim texts. To enable live Gemini synthesis, set `GEMINI_API_KEY` in `.env`.
 - **Reset Demo State:** Run `pnpm demo:reset` to clear all player demo graphs.
-- **Model Context Protocol (MCP):** Run `pnpm mcp` to start the stdio MCP server.
+- **Model Context Protocol (MCP):** Run `pnpm mcp` to start the stdio MCP server for Claude or Cursor.
 
 ---
 
-## 4. The Three Levels & Season 1 Arc
+## 4. The Three Cases & Mechanics
 
 Season 1 introduces three original, self-contained mystery cases designed to teach distinct graph reasoning capabilities:
 
@@ -95,11 +105,11 @@ Season 1 introduces three original, self-contained mystery cases designed to tea
 | **Level 3** | *The Blackout Dinner* | An estate patriarch is killed in a locked study during an 8-minute power cut. | Hidden passage discovery (`HIDDEN_KNOWN`), candidate elimination, alibi-support chain collapse, multi-hop motive paths. |
 
 ### Season 1 Arc: "The Auditor"
-Every case solved unearths an archival dossier fragment pointing toward a shadow syndicate known as *The Auditor*. The clues combine on the player's dossier to reveal the conspiracy setting up Season 2.
+Every case solved unearths an archival dossier fragment pointing toward a shadow syndicate known as *The Auditor*. The clues combine on the player's dossier to reveal the overarching conspiracy.
 
 ---
 
-## 5. Graph Data Model
+## 5. Graph Data Model & Information Barrier
 
 Alibi maintains three distinct graph scopes to preserve the **Information Barrier**:
 
@@ -144,39 +154,23 @@ graph TD
 
 ---
 
-## 6. Queries and Algorithms
+## 6. Cypher Queries and Reasoning Catalog
 
 All Cypher queries are parameterised, named constants stored in [`src/engine/queries/`](file:///home/saturnsurfer/Documents/PROJECTS/alibi/src/engine/queries/) and mirrored in [`queries/`](file:///home/saturnsurfer/Documents/PROJECTS/alibi/queries/). The LLM **never** writes or executes arbitrary Cypher.
 
-| Query ID | Name | Target Graph | Purpose |
+| Category | Query IDs | Target Graph | Primary Operations & Algorithms |
 |:---|:---|:---|:---|
-| `Q00` | `graph_list` | System | Check existing database graphs |
-| `Q01` | `graph_copy` | System | Clone public case template to player graph (`GRAPH.COPY`) |
-| `Q02` | `graph_delete` | System | Reset player graph (`GRAPH.DELETE`) |
-| `Q10-Q19` | `seed_*` | Truth/Public | Idempotent database seeding for rooms, edges, claims, facts, and cases |
-| `Q20-Q24` | `lifecycle_*` | Play/Player | Player creation, tick counters, and career progress upsert |
-| `Q40` | `select_claims` | Truth | Select eligible suspect claims filtered by knowledge firewall |
-| `Q41-Q45` | `board_writes` | Play | Write statements, assertions, and revealed relations to the board |
-| `Q50` | `evidence_in_room` | Truth | Retrieve evidence located in a searched room |
-| `Q51-Q59` | `evidence_writes` | Play | Add evidence, search logs, revealed passages, and inferred anchors |
-| `Q60` | `contradictions` | Play | **Contradiction match:** Find assertion pairs placing person in 2 places at slot |
-| `Q61` | `rehearsed` | Play | **Rehearsed alibis:** Group statements with identical room and detail |
-| `Q62` | `assertion_pairs` | Play | **Movement order:** Assertion sequences for impossible travel detection |
-| `Q63` | `distance` | Play | **Shortest path:** Compute path distance respecting doors and knowers |
-| `Q64` | `map_edges` | Play | Retrieve active connectivity topology |
-| `Q66` | `hard_anchors` | Play | Fetch all hard assertions for a suspect |
-| `Q67` | `room_degree` | Play | Check reachable room connectivity |
-| `Q68` | `evidence_act` | Play | Query act slot, room, and candidate constraints |
-| `Q70` | `motive_paths` | Play | **Multi-hop traversal:** 1-3 hop paths from suspect to victim |
-| `Q71` | `alibi_support` | Play | **Alibi chain:** Check witness reliability and contradiction status |
-| `Q72` | `window` | Play | Calculate active time-of-death window |
-| `Q80-Q83` | `notes_writes` | Play | Write Flags and Hypotheses nodes onto the board |
-| `Q90-Q92` | `bait_*` | Truth/Play | Evaluate suspect slip reactions based on knowledge asymmetry |
-| `Q95-Q99` | `verdict_*` | Truth/Play | Evaluate final accusation against solution and calculate score |
+| **Lifecycle & Seeding** | `Q00-Q03`, `Q10-Q24` | System, Truth, Play | `GRAPH.COPY`, `GRAPH.DELETE`, idempotent batch node/relationship seeding, player tick counters. |
+| **Dialogue & Interrogation** | `Q40-Q45` | Truth, Play | Knowledge firewall filtering, statement ingestion, assertion node generation. |
+| **Physical Evidence & Scene** | `Q50-Q59` | Truth, Play | Room item retrieval, keycard door log parsing, revealed passage assertions, inferred anchor writes. |
+| **Graph Pattern Matching** | `Q60-Q62` | Play | Contradiction pair detection (subject + slot collision), rehearsed alibi grouping across suspects. |
+| **Topology & Shortest Path** | `Q63-Q68` | Play | `shortestPath` distance traversal, active map edge query, single-survivor candidate elimination (`whoCouldHave`). |
+| **Relational Chains** | `Q70-Q72` | Play | Variable-length multi-hop motive traversals (`[:KNOWN_REL*1..3]`), alibi dependency trees, time-of-death window calculation. |
+| **Notes & Verdict Inquest** | `Q80-Q99` | Play, Truth | Visual Flag/Hypothesis writes, knowledge-slip bait evaluation, final accusation grading against ground truth. |
 
 ---
 
-## 7. Tool Catalogue & MCP Server
+## 7. Tool Catalogue & Model Context Protocol (MCP)
 
 The reasoning engine exposes 8 read tools and 2 board write tools governed by strict [Zod schemas](file:///home/saturnsurfer/Documents/PROJECTS/alibi/src/engine/contract.ts):
 
@@ -212,30 +206,7 @@ The MCP server exposes all 8 reasoning read tools, enabling external agents to a
 
 ---
 
-## 8. Oracle Parity and Case Validation
-
-To ensure fair mysteries without plot holes or mathematical ambiguity, Alibi implements dual verification:
-
-1. **The Reference Engine (`scripts/reference-engine.mjs`):**  
-   A pure JavaScript oracle implementation of every reasoning tool. Vitest tests (`tests/engine/reasoning.test.ts`) assert exact 1:1 parity between Cypher execution in FalkorDB and the oracle across cold, partial, and completed boards.
-2. **Case Solvability Validation (`scripts/validate-cases.mjs`):**  
-   Every case JSON file is validated mathematically before runtime:
-   - Exactly the intended culprits are solvable.
-   - Every false claim is detectable through contradictions, impossible moves, or inferred anchors.
-   - Every innocent suspect is provably cleared.
-   - Baits with 1 knower point only to guilty culprits.
-
-```bash
-$ pnpm cases:validate
-PASS  l1-quiet-pact      — 20 claims, 5 evidence, 4 suspects, 9 contradictions
-PASS  l2-stopped-watch   — 17 claims, 9 evidence, 4 suspects, 5 contradictions, 4 impossible moves
-PASS  l3-blackout-dinner — 26 claims, 11 evidence, 6 suspects, 11 contradictions
-All cases valid.
-```
-
----
-
-## 9. Track 01 Coverage Table
+## 8. Track 01 Rubric Alignment
 
 | Track 01 Requirement | How Alibi Satisfies It |
 |:---|:---|
@@ -247,25 +218,30 @@ All cases valid.
 
 ---
 
-## 10. Demo Video & Local Setup
+## 9. Quality Verification & Mathematical Parity
 
-- **Demo Video:** *[Insert 3-Minute Demo Video Link]*
-- **Local Dev Server:** Runs on port `3001` (`pnpm dev`) to avoid conflicting with FalkorDB Browser on `3000`.
-- **Keyboard Shortcuts:** Press `?` in-game to view hotkeys (`1-4` panel tabs, `Space` ask suspect, `S` search room, `B` use bait, `A` accuse, `P` present mode).
+To ensure fair mysteries without plot holes or mathematical ambiguity, Alibi implements dual verification:
+
+1. **The Reference Engine (`scripts/reference-engine.mjs`):** A pure JavaScript oracle implementation of every reasoning tool. Vitest tests (`tests/engine/reasoning.test.ts`) assert exact 1:1 parity between Cypher execution in FalkorDB and the oracle across cold, partial, and completed boards.
+2. **Case Solvability Validation (`scripts/validate-cases.mjs`):** Every case JSON file is validated mathematically before runtime:
+   - Exactly the intended culprits are solvable.
+   - Every false claim is detectable through contradictions, impossible moves, or inferred anchors.
+   - Every innocent suspect is provably cleared.
+   - Baits with 1 knower point only to guilty culprits.
 
 ---
 
-## 11. AI Usage Disclosure
+## 10. AI Usage Disclosure
 
 Per hackathon guidelines, AI coding assistance is fully disclosed:
 - **Assistant:** Gemini 3.8 Flash via Google DeepMind Antigravity CLI.
-- **Human Author & Architect (Ayo):** Conceived the original product architecture, designed the tripartite information barrier model, authored all three original mystery plots and clues, specified the design system (`DESIGN.md`), and authored the Cypher query catalog.
+- **Human Author & Architect (Ayo):** Conceived the product architecture, designed the tripartite information barrier model, authored all three original mystery plots and clues, specified the design system (`DESIGN.md`), and authored the Cypher query catalog.
 - **AI Coding Agent:** Assisted with implementing TypeScript schemas, unit tests, parity test suites against the oracle, React components, and styling token enforcement.
-- **Commit History:** Every agent-assisted commit includes the mandatory `Assisted-by: Gemini 3.8 Flash` trailer.
+- **Commit History:** Every agent-assisted commit includes the mandatory `Assisted-by: Gemini` trailer.
 
 ---
 
-## 12. Originality and Credits
+## 11. Originality and Credits
 
 Inspired by classic closed-circle detective fiction and consultant-detective television. All cases, characters, floor plans, and puzzles are original fictional works. No third-party scripts, plots, or intellectual property were used.
 
