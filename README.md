@@ -26,6 +26,11 @@ In classic detective fiction, investigators pace a room cross-referencing floor 
 
 The player interrogates AI suspects, searches crime scenes for physical evidence, and watches their deduction board assemble in real time. But suspects lie. To crack each case, the player collaborates with an autonomous **AI Inspector** that reasons over the connected graph using graph queries and pathfinding algorithms. When an alibi collapses or a suspect makes an impossible journey across locked doors, the graph catches the lie—and the Inspector explains the exact path that proved it.
 
+> 💡 **The Core Thesis (Track 01): The Graph is the Brain, the LLM is Just the Voice.**  
+> - **FalkorDB executes all reasoning:** Every contradiction, shortest-path movement check, single-survivor candidate elimination, and multi-hop motive query runs as deterministic OpenCypher on FalkorDB.
+> - **The LLM never writes Cypher and never receives Cypher:** It only roleplays suspect dialogue based on authored claims selected from FalkorDB, guarded by an automated graph firewall.
+> - **Why SQL & Vector search fail:** Vector stores cannot enforce topological constraints (e.g., that a suspect cannot cross three locked rooms in one 20-minute window). Relational SQL requires costly recursive self-joins for multi-hop alibi trees and hidden motives. FalkorDB solves this natively in sub-millisecond graph traversals.
+
 | Case Board & Conflict Threads | Timeline Grid & Rehearsed Story |
 |:---:|:---:|
 | ![Case Board](docs/screens/u4.png) | ![Timeline](docs/screens/u1.png) |
@@ -38,33 +43,70 @@ The player interrogates AI suspects, searches crime scenes for physical evidence
 
 ---
 
-## 2. Why This Needs a Graph
+## 2. Why This Needs a Graph: How and Why We Use FalkorDB
 
-A relational database or vector store cannot efficiently solve the deduction mechanics of Alibi. Every core feature relies on connected graph topologies, traversal algorithms, and tenant graph isolation:
+A relational database, vector store, or pure LLM cannot solve the deduction mechanics of Alibi. Every feature relies on connected graph topologies, traversal algorithms, and tenant graph isolation:
+
+| Capability | FalkorDB (Alibi's Approach) | Relational SQL | Vector Search / RAG | Pure LLM |
+|:---|:---|:---|:---|:---|
+| **Contradiction Detection** | Instant dual-node pattern match on `(:Assertion)` | Slow self-join on wide assertion tables | Fails (semantic similarity misses discrete time/room clashes) | Prone to hallucinations & missed edge cases |
+| **Physical Movement Feasibility** | `shortestPath()` graph traversal over door & keycard topologies | Complex recursive CTEs; brittle on cyclic graphs | Impossible (vectors cannot model room adjacency) | Hallucinates paths and ignores locked doors |
+| **Single-Survivor Elimination** | Graph degree & path feasibility pruning down to 1 candidate | Painful multi-stage aggregation queries | Impossible | Cannot mathematically guarantee elimination |
+| **Alibi-Support Chains** | Traverses witness dependency trees; cascades on conflict | Complex tree traversal tables | Impossible | Easily confused by circular claims |
+| **Multi-Hop Motives** | Variable-length path traversal `[:KNOWN_REL*1..3]` | Costly recursive joins per hop | Fails to trace multi-hop entity relationships | Fabricates non-existent relationships |
+| **Tenant Isolation** | Discrete graphs cloned via `GRAPH.COPY` in sub-ms | Risky row-level security (`WHERE tenant_id = ...`) | Leaky partitioned index namespaces | Prone to leaking ground truth in system prompt |
+
+### The 6 Connected-Data Superpowers in Alibi:
 
 1. **The Information Barrier (Graph-Level Multi-Tenancy)**  
-   Ground truth (`truth:{caseId}`) is kept completely segregated from the player's deduction graph (`play:{playerId}:{caseId}`). Neither the player, the LLM, the AI Inspector, nor external MCP agents ever see the truth graph. Tenants are discrete graphs, not `WHERE` clauses.
-2. **Contradictions as Graph Pattern Matching**  
+   Ground truth (`truth:{caseId}`) is kept completely segregated from the player's deduction graph (`play:{playerId}:{caseId}`). Neither the player, the LLM, the AI Inspector, nor external MCP agents ever see the truth graph. When starting a case, `GRAPH.COPY` clones `public:{caseId}` into `play:{playerId}:{caseId}`. Tenants are discrete graphs, not leaky `WHERE` clauses.
+2. **Contradictions as Graph Pattern Matching (`Q60_contradictions`)**  
    A lie is detected when two assertion nodes disagree on a suspect's location for the same time slot:
    ```cypher
    MATCH (a:Assertion), (b:Assertion)
    WHERE a.subject = b.subject AND a.slot = b.slot AND a.room <> b.room AND a.src < b.src
    RETURN a.src AS srcA, a.room AS roomA, b.src AS srcB, b.room AS roomB
    ```
-3. **Feasibility via Shortest Path Traversal**  
+3. **Feasibility via Shortest Path Traversal (`Q63_distance`)**  
    Moving between rooms takes 1 time slot per edge. Given hard anchors (camera stills, electronic keycard logs), can a suspect physically traverse the map between slot $i$ in room $A$ and slot $j$ in room $B$? FalkorDB calculates the shortest path over active edges:
    $$\text{feasible} \iff \text{shortestPath}(A, B) \le |j - i|$$
    If door locks or hidden passage access rules (`knowers`) block the path, the suspect is provably cleared or exposed.
-4. **Single-Survivor Elimination Chains**  
+4. **Single-Survivor Elimination Chains (`whoCouldHave`)**  
    Physical evidence records an act (e.g., circuit breaker tripped at slot 4). Graph feasibility eliminates impossible suspects one by one. When only a single candidate remains, an inferred anchor node `(:Assertion {hard: true, src: 'inferred:<id>'})` is written to the graph, immediately triggering downstream contradictions against their prior claims.
-5. **Alibi-Support Chains**  
-   Witness sightings form a dependency tree: suspect $A$ claims to be in the lounge because witness $B$ claims to have seen them there. If graph contradictions place witness $B$ elsewhere, the entire alibi chain breaks.
-6. **Multi-Hop Motive Traversals**  
+5. **Alibi-Support Dependency Trees (`Q71_alibi_support`)**  
+   Witness sightings form a dependency tree: suspect $A$ claims to be in the lounge because witness $B$ claims to have seen them there. If graph contradictions place witness $B$ elsewhere, the supporting edge breaks and the entire alibi chain collapses.
+6. **Multi-Hop Motive Traversals (`Q70_motive_paths`)**  
    Variable-length path queries `(p:Party)-[:KNOWN_REL*1..3]-(v:Person {victim: true})` uncover hidden corporate, familial, and financial ties to the victim across intermediate entities.
 
 ---
 
-## 3. Quickstart
+## 3. How the LLM is Used (and How the Graph Protects It)
+
+In Alibi, Gemini Flash is used solely for **in-character dialogue voicing**, protected by a graph-enforced firewall:
+
+```
+[Player Question] 
+       │
+       ▼
+[FalkorDB Cypher Q40_select_claims] ──► Retrieves only eligible authored claims for suspect
+       │
+       ▼
+[Gemini Flash (via Vercel AI SDK)] ───► Synthesizes persona & voice into structured JSON:
+       │                                 { reply: string, claimIds: string[] }
+       ▼
+[The Graph Firewall] ─────────────────► 1. Verifies claimIds match allowed graph claims
+       │                                2. Screens for forbidden ground-truth leaks
+       ▼
+[Play Graph Update (Q43_add_statement)]► Statement node added to player's FalkorDB graph
+```
+
+- **Zero Cypher in Prompts:** The LLM never writes or executes Cypher. All 58 queries are parameterised constants in [`src/engine/queries/`](file:///home/saturnsurfer/Documents/PROJECTS/alibi/src/engine/queries/).
+- **Zero Hallucination of Facts:** Suspects can only express claims selected from FalkorDB. If a model tries to invent details or leak truth, the firewall rejects the reply and falls back to authored claim text.
+- **100% Offline Capable:** If no API key is provided (`ALIBI_LLM=off`), the game runs 100% deterministically using the pre-authored claim text templates. Judges need zero API keys to evaluate the project.
+
+---
+
+## 4. Quickstart
 
 Get Alibi up and running locally in 5 commands:
 
@@ -94,7 +136,7 @@ Open [http://localhost:3001](http://localhost:3001) in your browser.
 
 ---
 
-## 4. The Three Cases & Mechanics
+## 5. The Three Cases & Mechanics
 
 Season 1 introduces three original, self-contained mystery cases designed to teach distinct graph reasoning capabilities:
 
@@ -109,7 +151,7 @@ Every case solved unearths an archival dossier fragment pointing toward a shadow
 
 ---
 
-## 5. Graph Data Model & Information Barrier
+## 6. Graph Data Model & Information Barrier
 
 Alibi maintains three distinct graph scopes to preserve the **Information Barrier**:
 
@@ -154,7 +196,7 @@ graph TD
 
 ---
 
-## 6. Cypher Queries and Reasoning Catalog
+## 7. Cypher Queries and Reasoning Catalog
 
 All Cypher queries are parameterised, named constants stored in [`src/engine/queries/`](file:///home/saturnsurfer/Documents/PROJECTS/alibi/src/engine/queries/) and mirrored in [`queries/`](file:///home/saturnsurfer/Documents/PROJECTS/alibi/queries/). The LLM **never** writes or executes arbitrary Cypher.
 
@@ -170,7 +212,7 @@ All Cypher queries are parameterised, named constants stored in [`src/engine/que
 
 ---
 
-## 7. Tool Catalogue & Model Context Protocol (MCP)
+## 8. Tool Catalogue & Model Context Protocol (MCP)
 
 The reasoning engine exposes 8 read tools and 2 board write tools governed by strict [Zod schemas](file:///home/saturnsurfer/Documents/PROJECTS/alibi/src/engine/contract.ts):
 
@@ -206,7 +248,7 @@ The MCP server exposes all 8 reasoning read tools, enabling external agents to a
 
 ---
 
-## 8. Track 01 Rubric Alignment
+## 9. Track 01 Rubric Alignment
 
 | Track 01 Requirement | How Alibi Satisfies It |
 |:---|:---|
@@ -218,7 +260,7 @@ The MCP server exposes all 8 reasoning read tools, enabling external agents to a
 
 ---
 
-## 9. Quality Verification & Mathematical Parity
+## 10. Quality Verification & Mathematical Parity
 
 To ensure fair mysteries without plot holes or mathematical ambiguity, Alibi implements dual verification:
 
@@ -231,7 +273,7 @@ To ensure fair mysteries without plot holes or mathematical ambiguity, Alibi imp
 
 ---
 
-## 10. AI Usage Disclosure
+## 11. AI Usage Disclosure
 
 Per hackathon guidelines, AI coding assistance is fully disclosed:
 - **Assistant:** Gemini 3.8 Flash via Google DeepMind Antigravity CLI.
@@ -241,7 +283,7 @@ Per hackathon guidelines, AI coding assistance is fully disclosed:
 
 ---
 
-## 11. Originality and Credits
+## 12. Originality and Credits
 
 Inspired by classic closed-circle detective fiction and consultant-detective television. All cases, characters, floor plans, and puzzles are original fictional works. No third-party scripts, plots, or intellectual property were used.
 
