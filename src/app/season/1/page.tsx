@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Chip, Stamp, Polaroid } from '@/components/atoms';
+import { Footer } from '@/components/shell/Footer';
 import { useGameStore } from '@/lib/store';
 import {
   FolderOpen,
@@ -345,6 +346,9 @@ function Season1Content() {
           })}
         </div>
       </section>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

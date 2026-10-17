@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Chip, Stamp } from '@/components/atoms';
+import { Footer } from '@/components/shell/Footer';
 import {
   ShieldAlert,
   Sparkles,
@@ -275,14 +276,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border py-8 px-6 md:px-12 text-center text-xs text-text-secondary max-w-7xl mx-auto space-y-2">
-        <p className="font-mono text-brass">
-          ALIBI · Track 01: Agents That Act on Connected Data
-        </p>
-        <p className="text-text-tertiary">
-          FalkorDB · Next.js App Router · Vercel AI SDK with Gemini Flash · @xyflow/react
-        </p>
-      </footer>
+      <Footer />
     </div>
   );
 }
