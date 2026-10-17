@@ -250,7 +250,7 @@ function PlayPageContent({ level }: { level: string }) {
       {/* Main Layout: On desktop all 3 side-by-side; on mobile only the active tab */}
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-[calc(100vh-7rem)] lg:min-h-[calc(100vh-3.5rem)]">
         <div
-          className={`w-full lg:w-72 xl:w-80 shrink-0 h-full ${
+          className={`w-full lg:w-72 xl:w-80 shrink-0 h-full min-w-0 overflow-hidden ${
             mobileTab === 'suspects' ? 'flex flex-col' : 'hidden lg:flex lg:flex-col'
           }`}
         >

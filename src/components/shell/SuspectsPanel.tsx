@@ -30,7 +30,7 @@ export function SuspectsPanel() {
   const baitsLeft = board?.baitsLeft ?? caseData.baitsAllowed;
 
   return (
-    <aside className="w-full h-full flex flex-col bg-surface-1 border-r border-border overflow-y-auto p-4 space-y-6 select-none">
+    <aside className="w-full h-full flex flex-col bg-surface-1 border-r border-border overflow-y-auto overflow-x-hidden p-3 sm:p-3.5 space-y-5 select-none">
       {/* 1. Suspects Section */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
@@ -90,19 +90,19 @@ export function SuspectsPanel() {
             return (
               <div
                 key={room.id}
-                className={`flex items-center justify-between p-2 rounded-lg border text-xs transition-colors ${
+                className={`flex items-center justify-between gap-1.5 p-2 rounded-lg border text-xs transition-colors min-w-0 ${
                   isSearched
                     ? 'bg-surface-2/60 border-border/40 text-text-secondary'
                     : 'bg-surface-2 border-border text-text-primary'
                 }`}
               >
-                <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-1.5 min-w-0 flex-1">
                   <MapPin
                     className={`size-3.5 shrink-0 ${
                       isCrimeScene ? 'text-thread' : 'text-text-tertiary'
                     }`}
                   />
-                  <div className="flex items-center gap-1.5 truncate">
+                  <div className="flex items-center gap-1 min-w-0 truncate">
                     <span className="font-medium truncate">{room.name}</span>
                     {isCrimeScene && (
                       <span className="font-mono text-xs text-thread shrink-0">
@@ -112,10 +112,10 @@ export function SuspectsPanel() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex items-center gap-1 shrink-0">
                   {roomExhibits > 0 && (
-                    <Chip variant="default" className="text-xs px-1.5 py-0">
-                      {roomExhibits} {roomExhibits === 1 ? 'exhibit' : 'exhibits'}
+                    <Chip variant="default" className="text-xs px-1.5 py-0 shrink-0">
+                      {roomExhibits} {roomExhibits === 1 ? 'ex.' : 'ex.'}
                     </Chip>
                   )}
 
@@ -124,7 +124,7 @@ export function SuspectsPanel() {
                     size="sm"
                     disabled={isSearched || isLoading}
                     onClick={() => searchRoomAction(room.id)}
-                    className="h-7 px-2 text-xs"
+                    className="h-7 px-2 text-xs shrink-0"
                   >
                     {isSearched ? (
                       <>

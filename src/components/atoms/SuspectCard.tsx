@@ -29,6 +29,7 @@ export function SuspectCard({
   onClick,
   className,
 }: SuspectCardProps) {
+  const [imgError, setImgError] = React.useState(false);
   const initials = name
     .split(/\s+/)
     .map((w) => w[0])
@@ -51,18 +52,18 @@ export function SuspectCard({
       onClick={onClick}
       onKeyDown={handleKeyDown}
       className={cn(
-        'group flex flex-col gap-2.5 p-3 rounded-xl bg-surface-2 shadow-card border transition-all duration-120 outline-none cursor-pointer',
+        'group flex flex-col gap-2 p-2.5 sm:p-3 rounded-xl bg-surface-2 shadow-card border transition-all duration-120 outline-none cursor-pointer w-full min-w-0 overflow-hidden',
         isSelected
           ? 'border-brass ring-2 ring-brass/80 bg-surface-3'
           : 'border-border hover:bg-surface-3 hover:border-border-strong focus-visible:ring-2 focus-visible:ring-thread',
         className
       )}
     >
-      <div className="flex items-center gap-3">
-        {/* Avatar with inset outline */}
+      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 w-full">
+        {/* Avatar with inset outline and fallback */}
         <div
           className={cn(
-            'relative size-10 rounded-full shrink-0 overflow-hidden ring-1 select-none shadow-sm',
+            'relative size-10 rounded-full shrink-0 overflow-hidden ring-1 select-none shadow-sm flex items-center justify-center bg-surface-3',
             isVictim
               ? 'ring-thread/60'
               : isSelected
@@ -70,22 +71,29 @@ export function SuspectCard({
               : 'ring-border group-hover:ring-brass/50'
           )}
         >
-          <Image
-            src={`/avatars/${id}.svg`}
-            alt={name}
-            width={40}
-            height={40}
-            className="size-full object-cover"
-          />
+          {!imgError ? (
+            <Image
+              src={`/avatars/${id}.svg`}
+              alt={name}
+              width={40}
+              height={40}
+              className="size-full object-cover"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <span className="font-mono text-xs font-semibold text-brass">
+              {initials}
+            </span>
+          )}
         </div>
 
-        <div className="flex flex-col min-w-0">
-          <div className="flex items-center gap-1.5">
+        <div className="flex flex-col min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 min-w-0">
             <span className="font-medium text-sm text-text-primary truncate">
               {name}
             </span>
             {isVictim && (
-              <span className="font-mono text-xs text-thread uppercase tracking-wider">
+              <span className="font-mono text-xs text-thread uppercase tracking-wider shrink-0">
                 (Victim)
               </span>
             )}
