@@ -138,7 +138,7 @@ export function InterrogationPanel() {
           <div className="h-full flex flex-col items-center justify-center text-center p-6 text-text-tertiary space-y-2">
             <MessageSquare className="size-8 text-text-tertiary/60" />
             <p className="text-xs max-w-xs">
-              No questions asked yet. Inquire about whereabouts, sightings, or relations below.
+              No questions recorded for {suspect.name} yet. Inquire about whereabouts, sightings, or relations below.
             </p>
           </div>
         ) : (

@@ -275,7 +275,7 @@ function Season1Content() {
                         onClick={() => handlePlay(caseMeta.id, false)}
                         className="flex-1 justify-between"
                       >
-                        <span>{prog.solved ? 'Review / Play' : 'Play Case'}</span>
+                        <span>{prog.solved ? 'Review Dossier' : 'Play Case'}</span>
                         <ArrowRight className="size-4" />
                       </Button>
                       {prog.solved && (

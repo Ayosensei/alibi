@@ -14,12 +14,16 @@ import {
   ArrowLeft,
   Search,
   RotateCcw,
+  CheckCircle2,
 } from 'lucide-react';
 
 export function CaseHeader() {
   const {
+    caseId,
     caseData,
     board,
+    progress,
+    lastVerdict,
     setAccuseModalOpen,
     setBaitModalOpen,
     runInspectorAction,
@@ -29,6 +33,10 @@ export function CaseHeader() {
   } = useGameStore();
 
   if (!caseData) return null;
+
+  const isSolved = Boolean(
+    progress[caseId]?.solved || lastVerdict?.result === 'full'
+  );
 
   const baitsLeft = board?.baitsLeft ?? caseData.baitsAllowed;
 
@@ -70,6 +78,11 @@ export function CaseHeader() {
           <h1 className="font-serif text-base md:text-lg font-semibold text-text-primary truncate">
             {caseData.title}
           </h1>
+          {isSolved && (
+            <span className="font-mono text-xs px-2 py-0.5 rounded bg-status-cleared/15 text-status-cleared border border-status-cleared/30 font-semibold tracking-wider shrink-0">
+              SOLVED
+            </span>
+          )}
         </div>
       </div>
 
@@ -137,16 +150,30 @@ export function CaseHeader() {
           <span className="hidden sm:inline">Ask </span>Inspector
         </Button>
 
-        <Button
-          variant="default"
-          size="sm"
-          onClick={() => setAccuseModalOpen(true)}
-          className="text-xs h-8 px-2.5 sm:px-3"
-          title="File Formal Accusation (A)"
-        >
-          <ShieldAlert className="size-3.5 mr-1" />
-          Accuse
-        </Button>
+        {isSolved ? (
+          <Link href={`/play/${caseId}/verdict`}>
+            <Button
+              variant="brass"
+              size="sm"
+              className="text-xs h-8 px-2.5 sm:px-3 shadow-xs"
+              title="View Solved Case Verdict & Recap"
+            >
+              <CheckCircle2 className="size-3.5 mr-1" />
+              Verdict
+            </Button>
+          </Link>
+        ) : (
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => setAccuseModalOpen(true)}
+            className="text-xs h-8 px-2.5 sm:px-3"
+            title="File Formal Accusation (A)"
+          >
+            <ShieldAlert className="size-3.5 mr-1" />
+            Accuse
+          </Button>
+        )}
       </div>
     </header>
   );

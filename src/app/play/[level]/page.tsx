@@ -27,6 +27,7 @@ function PlayPageContent({ level }: { level: string }) {
   const {
     caseId,
     caseData,
+    progress,
     isLoading,
     error,
     initCase,
@@ -168,14 +169,29 @@ function PlayPageContent({ level }: { level: string }) {
   ]);
 
   const isCaseReady = Boolean(caseData && caseId === level);
+  const isSolved = Boolean(
+    progress[level]?.solved ||
+    (typeof window !== 'undefined' && localStorage.getItem(`alibi_verdict_${level}`))
+  );
+  const caseTitle =
+    level.startsWith('l1')
+      ? 'File 01: The Quiet Pact'
+      : level.startsWith('l2')
+      ? 'File 02: The Stopped Watch'
+      : 'File 03: The Blackout Dinner';
 
   if (isLoading && !isCaseReady) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center space-y-4">
         <Loader2 className="size-8 animate-spin text-brass" />
-        <span className="font-mono text-xs uppercase tracking-widest text-text-secondary">
-          Opening Dossier {level}...
-        </span>
+        <div className="flex flex-col items-center space-y-1 text-center">
+          <span className="font-mono text-xs uppercase tracking-widest text-text-primary font-semibold">
+            {isSolved ? 'Reviewing Solved Case Dossier' : 'Opening Dossier'}
+          </span>
+          <span className="text-xs text-text-secondary font-serif">
+            {caseTitle}
+          </span>
+        </div>
       </div>
     );
   }

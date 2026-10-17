@@ -60,6 +60,37 @@ function saveStoredProgress(progress: Record<string, LevelProgress>) {
   }
 }
 
+function loadStoredChat(caseId: string): ChatMessage[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(`alibi_chat_${caseId}`);
+    if (raw) return JSON.parse(raw);
+  } catch {
+    // fallback
+  }
+  return [];
+}
+
+function saveStoredChat(caseId: string, chat: ChatMessage[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(`alibi_chat_${caseId}`, JSON.stringify(chat));
+  } catch {
+    // ignore
+  }
+}
+
+function loadStoredVerdict(caseId: string): AccuseOutput | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(`alibi_verdict_${caseId}`);
+    if (raw) return JSON.parse(raw);
+  } catch {
+    // fallback
+  }
+  return null;
+}
+
 export interface GameState {
   playerId: string;
   caseId: string;
@@ -204,23 +235,30 @@ export const useGameStore = create<GameState>((set, get) => ({
       return;
     }
 
+    if (reset && typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(`alibi_verdict_${caseId}`);
+        localStorage.removeItem(`alibi_chat_${caseId}`);
+      } catch {
+        // ignore
+      }
+    }
+
+    const cachedVerdict = reset ? null : loadStoredVerdict(caseId);
+    const cachedChat = reset ? [] : loadStoredChat(caseId);
+    const isSolved = Boolean(
+      get().progress[caseId]?.solved || cachedVerdict?.result === 'full'
+    );
+
     set({
       isLoading: true,
       error: null,
       caseId,
       caseData: null,
-      lastVerdict: null,
+      lastVerdict: cachedVerdict,
       usedBaitIds: [],
     });
     const { playerId } = get();
-
-    if (reset && typeof window !== 'undefined') {
-      try {
-        localStorage.removeItem(`alibi_verdict_${caseId}`);
-      } catch {
-        // ignore
-      }
-    }
 
     const startRes = await api.startCase(playerId, caseId, reset);
     if (!startRes.ok) {
@@ -235,8 +273,8 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({
       caseData,
       selectedSuspectId: firstSuspect,
-      isBriefingOpen: true,
-      chatHistory: [],
+      isBriefingOpen: !isSolved,
+      chatHistory: cachedChat,
       inspectorEvents: [],
       lastSearchResults: null,
       usedBaitIds: [],
@@ -249,18 +287,19 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   resetCaseProgress: async (caseId: string) => {
-    await get().initCase(caseId, true);
     if (typeof window !== 'undefined') {
       try {
         localStorage.removeItem(`alibi_verdict_${caseId}`);
+        localStorage.removeItem(`alibi_chat_${caseId}`);
       } catch {}
     }
+    await get().initCase(caseId, true);
     const nextProgress = {
       ...get().progress,
       [caseId]: { stars: 0, solved: false, accusationsUsed: 0 },
     };
     saveStoredProgress(nextProgress);
-    set({ progress: nextProgress, lastVerdict: null });
+    set({ progress: nextProgress, lastVerdict: null, chatHistory: [] });
   },
 
   resetAllProgress: async () => {
@@ -270,11 +309,12 @@ export const useGameStore = create<GameState>((set, get) => ({
       if (typeof window !== 'undefined') {
         try {
           localStorage.removeItem(`alibi_verdict_${cid}`);
+          localStorage.removeItem(`alibi_chat_${cid}`);
         } catch {}
       }
     }
     saveStoredProgress(DEFAULT_PROGRESS);
-    set({ progress: DEFAULT_PROGRESS, lastVerdict: null });
+    set({ progress: DEFAULT_PROGRESS, lastVerdict: null, chatHistory: [] });
     await get().initCase(get().caseId, true);
   },
 
@@ -323,6 +363,21 @@ export const useGameStore = create<GameState>((set, get) => ({
           .map((s) => s.claimId.replace('slip:', '').replace('stmt_slip_', ''))
       : [];
 
+    // Reconstruct or restore chat messages if chatHistory is currently empty
+    const currentChat = get().chatHistory;
+    let nextChat = currentChat;
+    if (currentChat.length === 0 && boardRes.ok && boardRes.data.statements.length > 0) {
+      const reconstructed: ChatMessage[] = boardRes.data.statements.map((s) => ({
+        id: `msg_recon_${s.id}`,
+        suspectId: s.by,
+        speaker: 'suspect',
+        text: s.text,
+        tick: s.tick,
+      }));
+      nextChat = reconstructed;
+      saveStoredChat(caseId, reconstructed);
+    }
+
     set((s) => ({
       board: boardRes.ok ? boardRes.data : null,
       contradictions: contraRes.ok ? contraRes.data.pairs : [],
@@ -330,6 +385,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       impossible: impRes.ok ? impRes.data.moves : [],
       clearedSuspects,
       usedBaitIds: Array.from(new Set([...s.usedBaitIds, ...derivedSlipBaits])),
+      chatHistory: nextChat,
     }));
   },
 
@@ -364,7 +420,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       tick: (board?.tick ?? 0) + 1,
     };
 
-    set((s) => ({ chatHistory: [...s.chatHistory, playerMsg] }));
+    set((s) => {
+      const updated = [...s.chatHistory, playerMsg];
+      saveStoredChat(caseId, updated);
+      return { chatHistory: updated };
+    });
 
     const res = await api.ask(playerId, caseId, selectedSuspectId, topic, slot, about);
     set({ isAsking: false });
@@ -384,7 +444,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       tick: (board?.tick ?? 0) + 1,
     };
 
-    set((s) => ({ chatHistory: [...s.chatHistory, suspectMsg] }));
+    set((s) => {
+      const updated = [...s.chatHistory, suspectMsg];
+      saveStoredChat(caseId, updated);
+      return { chatHistory: updated };
+    });
     await get().refreshBoard();
     return res.data;
   },
@@ -423,19 +487,19 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
 
     // Add suspect reactions to chat history if relevant
-    for (const react of res.data.reactions) {
-      set((s) => ({
-        chatHistory: [
-          ...s.chatHistory,
-          {
-            id: `msg_bait_${react.person}_${Date.now()}`,
-            suspectId: react.person,
-            speaker: 'suspect',
-            text: react.text,
-            observation: react.observation,
-          },
-        ],
+    if (res.data.reactions && res.data.reactions.length > 0) {
+      const reactions: ChatMessage[] = res.data.reactions.map((react) => ({
+        id: `msg_bait_${react.person}_${Date.now()}`,
+        suspectId: react.person,
+        speaker: 'suspect',
+        text: react.text,
+        observation: react.observation,
       }));
+      set((s) => {
+        const updated = [...s.chatHistory, ...reactions];
+        saveStoredChat(caseId, updated);
+        return { chatHistory: updated };
+      });
     }
 
     set((s) => ({

@@ -1,23 +1,61 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useGameStore } from '@/lib/store';
 import { Compass, Clock, Search, LayoutGrid, ShieldAlert, CheckCircle2 } from 'lucide-react';
 
 export function CaseObjectiveBanner() {
   const {
+    caseId,
     caseData,
     board,
     contradictions,
     rehearsed,
     clearedSuspects,
+    progress,
+    lastVerdict,
     selectTab,
     selectedTab,
     setAccuseModalOpen,
   } = useGameStore();
 
   if (!caseData) return null;
+
+  const isCaseSolved = Boolean(
+    progress[caseId]?.solved || lastVerdict?.result === 'full'
+  );
+
+  if (isCaseSolved) {
+    return (
+      <div className="bg-surface-2 border-b border-border px-4 py-1.5 flex items-center justify-between gap-3 text-xs select-none">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="flex items-center gap-1.5 shrink-0">
+            <CheckCircle2 className="size-3.5 text-status-cleared shrink-0" />
+            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-status-cleared hidden sm:inline">
+              Case Solved:
+            </span>
+          </div>
+          <p className="text-xs text-text-primary truncate font-medium">
+            All conspirators exposed and verified! Review the dossier, evidence board, or verdict report.
+          </p>
+        </div>
+
+        <div className="shrink-0 flex items-center gap-2">
+          <Link href={`/play/${caseId}/verdict`}>
+            <Button
+              variant="brass"
+              size="sm"
+              className="h-6 px-2.5 text-xs shadow-xs"
+            >
+              View Verdict
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const activeWindow = board?.window ?? caseData.publicWindow ?? [5];
   const murderSlot = activeWindow[0] ?? 5;
