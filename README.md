@@ -8,6 +8,10 @@
 
 ## 1. Pitch & Overview
 
+| Home page |
+|:---:|
+| ![Home Page](docs/screens/u0.png) |
+
 **Alibi** is an investigative detective game where every statement, every piece of evidence, and every alibi becomes nodes and edges in a **FalkorDB** graph.
 
 The player interrogates AI suspects, searches crime scenes for physical evidence, and watches their deduction board build in real time. But suspects lie. To crack each case, the player collaborates with an autonomous **AI Inspector** that reasons over the graph using graph queries and path-finding algorithms. When an alibi collapses or a suspect makes an impossible journey across locked rooms, the graph catches the lie—and the Inspector explains the exact path that proved it.
