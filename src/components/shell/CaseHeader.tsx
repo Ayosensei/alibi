@@ -46,8 +46,8 @@ export function CaseHeader() {
       <div className="flex items-center gap-3 min-w-0">
         <Link
           href="/season/1"
-          className="flex items-center gap-2 text-text-secondary hover:text-text-primary p-1 -ml-1 rounded transition-colors group shrink-0"
-          title="Back to Dossiers"
+          className="flex items-center gap-1.5 text-text-secondary hover:text-text-primary p-1 -ml-1 rounded transition-colors group shrink-0"
+          title="Back to Dossiers Menu"
         >
           <ArrowLeft className="size-4" />
           <Image
@@ -57,6 +57,9 @@ export function CaseHeader() {
             height={24}
             className="size-6 rounded-full object-cover border border-brass/50 group-hover:border-brass transition-colors shadow-sm"
           />
+          <span className="font-mono text-xs text-text-secondary group-hover:text-text-primary hidden sm:inline font-medium">
+            Menu
+          </span>
         </Link>
 
         <div className="flex items-center gap-2.5 min-w-0">

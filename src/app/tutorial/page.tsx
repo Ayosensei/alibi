@@ -53,7 +53,13 @@ export default function TutorialPage() {
           </span>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link href="/">
+            <Button variant="ghost" size="sm" className="text-xs text-text-secondary hover:text-text-primary gap-1.5" title="Return to Main Menu">
+              <ArrowLeft className="size-3.5 text-brass" />
+              <span>Menu</span>
+            </Button>
+          </Link>
           <Link href="/docs">
             <Button variant="ghost" size="sm" className="text-xs text-text-secondary hover:text-text-primary">
               Docs & Arch

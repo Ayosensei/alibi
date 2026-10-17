@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
   Chip,
@@ -23,6 +24,7 @@ import {
   Sparkles,
   CheckCircle,
   ArrowRight,
+  ArrowLeft,
 } from 'lucide-react';
 import { TimelineGrid } from '@/components/timeline/TimelineGrid';
 import { EvidenceBoard } from '@/components/board/EvidenceBoard';
@@ -71,8 +73,21 @@ export default function StyleguidePage() {
     <div className="min-h-screen bg-background text-text-primary p-8 md:p-12 lg:p-16 max-w-7xl mx-auto space-y-16">
       {/* Header */}
       <header className="border-b border-border pb-8 space-y-3">
-        <div className="font-mono text-xs uppercase tracking-widest text-brass">
-          Design System & Component Library
+        <div className="flex items-center justify-between">
+          <div className="font-mono text-xs uppercase tracking-widest text-brass">
+            Design System & Component Library
+          </div>
+          <Link href="/">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs text-text-secondary hover:text-text-primary gap-1.5"
+              title="Return to Main Menu"
+            >
+              <ArrowLeft className="size-3.5 text-brass" />
+              <span>Main Menu</span>
+            </Button>
+          </Link>
         </div>
         <h1 className="font-serif text-4xl md:text-5xl font-semibold tracking-tight text-balance">
           Alibi <span className="italic font-normal text-thread">Styleguide</span>

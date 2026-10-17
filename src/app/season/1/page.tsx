@@ -16,6 +16,7 @@ import {
   RotateCcw,
   Sparkles,
   ArrowRight,
+  ArrowLeft,
   ShieldAlert,
   Compass,
   BookOpen,
@@ -138,6 +139,18 @@ function Season1Content() {
         {/* Actions (Hidden in Present Mode) */}
         {!isPresentMode && (
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <Link href="/">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs text-text-secondary hover:text-text-primary gap-1.5"
+                title="Return to Main Menu"
+              >
+                <ArrowLeft className="size-3.5 text-brass" />
+                <span>Main Menu</span>
+              </Button>
+            </Link>
+
             <Link href="/tutorial">
               <Button
                 variant="ghost"
