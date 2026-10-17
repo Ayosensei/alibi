@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Stamp, Chip } from '@/components/atoms';
@@ -275,13 +276,19 @@ export function AccuseModal() {
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div
-                        className={`size-8 rounded-full flex items-center justify-center font-mono text-xs font-semibold shrink-0 ${
+                        className={`relative size-9 rounded-full overflow-hidden shrink-0 ring-1 ${
                           isSelected
-                            ? 'bg-thread text-on-primary'
-                            : 'bg-surface-3 text-text-secondary border border-border'
+                            ? 'ring-thread ring-offset-1 ring-offset-surface-3'
+                            : 'ring-border'
                         }`}
                       >
-                        {initials}
+                        <Image
+                          src={`/avatars/${suspect.id}.svg`}
+                          alt={suspect.name}
+                          width={36}
+                          height={36}
+                          className="size-full object-cover"
+                        />
                       </div>
                       <div className="min-w-0">
                         <span className="font-medium text-xs text-text-primary block truncate">

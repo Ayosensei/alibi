@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Chip, EmptyState } from '@/components/atoms';
 import { useGameStore } from '@/lib/store';
@@ -102,13 +103,14 @@ export function InterrogationPanel() {
       {/* 1. Header */}
       <div className="h-14 shrink-0 flex items-center justify-between px-4 border-b border-border bg-surface-2/60">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="size-8 rounded-full bg-surface-3 flex items-center justify-center text-text-primary text-xs font-semibold ring-1 ring-border">
-            {suspect.name
-              .split(/\s+/)
-              .map((w) => w[0])
-              .join('')
-              .slice(0, 2)
-              .toUpperCase()}
+          <div className="relative size-9 rounded-full shrink-0 overflow-hidden ring-1 ring-border shadow-sm">
+            <Image
+              src={`/avatars/${suspect.id}.svg`}
+              alt={suspect.name}
+              width={36}
+              height={36}
+              className="size-full object-cover"
+            />
           </div>
           <div className="flex flex-col min-w-0">
             <span className="font-medium text-sm text-text-primary truncate">

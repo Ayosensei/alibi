@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <radialGradient id="bg_roz" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#2e1925" />
+      <stop offset="100%" stop-color="#160a12" />
+    </radialGradient>
+    <linearGradient id="rim_roz" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d4af37" />
+      <stop offset="100%" stop-color="#8c6d1d" />
+    </linearGradient>
+    <clipPath id="circleClip_roz">
+      <circle cx="64" cy="64" r="60" />
+    </clipPath>
+  </defs>
+
+  <!-- Background Circle with Noir Gradient -->
+  <circle cx="64" cy="64" r="62" fill="url(#bg_roz)" />
+
+  <!-- Clipped Portrait Illustration -->
+  <g clip-path="url(#circleClip_roz)">
+    <!-- Victim Background Watermark -->
+    
+
+    <!-- Shoulders & Coat -->
+    <path d="M 22 128 Q 22 100 48 94 L 80 94 Q 106 100 106 128 Z" fill="#361e2c" />
+    <!-- Collar / Shirt -->
+    <polygon points="54,94 64,106 74,94" fill="#ede8df" />
+    <polygon points="56,94 64,116 72,94" fill="#202228" opacity="0.4" />
+
+    <!-- Neck -->
+    <rect x="56" y="78" width="16" height="18" fill="#e0c0ab" />
+    <path d="M 56 86 Q 64 92 72 86 Z" fill="#000" opacity="0.15" />
+
+    <!-- Head / Face -->
+    <ellipse cx="64" cy="66" rx="20" ry="24" fill="#e0c0ab" />
+
+    <!-- Ears -->
+    <circle cx="43" cy="66" r="4" fill="#e0c0ab" />
+    <circle cx="85" cy="66" r="4" fill="#e0c0ab" />
+
+    <!-- Hair -->
+    
+      <path d="M 36 65 Q 32 36 64 34 Q 96 36 92 65 Q 86 42 64 42 Q 42 42 36 65 Z" fill="#54261d" />
+      <path d="M 34 52 Q 38 56 34 62 Q 38 66 36 72" stroke="#d4af37" stroke-width="1.5" fill="none" opacity="0.6" />
+      <path d="M 94 52 Q 90 56 94 62 Q 90 66 92 72" stroke="#d4af37" stroke-width="1.5" fill="none" opacity="0.6" />
+    
+    
+
+    <!-- Eyes (Subtle Noir Stylized) -->
+    <ellipse cx="54" cy="66" rx="2.5" ry="1.8" fill="#1a1818" />
+    <ellipse cx="74" cy="66" rx="2.5" ry="1.8" fill="#1a1818" />
+    <!-- Eyebrows -->
+    <path d="M 49 61 Q 54 59 59 61" stroke="#2a2420" stroke-width="1.5" fill="none" />
+    <path d="M 69 61 Q 74 59 79 61" stroke="#2a2420" stroke-width="1.5" fill="none" />
+
+    <!-- Nose -->
+    <path d="M 64 64 L 62 72 L 66 72" stroke="#000" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.35" />
+
+    <!-- Mouth -->
+    <path d="M 58 78 Q 64 81 70 78" stroke="#7a423b" stroke-width="1.8" fill="none" stroke-linecap="round" />
+
+    <!-- Extra Accessories & Details -->
+    
+  </g>
+
+  <!-- Outer Ring (Brass for suspects, Crimson for victims) -->
+  <circle cx="64" cy="64" r="61" fill="none" stroke="url(#rim_roz)" stroke-width="2" />
+</svg>

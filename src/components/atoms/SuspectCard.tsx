@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { Chip } from './Chip';
 import { MessageSquareText, Eye } from 'lucide-react';
@@ -61,13 +62,21 @@ export function SuspectCard({
         {/* Avatar with inset outline */}
         <div
           className={cn(
-            'size-10 rounded-full flex items-center justify-center shrink-0 font-medium text-xs select-none ring-1 ring-inset',
+            'relative size-10 rounded-full shrink-0 overflow-hidden ring-1 select-none shadow-sm',
             isVictim
-              ? 'bg-primary/20 text-thread ring-thread/40'
-              : 'bg-surface-3 text-text-primary ring-border-strong group-hover:ring-brass/40'
+              ? 'ring-thread/60'
+              : isSelected
+              ? 'ring-brass'
+              : 'ring-border group-hover:ring-brass/50'
           )}
         >
-          {initials}
+          <Image
+            src={`/avatars/${id}.svg`}
+            alt={name}
+            width={40}
+            height={40}
+            className="size-full object-cover"
+          />
         </div>
 
         <div className="flex flex-col min-w-0">

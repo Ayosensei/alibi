@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <radialGradient id="bg_dorian" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#2b2420" />
+      <stop offset="100%" stop-color="#15110f" />
+    </radialGradient>
+    <linearGradient id="rim_dorian" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d4af37" />
+      <stop offset="100%" stop-color="#8c6d1d" />
+    </linearGradient>
+    <clipPath id="circleClip_dorian">
+      <circle cx="64" cy="64" r="60" />
+    </clipPath>
+  </defs>
+
+  <!-- Background Circle with Noir Gradient -->
+  <circle cx="64" cy="64" r="62" fill="url(#bg_dorian)" />
+
+  <!-- Clipped Portrait Illustration -->
+  <g clip-path="url(#circleClip_dorian)">
+    <!-- Victim Background Watermark -->
+    
+
+    <!-- Shoulders & Coat -->
+    <path d="M 22 128 Q 22 100 48 94 L 80 94 Q 106 100 106 128 Z" fill="#302621" />
+    <!-- Collar / Shirt -->
+    <polygon points="54,94 64,106 74,94" fill="#ede8df" />
+    <polygon points="56,94 64,116 72,94" fill="#202228" opacity="0.4" />
+
+    <!-- Neck -->
+    <rect x="56" y="78" width="16" height="18" fill="#d6b79f" />
+    <path d="M 56 86 Q 64 92 72 86 Z" fill="#000" opacity="0.15" />
+
+    <!-- Head / Face -->
+    <ellipse cx="64" cy="66" rx="20" ry="24" fill="#d6b79f" />
+
+    <!-- Ears -->
+    <circle cx="43" cy="66" r="4" fill="#d6b79f" />
+    <circle cx="85" cy="66" r="4" fill="#d6b79f" />
+
+    <!-- Hair -->
+    
+    <!-- Default Hair -->
+    <path d="M 38 62 Q 34 38 64 36 Q 94 38 90 62 Q 82 46 64 46 Q 46 46 38 62 Z" fill="#382a20" />
+  
+    
+      <!-- Fedora -->
+      <path d="M 28 50 Q 64 36 100 50 L 94 44 Q 64 28 34 44 Z" fill="#201a18" />
+      <path d="M 36 46 Q 64 24 92 46 Q 84 34 64 32 Q 44 34 36 46 Z" fill="#151210" />
+      <path d="M 40 45 Q 64 38 88 45" stroke="#d4af37" stroke-width="2" fill="none" opacity="0.8" />
+      <!-- Cigar -->
+      <rect x="76" y="78" width="16" height="4" rx="2" fill="#8c6248" transform="rotate(15 76 78)" />
+      <circle cx="92" cy="82" r="2" fill="#e8613c" />
+      <path d="M 94 81 Q 98 76 96 70 Q 100 66 98 60" stroke="#aaa" stroke-width="1.2" fill="none" stroke-dasharray="2,2" opacity="0.6" />
+    
+
+    <!-- Eyes (Subtle Noir Stylized) -->
+    <ellipse cx="54" cy="66" rx="2.5" ry="1.8" fill="#1a1818" />
+    <ellipse cx="74" cy="66" rx="2.5" ry="1.8" fill="#1a1818" />
+    <!-- Eyebrows -->
+    <path d="M 49 61 Q 54 59 59 61" stroke="#2a2420" stroke-width="1.5" fill="none" />
+    <path d="M 69 61 Q 74 59 79 61" stroke="#2a2420" stroke-width="1.5" fill="none" />
+
+    <!-- Nose -->
+    <path d="M 64 64 L 62 72 L 66 72" stroke="#000" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.35" />
+
+    <!-- Mouth -->
+    <path d="M 58 78 Q 64 81 70 78" stroke="#7a423b" stroke-width="1.8" fill="none" stroke-linecap="round" />
+
+    <!-- Extra Accessories & Details -->
+    
+  </g>
+
+  <!-- Outer Ring (Brass for suspects, Crimson for victims) -->
+  <circle cx="64" cy="64" r="61" fill="none" stroke="url(#rim_dorian)" stroke-width="2" />
+</svg>
