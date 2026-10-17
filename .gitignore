@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# internal demo & rehearsal notes
+docs/DEMO-*.md
+docs/*script*.md
