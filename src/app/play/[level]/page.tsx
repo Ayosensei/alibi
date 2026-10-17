@@ -25,6 +25,7 @@ function PlayPageContent({ level }: { level: string }) {
   const initialMode = searchParams.get('mode');
 
   const {
+    caseId,
     caseData,
     isLoading,
     error,
@@ -166,7 +167,9 @@ function PlayPageContent({ level }: { level: string }) {
     selectTab,
   ]);
 
-  if (isLoading && !caseData) {
+  const isCaseReady = Boolean(caseData && caseId === level);
+
+  if (isLoading && !isCaseReady) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center space-y-4">
         <Loader2 className="size-8 animate-spin text-brass" />
@@ -177,13 +180,13 @@ function PlayPageContent({ level }: { level: string }) {
     );
   }
 
-  if (error && !caseData) {
+  if (error && !isCaseReady) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 max-w-lg mx-auto">
         <ErrorBanner
           message="Could not load the requested case file."
           hint={error}
-          onRetry={() => initCase(level)}
+          onRetry={() => initCase(level, true)}
         />
       </div>
     );

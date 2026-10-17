@@ -198,7 +198,20 @@ export const useGameStore = create<GameState>((set, get) => ({
   usedBaitIds: [],
 
   initCase: async (caseId: string, reset = false) => {
-    set({ isLoading: true, error: null, caseId, lastVerdict: null, usedBaitIds: [] });
+    const currentCaseId = get().caseId;
+    const currentCaseData = get().caseData;
+    if (!reset && currentCaseId === caseId && currentCaseData) {
+      return;
+    }
+
+    set({
+      isLoading: true,
+      error: null,
+      caseId,
+      caseData: null,
+      lastVerdict: null,
+      usedBaitIds: [],
+    });
     const { playerId } = get();
 
     if (reset && typeof window !== 'undefined') {
