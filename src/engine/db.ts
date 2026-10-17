@@ -16,8 +16,17 @@ let dbInstance: FalkorDB | null = null;
 
 export async function getDb(): Promise<FalkorDB> {
   if (!dbInstance) {
-    const url = process.env.FALKORDB_URL ?? 'redis://localhost:6379';
-    dbInstance = await FalkorDB.connect({ url });
+    if (process.env.FALKORDB_HOST) {
+      dbInstance = await FalkorDB.connect({
+        host: process.env.FALKORDB_HOST,
+        port: Number(process.env.FALKORDB_PORT ?? 6379),
+        username: process.env.FALKORDB_USER || undefined,
+        password: process.env.FALKORDB_PASSWORD,
+      });
+    } else {
+      const url = process.env.FALKORDB_URL ?? 'redis://localhost:6379';
+      dbInstance = await FalkorDB.connect({ url });
+    }
   }
   return dbInstance;
 }
