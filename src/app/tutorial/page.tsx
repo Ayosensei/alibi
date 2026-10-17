@@ -45,6 +45,11 @@ export default function TutorialPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <Link href="/docs">
+            <Button variant="ghost" size="sm" className="text-xs text-text-secondary hover:text-text-primary">
+              Docs & Arch
+            </Button>
+          </Link>
           <Link href="/season/1">
             <Button variant="ghost" size="sm" className="text-xs text-text-secondary hover:text-text-primary">
               Case Dossiers

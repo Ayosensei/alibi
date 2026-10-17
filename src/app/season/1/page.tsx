@@ -17,6 +17,7 @@ import {
   ArrowRight,
   ShieldAlert,
   Compass,
+  BookOpen,
 } from 'lucide-react';
 
 interface CaseMeta {
@@ -145,6 +146,18 @@ function Season1Content() {
               >
                 <Compass className="size-3.5 text-brass" />
                 <span>Field Manual</span>
+              </Button>
+            </Link>
+
+            <Link href="/docs">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs text-text-secondary hover:text-text-primary gap-1.5"
+                title="Open architecture and Track 01 docs"
+              >
+                <BookOpen className="size-3.5 text-brass" />
+                <span>Docs</span>
               </Button>
             </Link>
 

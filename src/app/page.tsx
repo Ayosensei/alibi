@@ -36,6 +36,11 @@ export default function Home() {
               Tutorial
             </Button>
           </Link>
+          <Link href="/docs">
+            <Button variant="ghost" size="sm" className="text-xs text-text-secondary hover:text-text-primary">
+              Docs & Arch
+            </Button>
+          </Link>
           <Link href="/styleguide">
             <Button variant="ghost" size="sm" className="text-xs text-text-secondary hover:text-text-primary">
               Styleguide
