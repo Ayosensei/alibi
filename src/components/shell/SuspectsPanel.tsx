@@ -155,7 +155,7 @@ export function SuspectsPanel() {
                     }`}
                   />
                   <div className="flex items-center gap-1 min-w-0 truncate">
-                    <span className="font-medium truncate">{room.name}</span>
+                    <span className="font-medium text-sm truncate">{room.name}</span>
                     {isCrimeScene && (
                       <span className="font-mono text-xs text-thread shrink-0">
                         (Scene)
@@ -174,6 +174,7 @@ export function SuspectsPanel() {
                   <Button
                     variant={isSearched ? 'ghost' : 'secondary'}
                     size="sm"
+                    data-room-search={room.id}
                     disabled={isSearched || isLoading}
                     onClick={() => searchRoomAction(room.id)}
                     className="h-7 px-2 text-xs shrink-0"

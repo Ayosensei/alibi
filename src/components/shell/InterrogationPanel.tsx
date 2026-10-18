@@ -141,10 +141,10 @@ export function InterrogationPanel() {
             />
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="font-medium text-sm text-text-primary truncate">
+            <span className="font-semibold text-base text-text-primary truncate">
               {suspect.name}
             </span>
-            <span className="text-xs text-text-secondary truncate">
+            <span className="text-sm text-text-secondary truncate">
               {suspect.role}
             </span>
           </div>
@@ -165,7 +165,7 @@ export function InterrogationPanel() {
         {suspectMessages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center p-6 text-text-tertiary space-y-2">
             <MessageSquare className="size-8 text-text-tertiary/60" />
-            <p className="text-xs max-w-xs">
+            <p className="text-sm max-w-xs text-text-secondary">
               No questions recorded for {suspect.name} yet. Inquire about whereabouts, sightings, or relations below.
             </p>
           </div>
@@ -179,7 +179,7 @@ export function InterrogationPanel() {
                 className={`flex flex-col ${isPlayer ? 'items-end' : 'items-start'} space-y-1`}
               >
                 <div
-                  className={`max-w-md p-3 rounded-xl text-xs md:text-sm leading-relaxed ${
+                  className={`max-w-md p-3.5 rounded-xl text-sm md:text-base leading-relaxed ${
                     isPlayer
                       ? 'bg-surface-3 text-text-primary shadow-sm rounded-tr-none'
                       : 'bg-surface-2 text-text-primary border-l-2 border-brass shadow-card rounded-tl-none'
@@ -344,6 +344,7 @@ export function InterrogationPanel() {
           <Button
             variant="secondary"
             size="default"
+            data-lead-button="murder-window"
             disabled={isAsking}
             onClick={() => handleAsk('whereabouts', murderSlot)}
             className={`w-full justify-between h-auto py-2.5 px-3 text-left transition-all ${
@@ -359,16 +360,16 @@ export function InterrogationPanel() {
                 <Clock className="size-4 text-brass shrink-0 animate-pulse" />
               )}
               <div className="flex flex-col min-w-0">
-                <span className="font-semibold text-xs md:text-sm text-text-primary truncate">
+                <span className="font-semibold text-sm md:text-base text-text-primary truncate">
                   Where were you at {murderTime}?
                 </span>
-                <span className="text-xs text-text-secondary truncate">
+                <span className="text-xs md:text-sm text-text-secondary truncate">
                   {murderSubtitle}
                 </span>
               </div>
             </div>
             <span
-              className={`font-mono text-xs px-2.5 py-1 rounded font-medium shrink-0 ml-2 ${
+              className={`font-mono text-xs px-2.5 py-1 rounded font-semibold shrink-0 ml-2 ${
                 hasAskedMurderQuestion
                   ? 'bg-surface-3 text-text-secondary border border-border'
                   : 'bg-brass text-on-brass'
@@ -470,7 +471,7 @@ export function InterrogationPanel() {
 
       {/* 4. Docked Detective Phone */}
       {isPhoneDockedUnderInterrogation && (
-        <div className="p-3 pt-0 shrink-0 border-t border-border bg-surface-1/50">
+        <div data-phone-container="true" className="p-3 pt-0 shrink-0 border-t border-border bg-surface-1/50">
           <DetectivePhone mode="docked" />
         </div>
       )}

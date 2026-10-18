@@ -166,6 +166,7 @@ export function CaseHeader() {
           <Button
             variant="default"
             size="sm"
+            data-accuse-button="true"
             onClick={() => setAccuseModalOpen(true)}
             className="text-xs h-8 px-2.5 sm:px-3"
             title="File Formal Accusation (A)"

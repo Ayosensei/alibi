@@ -91,24 +91,24 @@ export function SuspectCard({
 
         <div className="flex flex-col min-w-0 flex-1">
           <div className="flex items-center gap-1.5 min-w-0">
-            <span className="font-medium text-sm text-text-primary truncate">
+            <span className="font-semibold text-base text-text-primary truncate">
               {name}
             </span>
             {isVictim && (
-              <span className="font-mono text-xs text-thread uppercase tracking-wider shrink-0">
+              <span className="font-mono text-xs text-thread uppercase tracking-wider shrink-0 font-medium">
                 (Victim)
               </span>
             )}
           </div>
-          <span className="text-xs text-text-secondary truncate">{role}</span>
+          <span className="text-sm text-text-secondary truncate">{role}</span>
         </div>
       </div>
 
       {/* Badges / Chips */}
       {!isVictim && statementsCount > 0 && (
-        <div className="flex items-center gap-1 text-xs font-mono text-text-tertiary pt-0.5">
-          <MessageSquareText className="size-3 text-brass/70" />
-          <span className="tabular-nums">{statementsCount}</span> {statementsCount === 1 ? 'claim logged' : 'claims logged'}
+        <div className="flex items-center gap-1.5 text-xs font-mono text-text-secondary pt-0.5">
+          <MessageSquareText className="size-3.5 text-brass" />
+          <span className="tabular-nums font-medium">{statementsCount}</span> {statementsCount === 1 ? 'claim on graph' : 'claims on graph'}
         </div>
       )}
       {!isVictim && statementsCount === 0 && hasInquiries && (

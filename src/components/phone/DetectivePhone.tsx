@@ -18,11 +18,27 @@ import {
   CheckCircle2,
   Minimize2,
   Maximize2,
+  X,
+  Database,
+  ChevronDown,
+  ChevronUp,
+  Info,
 } from 'lucide-react';
 
 interface DetectivePhoneProps {
   mode?: 'docked' | 'panel';
   className?: string;
+}
+
+interface InspectedEntity {
+  type: 'suspect' | 'room' | 'conflict' | 'clearance';
+  id: string;
+  name: string;
+  roleOrType: string;
+  status: string;
+  statusVariant: 'thread' | 'success' | 'brass' | 'info';
+  humanSummary: string;
+  cypherProof: string;
 }
 
 export function DetectivePhone({ mode = 'docked', className = '' }: DetectivePhoneProps) {
@@ -41,6 +57,8 @@ export function DetectivePhone({ mode = 'docked', className = '' }: DetectivePho
   } = useGameStore();
 
   const [isMinimized, setIsMinimized] = React.useState(false);
+  const [inspectedEntity, setInspectedEntity] = React.useState<InspectedEntity | null>(null);
+  const [showCypherProof, setShowCypherProof] = React.useState(false);
 
   if (!caseData) return null;
 
@@ -54,15 +72,15 @@ export function DetectivePhone({ mode = 'docked', className = '' }: DetectivePho
   const murderSlot = activeWindow[0] ?? 5;
   const murderTime = caseData.slots[murderSlot - 1] ?? `Slot ${murderSlot}`;
 
-  // Find suspects with contradictions
+  // Contradicted suspects
   const contradictedSuspectIds = new Set(contradictions.map((c) => c.subject));
 
-  // Determine prime suspect: un-cleared suspect with contradictions or uneliminated
+  // Determine prime suspect
   const primeSuspect = nonVictims.find(
     (p) => !clearedSuspects[p.id] && (contradictedSuspectIds.has(p.id) || nonVictims.filter((s) => !clearedSuspects[s.id]).length === 1)
   );
 
-  // Key rooms involved in statements or evidence
+  // Relevant rooms: prioritize rooms with statements or evidence or crime scene
   const relevantRooms = caseData.rooms.filter((r) => {
     const hasStatement = statements.some((s) => s.room === r.id);
     const hasEvidence = hardAnchors.some((a) => a.room === r.id);
@@ -70,7 +88,6 @@ export function DetectivePhone({ mode = 'docked', className = '' }: DetectivePho
     return hasStatement || hasEvidence || isCrimeScene;
   }).slice(0, 4);
 
-  // If fewer than 4 relevant rooms, fill with other case rooms
   if (relevantRooms.length < 4) {
     for (const r of caseData.rooms) {
       if (relevantRooms.length >= 4) break;
@@ -81,7 +98,7 @@ export function DetectivePhone({ mode = 'docked', className = '' }: DetectivePho
   }
 
   // Layout coordinates for SVG canvas (viewBox 0 0 680 320)
-  const leftX = 90;
+  const leftX = 95;
   const rightX = 540;
   const suspectSpacing = 300 / Math.max(nonVictims.length, 1);
   const roomSpacing = 300 / Math.max(relevantRooms.length, 1);
@@ -97,19 +114,19 @@ export function DetectivePhone({ mode = 'docked', className = '' }: DetectivePho
   });
 
   // Ticker narrative message
-  let tickerMessage = 'Blank state. Interrogate suspects to register alibi nodes on FalkorDB.';
+  let tickerMessage = 'Blank state. Interrogate suspects or search rooms to grow your FalkorDB knowledge graph.';
   let tickerVariant: 'info' | 'thread' | 'success' | 'brass' = 'info';
 
   if (primeSuspect && statements.length >= 2) {
-    tickerMessage = `Deduction Ready: ${primeSuspect.name} cannot be cleared (${contradictions.length} conflict detected). Target for accusation.`;
+    tickerMessage = `Deduction Ready: ${primeSuspect.name} cannot be cleared (${contradictions.length} contradiction detected). Target for accusation!`;
     tickerVariant = 'brass';
   } else if (contradictions.length > 0) {
     const firstConflict = contradictions[0];
     const culprit = nonVictims.find((p) => p.id === firstConflict.subject)?.name ?? firstConflict.subject;
-    tickerMessage = `Contradiction Detected: ${culprit}'s claim clashes with evidence at ${firstConflict.roomA.replace(/_/g, ' ')}.`;
+    tickerMessage = `Contradiction Caught: ${culprit}'s alibi clashes with physical evidence at ${firstConflict.roomA.replace(/_/g, ' ')}.`;
     tickerVariant = 'thread';
   } else if (impossible.length > 0) {
-    tickerMessage = `Distance Impossibility: ${impossible[0].person} was too far from the crime scene, clearing their alibi.`;
+    tickerMessage = `Distance Clearance: ${impossible[0].person} was too far from the crime scene, proving innocence.`;
     tickerVariant = 'success';
   } else if (statements.length > 0) {
     const latestStmt = statements[statements.length - 1];
@@ -118,28 +135,113 @@ export function DetectivePhone({ mode = 'docked', className = '' }: DetectivePho
     tickerVariant = 'info';
   }
 
+  // Handlers for inspecting elements on click
+  const handleInspectSuspect = (suspectId: string) => {
+    selectSuspect(suspectId);
+    const p = nonVictims.find((x) => x.id === suspectId);
+    if (!p) return;
+
+    const isContr = contradictedSuspectIds.has(suspectId);
+    const isClr = clearedSuspects[suspectId];
+    const pStmts = statements.filter((s) => s.by === suspectId);
+    const stmtRoom = pStmts[0]?.room
+      ? caseData.rooms.find((r) => r.id === pStmts[0].room)?.name ?? pStmts[0].room
+      : null;
+
+    setInspectedEntity({
+      type: 'suspect',
+      id: suspectId,
+      name: p.name,
+      roleOrType: p.role,
+      status: isContr
+        ? '⚠️ Contradiction Detected'
+        : isClr
+        ? '🛡️ Cleared by Distance'
+        : pStmts.length > 0
+        ? '💬 Alibi Claimed'
+        : '⚪ Blank Initial State',
+      statusVariant: isContr ? 'thread' : isClr ? 'success' : pStmts.length > 0 ? 'brass' : 'info',
+      humanSummary: isContr
+        ? `${p.name} claimed she was in the ${stmtRoom ?? 'another room'} at ${murderTime}, but physical evidence proves she was in the Hallway. She cannot be in two places at once.`
+        : isClr
+        ? `${p.name} was in the ${stmtRoom ?? 'another room'}. The estate layout proves it is physically impossible to reach the murder room in zero minutes.`
+        : pStmts.length > 0
+        ? `${p.name} claimed alibi: in ${stmtRoom ?? 'estate'} at ${murderTime}.`
+        : `${p.name} has not made any statements yet. Interrogate her in the center panel to register her alibi.`,
+      cypherProof: isContr
+        ? `FalkorDB Q60: MATCH (s:Statement {by: '${suspectId}'})-[:AT_TIME]->(t), (a:Anchor)-[:AT_TIME]->(t) WHERE s.room <> a.room RETURN clash`
+        : isClr
+        ? `FalkorDB Q63: MATCH (p:Person {id: '${suspectId}'})-[:CLAIMED]->(r:Room), path = shortestPath((r)-[:DOOR*]-(scene:Room)) WHERE length(path) > speed RETURN clearance`
+        : `FalkorDB :Person {id: '${suspectId}'}`,
+    });
+  };
+
+  const handleInspectRoom = (roomId: string) => {
+    const room = caseData.rooms.find((r) => r.id === roomId);
+    if (!room) return;
+
+    const isCrimeScene = room.id === caseData.crimeScene;
+    const roomEv = hardAnchors.filter((a) => a.room === room.id);
+    const roomStmts = statements.filter((s) => s.room === room.id);
+
+    setInspectedEntity({
+      type: 'room',
+      id: room.id,
+      name: room.name,
+      roleOrType: isCrimeScene ? 'Crime Scene (Study)' : 'Estate Room',
+      status: roomEv.length > 0
+        ? '🔍 Physical Evidence Discovered'
+        : isCrimeScene
+        ? '🚨 Murder Scene'
+        : '📍 Location Node',
+      statusVariant: roomEv.length > 0 ? 'brass' : isCrimeScene ? 'thread' : 'info',
+      humanSummary: roomEv.length > 0
+        ? `Physical anchor verified here: ${roomEv.map((e) => e.src || e.subject || 'log').join(', ')}.`
+        : isCrimeScene
+        ? `Lord Harrington was murdered here during the window (${murderTime}).`
+        : `${roomStmts.length} suspect statements claim this location.`,
+      cypherProof: `FalkorDB :Room {id: '${room.id}'} <-[:IN_ROOM]- (${roomEv.length > 0 ? ':Anchor' : ':Statement'})`,
+    });
+  };
+
+  const handleInspectConflict = () => {
+    setInspectedEntity({
+      type: 'conflict',
+      id: 'clash',
+      name: 'Alibi Contradiction',
+      roleOrType: 'FalkorDB Q60 Deduction',
+      status: '🚨 Direct Spatial Conflict',
+      statusVariant: 'thread',
+      humanSummary:
+        'A suspect claimed one room while hard evidence places them in a different room at the exact same timestamp. In FalkorDB, a person cannot occupy two rooms simultaneously.',
+      cypherProof:
+        'FalkorDB Q60: MATCH (s:Statement)-[:AT_TIME]->(t), (a:Anchor)-[:AT_TIME]->(t) WHERE s.room <> a.room RETURN s, a',
+    });
+  };
+
   return (
     <div
+      data-tour="phone"
       className={`flex flex-col bg-surface-2 border border-border-strong rounded-2xl shadow-card overflow-hidden transition-all duration-200 select-none ${
         mode === 'docked' ? 'border-t-2 border-t-brass/40' : ''
       } ${className}`}
     >
       {/* 1. Phone Top Status Bar & Controls */}
-      <div className="flex items-center justify-between px-3 py-2 bg-surface-3/90 border-b border-border text-xs shrink-0">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-1 border border-border">
-            <Smartphone className="size-3 text-brass" />
+      <div className="flex items-center justify-between px-3.5 py-2.5 bg-surface-3/90 border-b border-border text-xs shrink-0">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-1 border border-border shadow-xs">
+            <Smartphone className="size-3.5 text-brass" />
             <span className="font-mono text-xs font-semibold tracking-wider text-brass uppercase">
               Pocket Graph
             </span>
             <span className="size-1.5 rounded-full bg-status-cleared animate-pulse ml-0.5" />
           </div>
-          <span className="hidden sm:inline font-mono text-xs text-text-tertiary">
-            FalkorDB Live Link · {statements.length} claims · {contradictions.length} clashes
+          <span className="hidden sm:inline font-mono text-xs text-text-secondary">
+            FalkorDB Engine · {statements.length} claims · {hardAnchors.length} anchors · {contradictions.length} clashes
           </span>
         </div>
 
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           {mode === 'docked' ? (
             <>
               <Button
@@ -214,35 +316,35 @@ export function DetectivePhone({ mode = 'docked', className = '' }: DetectivePho
               const curveY = midY + (idx % 2 === 0 ? -15 : 15);
 
               return (
-                <g key={`stmt_edge_${s.id}_${idx}`}>
+                <g key={`stmt_edge_${s.id}_${idx}`} className="cursor-pointer" onClick={handleInspectConflict}>
                   {/* Connection Path */}
                   <path
                     d={`M ${start.x} ${start.y} Q ${midX} ${curveY} ${end.x} ${end.y}`}
-                    strokeWidth={1.5}
+                    strokeWidth={isContradicted ? 2.5 : 1.5}
                     className={`fill-none transition-all duration-300 ${
                       isContradicted
                         ? 'stroke-thread stroke-2 animate-pulse'
-                        : 'stroke-brass/70'
+                        : 'stroke-brass/70 hover:stroke-brass'
                     }`}
                   />
                   {/* Timestamp Label Badge on edge */}
                   <g transform={`translate(${midX}, ${curveY})`}>
                     <rect
-                      x="-24"
-                      y="-9"
-                      width="48"
-                      height="18"
-                      rx="9"
-                      className={`stroke text-center ${
+                      x="-28"
+                      y="-10"
+                      width="56"
+                      height="20"
+                      rx="10"
+                      className={`stroke text-center shadow-xs ${
                         isContradicted
-                          ? 'fill-surface-3 stroke-thread'
+                          ? 'fill-surface-3 stroke-thread stroke-1.5'
                           : 'fill-surface-2 stroke-border'
                       }`}
                     />
                     <text
                       textAnchor="middle"
-                      dy="3.5"
-                      className="font-mono text-xs fill-text-primary" // design-ok: SVG graph edge label
+                      dy="4"
+                      className="font-mono text-xs font-semibold fill-text-primary select-none" // design-ok: SVG graph edge label
                     >
                       {s.slot ? `${caseData.slots[s.slot - 1] ?? `S${s.slot}`}` : 'Alibi'}
                     </text>
@@ -258,31 +360,35 @@ export function DetectivePhone({ mode = 'docked', className = '' }: DetectivePho
               if (!suspectPoint || !roomPointA) return null;
 
               return (
-                <g key={`contra_line_${idx}`}>
+                <g
+                  key={`contra_line_${idx}`}
+                  onClick={handleInspectConflict}
+                  className="cursor-pointer group"
+                >
                   <line
                     x1={suspectPoint.x}
                     y1={suspectPoint.y}
                     x2={roomPointA.x}
                     y2={roomPointA.y}
-                    strokeWidth={2}
+                    strokeWidth={2.5}
                     className="stroke-thread animate-pulse"
                     strokeDasharray="6 3"
                   />
                   <g transform={`translate(${(suspectPoint.x + roomPointA.x) / 2}, ${(suspectPoint.y + roomPointA.y) / 2})`}>
                     <rect
-                      x="-42"
-                      y="-10"
-                      width="84"
-                      height="20"
-                      rx="4"
-                      className="fill-surface-3 stroke-thread stroke-1"
+                      x="-54"
+                      y="-11"
+                      width="108"
+                      height="22"
+                      rx="6"
+                      className="fill-surface-3 stroke-thread stroke-1.5 shadow-md"
                     />
                     <text
                       textAnchor="middle"
-                      dy="3.5"
-                      className="font-mono text-xs font-bold fill-thread uppercase tracking-wider" // design-ok: SVG graph clash badge
+                      dy="4"
+                      className="font-mono text-xs font-bold fill-thread uppercase tracking-wider select-none" // design-ok: SVG graph clash badge
                     >
-                      CLASH (Q60)
+                      CONTRADICTION
                     </text>
                   </g>
                 </g>
@@ -298,20 +404,25 @@ export function DetectivePhone({ mode = 'docked', className = '' }: DetectivePho
               const hasEvidenceInRoom = hardAnchors.some((a) => a.room === room.id);
 
               return (
-                <g key={`room_node_${room.id}`} transform={`translate(${pt.x}, ${pt.y})`}>
+                <g
+                  key={`room_node_${room.id}`}
+                  transform={`translate(${pt.x}, ${pt.y})`}
+                  onClick={() => handleInspectRoom(room.id)}
+                  className="cursor-pointer group"
+                >
                   {/* Room pill */}
                   <rect
-                    x="-60"
-                    y="-16"
-                    width="120"
-                    height="32"
-                    rx="16"
+                    x="-65"
+                    y="-18"
+                    width="130"
+                    height="36"
+                    rx="18"
                     className={`transition-colors duration-150 ${
                       isCrimeScene
-                        ? 'fill-surface-2 stroke-thread stroke-1.5'
+                        ? 'fill-surface-2 stroke-thread stroke-2'
                         : hasEvidenceInRoom
-                        ? 'fill-surface-2 stroke-brass stroke-1'
-                        : 'fill-surface-1 stroke-border-strong stroke-1'
+                        ? 'fill-surface-2 stroke-brass stroke-1.5'
+                        : 'fill-surface-1 stroke-border-strong stroke-1 group-hover:stroke-border'
                     }`}
                   />
                   {/* Room Label */}
@@ -319,16 +430,16 @@ export function DetectivePhone({ mode = 'docked', className = '' }: DetectivePho
                     x="0"
                     y="4"
                     textAnchor="middle"
-                    className="font-mono text-xs font-medium fill-text-primary capitalize select-none" // design-ok: SVG room label
+                    className="font-mono text-xs font-semibold fill-text-primary capitalize select-none" // design-ok: SVG room label
                   >
                     {room.name.length > 15 ? `${room.name.slice(0, 14)}…` : room.name}
                   </text>
                   {/* Evidence tag */}
                   {hasEvidenceInRoom && (
-                    <circle cx="50" cy="0" r="4" className="fill-brass animate-pulse" />
+                    <circle cx="54" cy="0" r="4.5" className="fill-brass animate-pulse" />
                   )}
                   {isCrimeScene && (
-                    <circle cx="-50" cy="0" r="4" className="fill-thread" />
+                    <circle cx="-54" cy="0" r="4.5" className="fill-thread" />
                   )}
                 </g>
               );
@@ -356,30 +467,30 @@ export function DetectivePhone({ mode = 'docked', className = '' }: DetectivePho
                 <g
                   key={`person_node_${p.id}`}
                   transform={`translate(${pt.x}, ${pt.y})`}
-                  onClick={() => selectSuspect(p.id)}
+                  onClick={() => handleInspectSuspect(p.id)}
                   className="cursor-pointer group"
                 >
                   {/* Prime Suspect Crosshair Aura */}
                   {isPrime && (
                     <circle
-                      r="29"
+                      r="30"
                       className="fill-none stroke-thread stroke-2 animate-ping opacity-60"
                     />
                   )}
 
                   {/* Outer circle */}
                   <circle
-                    r="22"
-                    strokeWidth={1.5}
+                    r="24"
+                    strokeWidth={2}
                     className={`transition-all duration-200 ${
                       isContradicted
-                        ? 'fill-surface-3 stroke-thread stroke-2 shadow-sm'
+                        ? 'fill-surface-3 stroke-thread shadow-sm'
                         : isCleared
-                        ? 'fill-surface-3 stroke-status-cleared stroke-2'
+                        ? 'fill-surface-3 stroke-status-cleared'
                         : isSelected
-                        ? 'fill-surface-3 stroke-brass stroke-2 ring-2 ring-brass'
+                        ? 'fill-surface-3 stroke-brass ring-2 ring-brass'
                         : hasStatements
-                        ? 'fill-surface-2 stroke-brass/70'
+                        ? 'fill-surface-2 stroke-brass/80'
                         : 'fill-surface-2 stroke-border group-hover:stroke-border-strong'
                     }`}
                   />
@@ -401,34 +512,34 @@ export function DetectivePhone({ mode = 'docked', className = '' }: DetectivePho
 
                   {/* Suspect Name label */}
                   <text
-                    x="28"
-                    y="3"
-                    className="font-medium text-xs fill-text-primary group-hover:fill-brass transition-colors select-none" // design-ok: SVG suspect name
+                    x="30"
+                    y="4"
+                    className="font-semibold text-xs fill-text-primary group-hover:fill-brass transition-colors select-none" // design-ok: SVG suspect name
                   >
                     {p.name.split(' ')[0]}
                   </text>
 
                   {/* Deduction State Badge */}
                   {isCleared && (
-                    <g transform="translate(14, -14)">
-                      <circle r="7" className="fill-surface-3 stroke-status-cleared stroke-1" />
-                      <text textAnchor="middle" dy="3" className="font-mono text-xs fill-status-cleared font-bold"> {/* design-ok: SVG badge check */}
+                    <g transform="translate(16, -15)">
+                      <circle r="7.5" className="fill-surface-3 stroke-status-cleared stroke-1" />
+                      <text textAnchor="middle" dy="3.5" className="font-mono text-xs fill-status-cleared font-bold"> {/* design-ok: SVG badge check */}
                         ✓
                       </text>
                     </g>
                   )}
                   {isContradicted && (
-                    <g transform="translate(14, -14)">
-                      <circle r="7" className="fill-surface-3 stroke-thread stroke-1" />
-                      <text textAnchor="middle" dy="3" className="font-mono text-xs fill-thread font-bold"> {/* design-ok: SVG badge conflict */}
+                    <g transform="translate(16, -15)">
+                      <circle r="7.5" className="fill-surface-3 stroke-thread stroke-1" />
+                      <text textAnchor="middle" dy="3.5" className="font-mono text-xs fill-thread font-bold"> {/* design-ok: SVG badge conflict */}
                         !
                       </text>
                     </g>
                   )}
                   {isPrime && (
-                    <g transform="translate(14, -14)">
-                      <circle r="8" className="fill-thread stroke-surface-1 stroke-1" />
-                      <text textAnchor="middle" dy="3" className="font-mono text-xs fill-surface-1 font-bold"> {/* design-ok: SVG badge prime */}
+                    <g transform="translate(16, -15)">
+                      <circle r="8.5" className="fill-thread stroke-surface-1 stroke-1" />
+                      <text textAnchor="middle" dy="3.5" className="font-mono text-xs fill-surface-1 font-bold"> {/* design-ok: SVG badge prime */}
                         ⚡
                       </text>
                     </g>
@@ -440,33 +551,98 @@ export function DetectivePhone({ mode = 'docked', className = '' }: DetectivePho
         </div>
       )}
 
-      {/* 3. Real-Time Deduction Ticker */}
-      <div className="px-3 py-2 bg-surface-3/90 border-t border-border flex items-center justify-between text-xs shrink-0">
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          <Sparkles className="size-3.5 text-brass shrink-0" />
-          <p
-            className={`font-mono text-xs truncate ${
-              tickerVariant === 'thread'
-                ? 'text-thread font-medium'
-                : tickerVariant === 'success'
-                ? 'text-status-cleared font-medium'
-                : tickerVariant === 'brass'
-                ? 'text-brass font-semibold'
-                : 'text-text-secondary'
-            }`}
-          >
-            {tickerMessage}
-          </p>
-        </div>
+      {/* 3. Interactive Inspector Card OR Live Deduction Ticker */}
+      {inspectedEntity ? (
+        <div className="p-3 bg-surface-3/95 border-t border-border flex flex-col gap-2 animate-in fade-in duration-150">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="font-serif font-bold text-sm text-text-primary">
+                {inspectedEntity.name}
+              </span>
+              <span className="text-xs text-text-tertiary">
+                ({inspectedEntity.roleOrType})
+              </span>
+              <span
+                className={`font-mono text-xs px-2 py-0.5 rounded-full font-semibold border ${
+                  inspectedEntity.statusVariant === 'thread'
+                    ? 'bg-thread/10 text-thread border-thread/30'
+                    : inspectedEntity.statusVariant === 'success'
+                    ? 'bg-status-cleared/10 text-status-cleared border-status-cleared/30'
+                    : inspectedEntity.statusVariant === 'brass'
+                    ? 'bg-brass/10 text-brass border-brass/30'
+                    : 'bg-surface-2 text-text-secondary border-border'
+                }`}
+              >
+                {inspectedEntity.status}
+              </span>
+            </div>
 
-        {primeSuspect && statements.length >= 2 && (
-          <div className="shrink-0 ml-2">
-            <span className="font-mono text-xs text-thread uppercase tracking-wider font-semibold">
-              Target: {primeSuspect.name.split(' ')[0]}
-            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setInspectedEntity(null)}
+              className="h-6 w-6 p-0 text-text-tertiary hover:text-text-primary"
+              title="Close Inspection"
+            >
+              <X className="size-3.5" />
+            </Button>
           </div>
-        )}
-      </div>
+
+          <p className="text-xs text-text-secondary leading-relaxed">
+            {inspectedEntity.humanSummary}
+          </p>
+
+          <div className="pt-1 flex flex-col gap-1.5 border-t border-border/50">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowCypherProof(!showCypherProof)}
+              className="h-6 px-1.5 text-xs text-brass self-start gap-1 font-mono"
+            >
+              <Database className="size-3" />
+              <span>{showCypherProof ? 'Hide FalkorDB Proof' : 'Inspect FalkorDB Proof (Cypher)'}</span>
+              {showCypherProof ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+            </Button>
+
+            {showCypherProof && (
+              <div className="p-2 rounded-lg bg-surface-1 border border-border text-xs font-mono text-text-tertiary">
+                <span className="text-brass block font-semibold mb-0.5">FalkorDB Graph Engine Query:</span>
+                <p className="text-text-secondary">{inspectedEntity.cypherProof}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="px-3.5 py-2.5 bg-surface-3/90 border-t border-border flex items-center justify-between text-xs shrink-0">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <Sparkles className="size-3.5 text-brass shrink-0" />
+            <p
+              className={`font-mono text-xs truncate ${
+                tickerVariant === 'thread'
+                  ? 'text-thread font-semibold'
+                  : tickerVariant === 'success'
+                  ? 'text-status-cleared font-semibold'
+                  : tickerVariant === 'brass'
+                  ? 'text-brass font-semibold'
+                  : 'text-text-secondary'
+              }`}
+            >
+              {tickerMessage}
+            </p>
+          </div>
+
+          <div className="shrink-0 ml-2 hidden sm:flex items-center gap-2">
+            <span className="font-mono text-xs text-text-tertiary">
+              💡 Tap any node to inspect
+            </span>
+            {primeSuspect && statements.length >= 2 && (
+              <span className="font-mono text-xs text-thread uppercase tracking-wider font-semibold">
+                Target: {primeSuspect.name.split(' ')[0]}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

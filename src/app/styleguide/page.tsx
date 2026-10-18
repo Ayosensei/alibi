@@ -772,7 +772,7 @@ export default function StyleguidePage() {
           <span className="font-mono text-xs text-brass uppercase tracking-wider block">
             Guided Induction Walkthrough Banner
           </span>
-          <Case0Coach />
+          <Case0Coach specimenMode />
         </div>
 
         {/* Detective Phone Specimen */}
