@@ -16,6 +16,7 @@ export function CaseObjectiveBanner() {
     clearedSuspects,
     progress,
     lastVerdict,
+    chatHistory,
     selectTab,
     selectedTab,
     setAccuseModalOpen,
@@ -65,9 +66,26 @@ export function CaseObjectiveBanner() {
   // Progression metrics
   const suspects = caseData.people.filter((p) => !p.victim);
   const totalSuspects = suspects.length;
-  const murderStatements = (board?.statements ?? []).filter(
-    (s) => s.slot === murderSlot && s.kind === 'location'
-  );
+
+  // Track unique suspects questioned about murder window
+  const questionedSuspectIds = new Set<string>();
+  for (const s of board?.statements ?? []) {
+    if (s.slot === murderSlot && s.kind === 'location') {
+      questionedSuspectIds.add(s.by);
+    }
+  }
+  for (const m of chatHistory) {
+    if (m.speaker === 'player') {
+      if (
+        (m.topic === 'whereabouts' && m.slot === murderSlot) ||
+        (murderTime && m.text.includes(murderTime))
+      ) {
+        questionedSuspectIds.add(m.suspectId);
+      }
+    }
+  }
+  const questionedCount = Math.min(questionedSuspectIds.size, totalSuspects);
+
   const crimeSceneSearched = (board?.searchedRooms ?? []).includes(caseData.crimeScene);
   const hasContradictions = (contradictions?.length ?? 0) > 0;
   const hasRehearsed = (rehearsed?.length ?? 0) > 0;
@@ -78,12 +96,12 @@ export function CaseObjectiveBanner() {
   let icon = <Compass className="size-3.5 text-brass shrink-0" />;
   let actionButton: React.ReactNode = null;
 
-  if (murderStatements.length < totalSuspects) {
+  if (questionedCount < totalSuspects) {
     icon = <Clock className="size-3.5 text-brass shrink-0 animate-pulse" />;
     leadText = `Interrogate suspects about their whereabouts at ${murderTime} (Time of Murder).`;
     actionButton = (
       <span className="font-mono text-xs px-2 py-0.5 rounded bg-surface-3 text-brass border border-border">
-        {murderStatements.length}/{totalSuspects} Questioned
+        {questionedCount}/{totalSuspects} Questioned
       </span>
     );
   } else if (!crimeSceneSearched) {

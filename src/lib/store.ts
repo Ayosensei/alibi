@@ -20,6 +20,9 @@ export interface ChatMessage {
   suspectId: string;
   speaker: 'player' | 'suspect';
   text: string;
+  topic?: string;
+  slot?: number | null;
+  about?: string | null;
   observation?: string | null;
   firewallWarning?: boolean;
   tick?: number;
@@ -383,6 +386,9 @@ export const useGameStore = create<GameState>((set, get) => ({
         suspectId: s.by,
         speaker: 'suspect',
         text: s.text,
+        topic: s.kind === 'location' ? 'whereabouts' : s.kind === 'saw' ? 'witness' : 'motive',
+        slot: s.slot ?? null,
+        about: s.subject ?? null,
         tick: s.tick,
       }));
       nextChat = reconstructed;
@@ -441,6 +447,9 @@ export const useGameStore = create<GameState>((set, get) => ({
       suspectId: selectedSuspectId,
       speaker: 'player',
       text: playerQuestion,
+      topic,
+      slot: slot ?? null,
+      about: about ?? null,
       tick: (board?.tick ?? 0) + 1,
     };
 
@@ -463,6 +472,9 @@ export const useGameStore = create<GameState>((set, get) => ({
       suspectId: selectedSuspectId,
       speaker: 'suspect',
       text: res.data.reply,
+      topic,
+      slot: slot ?? null,
+      about: about ?? null,
       observation: res.data.observation,
       firewallWarning: !res.data.firewall.passed,
       status: res.data.status,

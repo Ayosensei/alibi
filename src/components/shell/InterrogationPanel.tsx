@@ -21,6 +21,13 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 
+const getQuestionKey = (
+  suspectId: string,
+  topic: string,
+  slot?: number | null,
+  about?: string | null
+) => `${suspectId}_${topic}_${slot ?? ''}_${about ?? ''}`;
+
 export function InterrogationPanel() {
   const {
     caseData,
@@ -50,6 +57,25 @@ export function InterrogationPanel() {
     (s) => s.by === suspect?.id && s.slot === murderSlot && s.kind === 'location'
   );
 
+  const hasAskedMurderQuestion = Boolean(
+    existingMurderStatement ||
+    chatHistory.some(
+      (m) =>
+        m.suspectId === suspect?.id &&
+        m.speaker === 'player' &&
+        ((m.topic === 'whereabouts' && m.slot === murderSlot) ||
+          m.text.includes(`Where were you at ${murderTime}`))
+    ) ||
+    exhaustedKeys.has(getQuestionKey(suspect?.id ?? '', 'whereabouts', murderSlot))
+  );
+
+  const murderSubtitle = existingMurderStatement
+    ? `Claimed: ${existingMurderStatement.room?.replace(/_/g, ' ')}`
+    : hasAskedMurderQuestion
+    ? `Inquired: Account given for ${murderTime}`
+    : 'Ask whereabouts during the time of murder';
+
+
   // Filter messages for current suspect
   const suspectMessages = chatHistory.filter(
     (m) => m.suspectId === selectedSuspectId
@@ -58,13 +84,6 @@ export function InterrogationPanel() {
   React.useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [suspectMessages, isAsking]);
-
-  const getQuestionKey = (
-    suspectId: string,
-    topic: string,
-    slot?: number | null,
-    about?: string | null
-  ) => `${suspectId}_${topic}_${slot ?? ''}_${about ?? ''}`;
 
   const handleAsk = async (
     topic: z.infer<typeof Topic>,
@@ -226,7 +245,15 @@ export function InterrogationPanel() {
                   activePicker === 'where' ? 'whereabouts' : 'witness',
                   slotNum
                 );
-                const isExhausted = exhaustedKeys.has(slotKey);
+                const isExhausted =
+                  exhaustedKeys.has(slotKey) ||
+                  chatHistory.some(
+                    (m) =>
+                      m.suspectId === suspect.id &&
+                      m.speaker === 'player' &&
+                      m.topic === (activePicker === 'where' ? 'whereabouts' : 'witness') &&
+                      m.slot === slotNum
+                  );
 
                 return (
                   <Button
@@ -265,7 +292,16 @@ export function InterrogationPanel() {
                     selectedSlot,
                     target.id
                   );
-                  const isExhausted = exhaustedKeys.has(witnessKey);
+                  const isExhausted =
+                    exhaustedKeys.has(witnessKey) ||
+                    chatHistory.some(
+                      (m) =>
+                        m.suspectId === suspect.id &&
+                        m.speaker === 'player' &&
+                        m.topic === 'witness' &&
+                        m.slot === selectedSlot &&
+                        m.about === target.id
+                    );
 
                   return (
                     <Button
@@ -302,13 +338,13 @@ export function InterrogationPanel() {
             disabled={isAsking}
             onClick={() => handleAsk('whereabouts', murderSlot)}
             className={`w-full justify-between h-auto py-2.5 px-3 text-left transition-all ${
-              existingMurderStatement
+              hasAskedMurderQuestion
                 ? 'bg-surface-2 hover:bg-surface-3 border border-border'
                 : 'bg-surface-2 hover:bg-surface-3 border-2 border-brass shadow-sm'
             }`}
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              {existingMurderStatement ? (
+              {hasAskedMurderQuestion ? (
                 <CheckCircle2 className="size-4 text-brass shrink-0" />
               ) : (
                 <Clock className="size-4 text-brass shrink-0 animate-pulse" />
@@ -318,20 +354,18 @@ export function InterrogationPanel() {
                   Where were you at {murderTime}?
                 </span>
                 <span className="text-xs text-text-secondary truncate">
-                  {existingMurderStatement
-                    ? `Claimed: ${existingMurderStatement.room?.replace(/_/g, ' ')}`
-                    : 'Ask whereabouts during the time of murder'}
+                  {murderSubtitle}
                 </span>
               </div>
             </div>
             <span
               className={`font-mono text-xs px-2.5 py-1 rounded font-medium shrink-0 ml-2 ${
-                existingMurderStatement
+                hasAskedMurderQuestion
                   ? 'bg-surface-3 text-text-secondary border border-border'
                   : 'bg-brass text-on-brass'
               }`}
             >
-              {existingMurderStatement ? 'Re-Ask' : 'Ask'}
+              {hasAskedMurderQuestion ? 'Re-Ask' : 'Ask'}
             </span>
           </Button>
         </div>

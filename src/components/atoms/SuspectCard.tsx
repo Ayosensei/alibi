@@ -11,6 +11,7 @@ export interface SuspectCardProps {
   name: string;
   role: string;
   statementsCount?: number;
+  hasInquiries?: boolean;
   observationsCount?: number;
   isSelected?: boolean;
   isVictim?: boolean;
@@ -23,6 +24,7 @@ export function SuspectCard({
   name,
   role,
   statementsCount = 0,
+  hasInquiries = false,
   observationsCount = 0,
   isSelected = false,
   isVictim = false,
@@ -107,6 +109,12 @@ export function SuspectCard({
         <div className="flex items-center gap-1 text-xs font-mono text-text-tertiary pt-0.5">
           <MessageSquareText className="size-3 text-brass/70" />
           <span className="tabular-nums">{statementsCount}</span> {statementsCount === 1 ? 'claim logged' : 'claims logged'}
+        </div>
+      )}
+      {!isVictim && statementsCount === 0 && hasInquiries && (
+        <div className="flex items-center gap-1 text-xs font-mono text-text-tertiary pt-0.5">
+          <MessageSquareText className="size-3 text-text-tertiary" />
+          <span>Questioned</span>
         </div>
       )}
     </div>

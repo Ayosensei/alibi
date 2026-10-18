@@ -21,6 +21,7 @@ export function SuspectsPanel() {
 
     caseData,
     board,
+    chatHistory,
     selectedSuspectId,
     selectSuspect,
     searchRoomAction,
@@ -61,6 +62,9 @@ export function SuspectsPanel() {
             // Count statements and observations for this person from board
             const statementsCount =
               board?.statements.filter((s) => s.by === person.id).length ?? 0;
+            const hasInquiries = (chatHistory ?? []).some(
+              (m) => m.suspectId === person.id && m.speaker === 'player'
+            );
             // Observations count from chat history
             const observationsCount = 0;
 
@@ -72,6 +76,7 @@ export function SuspectsPanel() {
                 role={person.role}
                 isVictim={person.victim}
                 statementsCount={statementsCount}
+                hasInquiries={hasInquiries}
                 observationsCount={observationsCount}
                 isSelected={selectedSuspectId === person.id}
                 onClick={() => !person.victim && selectSuspect(person.id)}
