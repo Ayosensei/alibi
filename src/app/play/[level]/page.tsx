@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { useGameStore } from '@/lib/store';
 import { CaseHeader } from '@/components/shell/CaseHeader';
 import { CaseObjectiveBanner } from '@/components/shell/CaseObjectiveBanner';
+import { Case0Coach } from '@/components/tutorial/Case0Coach';
 import { SuspectsPanel } from '@/components/shell/SuspectsPanel';
 import { InterrogationPanel } from '@/components/shell/InterrogationPanel';
 import { FileTabsPanel } from '@/components/shell/FileTabsPanel';
@@ -23,6 +24,8 @@ function PlayPageContent({ level }: { level: string }) {
   const searchParams = useSearchParams();
   const isPresentMode = searchParams.get('present') === '1';
   const initialMode = searchParams.get('mode');
+  const isCase0 = level === 'case-0' || searchParams.get('guided') === '1';
+  const backendCaseId = level === 'case-0' ? 'l1-quiet-pact' : level;
 
   const {
     caseId,
@@ -43,6 +46,7 @@ function PlayPageContent({ level }: { level: string }) {
   } = useGameStore();
 
   const [mobileTab, setMobileTab] = React.useState<'suspects' | 'interrogation' | 'tabs'>('suspects');
+  const [showCoach, setShowCoach] = React.useState(isCase0);
 
   React.useEffect(() => {
     if (selectedSuspectId) {
@@ -51,12 +55,12 @@ function PlayPageContent({ level }: { level: string }) {
   }, [selectedSuspectId]);
 
   React.useEffect(() => {
-    initCase(level).then(() => {
+    initCase(backendCaseId).then(() => {
       if (initialMode === 'cold_case') {
         runInspectorAction('cold_case');
       }
     });
-  }, [level, initialMode, initCase, runInspectorAction]);
+  }, [backendCaseId, initialMode, initCase, runInspectorAction]);
 
   React.useEffect(() => {
     if (isPresentMode) {
@@ -168,13 +172,16 @@ function PlayPageContent({ level }: { level: string }) {
     selectTab,
   ]);
 
-  const isCaseReady = Boolean(caseData && caseId === level);
+  const isCaseReady = Boolean(caseData && (caseId === backendCaseId || caseId === level));
   const isSolved = Boolean(
     progress[level]?.solved ||
-    (typeof window !== 'undefined' && localStorage.getItem(`alibi_verdict_${level}`))
+    progress[backendCaseId]?.solved ||
+    (typeof window !== 'undefined' && (localStorage.getItem(`alibi_verdict_${level}`) || localStorage.getItem(`alibi_verdict_${backendCaseId}`)))
   );
   const caseTitle =
-    level.startsWith('l1')
+    level === 'case-0'
+      ? 'Case 0: Field Induction (Interactive Tutorial)'
+      : level.startsWith('l1')
       ? 'File 01: The Quiet Pact'
       : level.startsWith('l2')
       ? 'File 02: The Stopped Watch'
@@ -202,7 +209,7 @@ function PlayPageContent({ level }: { level: string }) {
         <ErrorBanner
           message="Could not load the requested case file."
           hint={error}
-          onRetry={() => initCase(level, true)}
+          onRetry={() => initCase(backendCaseId, true)}
         />
       </div>
     );
@@ -216,6 +223,9 @@ function PlayPageContent({ level }: { level: string }) {
     >
       {/* 56px Header */}
       <CaseHeader />
+
+      {/* Case 0 Interactive Induction Coach */}
+      {showCoach && <Case0Coach onDismiss={() => setShowCoach(false)} />}
 
       {/* Dynamic Detective Lead Banner */}
       <CaseObjectiveBanner />

@@ -15,6 +15,7 @@ import {
   Layers,
   FolderOpen,
   Eye,
+  BookOpen,
 } from 'lucide-react';
 
 export default function Home() {
@@ -98,22 +99,28 @@ export default function Home() {
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+          <Link href="/play/case-0">
+            <Button variant="default" size="default" className="px-6 h-11 text-sm bg-brass text-on-brass hover:bg-brass/90 shadow-sm">
+              <Compass className="size-4 mr-2" />
+              Play Case 0 (Guided Walkthrough)
+            </Button>
+          </Link>
           <Link href="/season/1">
-            <Button variant="default" size="default" className="px-6 h-11 text-sm">
-              <FolderOpen className="size-4 mr-2" />
-              Begin Investigation (Season 1)
+            <Button variant="secondary" size="default" className="px-6 h-11 text-sm">
+              <FolderOpen className="size-4 mr-2 text-brass" />
+              All Cases (Season 1)
             </Button>
           </Link>
           <Link href="/tutorial">
-            <Button variant="secondary" size="default" className="px-6 h-11 text-sm">
-              <Compass className="size-4 mr-2 text-brass" />
-              Detective Manual
+            <Button variant="ghost" size="default" className="px-5 h-11 text-sm text-text-secondary hover:text-text-primary">
+              <BookOpen className="size-4 mr-2 text-brass" />
+              Field Manual
             </Button>
           </Link>
           <Link href="/play/l1-quiet-pact?mode=cold_case">
-            <Button variant="ghost" size="default" className="px-6 h-11 text-sm text-text-secondary hover:text-text-primary">
+            <Button variant="ghost" size="default" className="px-5 h-11 text-sm text-text-secondary hover:text-text-primary">
               <Eye className="size-4 mr-2 text-inspector" />
-              Watch Recorded Cold Case
+              Recorded Cold Case
             </Button>
           </Link>
         </div>

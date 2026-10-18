@@ -109,7 +109,10 @@ export interface GameState {
 
   // Selection & UI modals
   selectedSuspectId: string | null;
-  selectedTab: 'timeline' | 'board' | 'inspector' | 'notes';
+  selectedTab: 'timeline' | 'board' | 'inspector' | 'notes' | 'phone';
+  isPhoneDockedUnderInterrogation: boolean;
+  setPhoneDockedUnderInterrogation: (docked: boolean) => void;
+  togglePhoneDocked: () => void;
   isBriefingOpen: boolean;
   isBaitModalOpen: boolean;
   isAccuseModalOpen: boolean;
@@ -157,7 +160,7 @@ export interface GameState {
   resetAllProgress: () => Promise<void>;
   refreshBoard: () => Promise<void>;
   selectSuspect: (suspectId: string | null) => void;
-  selectTab: (tab: 'timeline' | 'board' | 'inspector' | 'notes') => void;
+  selectTab: (tab: 'timeline' | 'board' | 'inspector' | 'notes' | 'phone') => void;
   setBriefingOpen: (open: boolean) => void;
   setBaitModalOpen: (open: boolean) => void;
   setAccuseModalOpen: (open: boolean) => void;
@@ -196,6 +199,12 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   selectedSuspectId: null,
   selectedTab: 'timeline',
+  isPhoneDockedUnderInterrogation: true,
+  setPhoneDockedUnderInterrogation: (docked) => set({ isPhoneDockedUnderInterrogation: docked }),
+  togglePhoneDocked: () =>
+    set((s) => ({
+      isPhoneDockedUnderInterrogation: !s.isPhoneDockedUnderInterrogation,
+    })),
   isBriefingOpen: false,
   isBaitModalOpen: false,
   isAccuseModalOpen: false,

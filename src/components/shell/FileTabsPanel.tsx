@@ -5,11 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Chip, Stamp, EmptyState, TraceRow } from '@/components/atoms';
 import { TimelineGrid } from '@/components/timeline/TimelineGrid';
 import { EvidenceBoard } from '@/components/board/EvidenceBoard';
+import { DetectivePhone } from '@/components/phone/DetectivePhone';
 import { InspectorPanel } from '@/components/inspector/InspectorPanel';
 import { useGameStore } from '@/lib/store';
 import {
   CalendarDays,
   LayoutGrid,
+  Smartphone,
   Sparkles,
   BookOpen,
   Flag,
@@ -37,8 +39,9 @@ export function FileTabsPanel() {
   const tabs: Array<{ id: typeof selectedTab; label: string; num: string; icon: React.ReactNode }> = [
     { id: 'timeline', label: 'Timeline', num: '1', icon: <CalendarDays className="size-3.5" /> },
     { id: 'board', label: 'Board', num: '2', icon: <LayoutGrid className="size-3.5" /> },
-    { id: 'inspector', label: 'Inspector', num: '3', icon: <Sparkles className="size-3.5 text-inspector" /> },
-    { id: 'notes', label: 'Notes', num: '4', icon: <BookOpen className="size-3.5" /> },
+    { id: 'phone', label: 'Phone', num: '3', icon: <Smartphone className="size-3.5 text-brass" /> },
+    { id: 'inspector', label: 'Inspector', num: '4', icon: <Sparkles className="size-3.5 text-inspector" /> },
+    { id: 'notes', label: 'Notes', num: '5', icon: <BookOpen className="size-3.5" /> },
   ];
 
   return (
@@ -156,6 +159,25 @@ export function FileTabsPanel() {
 
             {/* Hero Evidence Board Canvas */}
             <EvidenceBoard />
+          </div>
+        )}
+
+        {/* PHONE TAB */}
+        {selectedTab === 'phone' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-serif text-lg font-semibold text-text-primary">
+                  Pocket <span className="italic font-normal text-brass">Graph</span>
+                </h3>
+                <p className="text-xs text-text-secondary">
+                  FalkorDB handheld node-link visualizer tracking live claims, contradictions, and clearance shields.
+                </p>
+              </div>
+            </div>
+
+            {/* Hero Detective Phone View */}
+            <DetectivePhone mode="panel" />
           </div>
         )}
 

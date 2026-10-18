@@ -8,6 +8,7 @@ import { useGameStore } from '@/lib/store';
 import { copy } from '@/lib/copy';
 import type { Topic } from '@/engine/contract';
 import { z } from 'zod';
+import { DetectivePhone } from '@/components/phone/DetectivePhone';
 import {
   MessageSquare,
   Clock,
@@ -36,6 +37,7 @@ export function InterrogationPanel() {
     chatHistory,
     isAsking,
     askQuestion,
+    isPhoneDockedUnderInterrogation,
   } = useGameStore();
 
   const [activePicker, setActivePicker] = React.useState<'none' | 'where' | 'saw'>('none');
@@ -105,14 +107,21 @@ export function InterrogationPanel() {
 
   if (!suspect) {
     return (
-      <section className="flex-1 flex flex-col items-center justify-center p-6 bg-surface-1">
-        <EmptyState
-          titlePrefix="Select a "
-          titleItalic="suspect"
-          titleSuffix=" to interrogate."
-          description="Choose a person of interest from the left dossier to review their statements or ask questions."
-          icon={<MessageSquare className="size-6 text-text-tertiary" />}
-        />
+      <section className="flex-1 flex flex-col justify-between bg-surface-1 border-r border-border min-w-0 h-full overflow-hidden">
+        <div className="flex-1 flex items-center justify-center p-6">
+          <EmptyState
+            titlePrefix="Select a "
+            titleItalic="suspect"
+            titleSuffix=" to interrogate."
+            description="Choose a person of interest from the left dossier to review their statements or ask questions."
+            icon={<MessageSquare className="size-6 text-text-tertiary" />}
+          />
+        </div>
+        {isPhoneDockedUnderInterrogation && (
+          <div className="p-3 shrink-0 border-t border-border bg-surface-1/50">
+            <DetectivePhone mode="docked" />
+          </div>
+        )}
       </section>
     );
   }
@@ -458,6 +467,13 @@ export function InterrogationPanel() {
         </div>
       </div>
     </div>
-  </section>
-);
+
+      {/* 4. Docked Detective Phone */}
+      {isPhoneDockedUnderInterrogation && (
+        <div className="p-3 pt-0 shrink-0 border-t border-border bg-surface-1/50">
+          <DetectivePhone mode="docked" />
+        </div>
+      )}
+    </section>
+  );
 }

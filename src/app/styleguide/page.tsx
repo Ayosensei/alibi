@@ -30,6 +30,8 @@ import { TimelineGrid } from '@/components/timeline/TimelineGrid';
 import { EvidenceBoard } from '@/components/board/EvidenceBoard';
 import { InspectorPanel } from '@/components/inspector/InspectorPanel';
 import { MiniFloorPlan } from '@/components/map/MiniFloorPlan';
+import { DetectivePhone } from '@/components/phone/DetectivePhone';
+import { Case0Coach } from '@/components/tutorial/Case0Coach';
 import { useGameStore } from '@/lib/store';
 
 const COLOR_CLASSES: Record<keyof typeof colors, { bg: string; text: string; border?: string }> = {
@@ -750,6 +752,42 @@ export default function StyleguidePage() {
             </p>
             <div className="font-mono text-xs text-text-tertiary">
               Target: 1440×900 / 1920×1080
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 17. Detective Phone & Case 0 Induction Walkthrough */}
+      <section className="space-y-6">
+        <div className="space-y-1">
+          <div className="font-mono text-xs text-brass uppercase tracking-wider">Investigator Tools</div>
+          <h2 className="font-serif text-2xl font-semibold">Detective Phone & Case 0 Walkthrough</h2>
+          <p className="text-text-secondary text-sm max-w-2xl">
+            A handheld node-link FalkorDB visualizer that starts in a clean blank state and dynamically renders real-time alibi links, red contradiction threads, and clearance shields.
+          </p>
+        </div>
+
+        {/* Case 0 Coach Specimen */}
+        <div className="space-y-2">
+          <span className="font-mono text-xs text-brass uppercase tracking-wider block">
+            Guided Induction Walkthrough Banner
+          </span>
+          <Case0Coach />
+        </div>
+
+        {/* Detective Phone Specimen */}
+        <div className="space-y-2">
+          <span className="font-mono text-xs text-brass uppercase tracking-wider block">
+            Pocket Graph (Docked & Panel Modes)
+          </span>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <span className="font-mono text-xs text-text-tertiary block">Docked Under Interrogation</span>
+              <DetectivePhone mode="docked" />
+            </div>
+            <div className="space-y-2">
+              <span className="font-mono text-xs text-text-tertiary block">Expanded Inside File Tabs</span>
+              <DetectivePhone mode="panel" />
             </div>
           </div>
         </div>

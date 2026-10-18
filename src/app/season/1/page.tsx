@@ -202,6 +202,34 @@ function Season1Content() {
         )}
       </header>
 
+      {/* Case 0 Training Banner */}
+      <div className="p-5 rounded-xl bg-surface-2 border-2 border-brass/50 shadow-card flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <Compass className="size-4 text-brass" />
+            <span className="font-mono text-xs font-semibold tracking-wider text-brass uppercase">
+              Field Induction · Replayable Training Level
+            </span>
+          </div>
+          <h2 className="font-serif text-lg font-semibold text-text-primary">
+            Case 0: The Induction Walkthrough
+          </h2>
+          <p className="text-xs text-text-secondary max-w-2xl leading-relaxed">
+            First time playing? Experience an interactive guided tour with step-by-step pointers.
+            Learn how FalkorDB detects contradictions and impossible moves on your Pocket Graph before tackling the main dossiers.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2.5 shrink-0 self-end md:self-auto">
+          <Link href="/play/case-0">
+            <Button variant="default" size="default" className="text-xs bg-brass text-on-brass hover:bg-brass/90 gap-1.5 shadow-sm">
+              <span>Launch Case 0</span>
+              <ArrowRight className="size-3.5" />
+            </Button>
+          </Link>
+        </div>
+      </div>
+
       {/* Case Folders Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {CASES.map((caseMeta, idx) => {
