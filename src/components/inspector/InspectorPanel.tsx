@@ -300,19 +300,6 @@ export function InspectorPanel() {
                     <p className="text-text-secondary leading-relaxed pl-5 font-normal">
                       {e.summary}
                     </p>
-                    {e.highlight && e.highlight.length > 0 && (
-                      <div className="flex flex-wrap items-center gap-1.5 pl-5 pt-0.5">
-                        <span className="font-mono text-xs text-text-tertiary">Entities:</span>
-                        {e.highlight.map((h, hIdx) => (
-                          <span
-                            key={hIdx}
-                            className="font-mono text-xs px-2 py-0.5 rounded bg-surface-3 text-text-primary border border-border"
-                          >
-                            {h.replace(/_/g, ' ')}
-                          </span>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 );
               }

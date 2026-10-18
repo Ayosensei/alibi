@@ -48,7 +48,7 @@ export function AccuseModal() {
   if (!isAccuseModalOpen || !caseData) return null;
 
   const suspects = caseData.people.filter((p) => !p.victim);
-  const wrongLeft = outcome?.wrongLeft ?? 2; // Default 2 wrong attempts before game over
+  const wrongLeft = outcome?.wrongLeft ?? lastVerdict?.wrongLeft ?? 2; // Read from last verdict or default to 2 attempts
 
   const handleTogglePerson = (id: string) => {
     if (selectedPersons.includes(id)) {
@@ -322,7 +322,11 @@ export function AccuseModal() {
                   Consequences of Indictment
                 </span>
                 <p>
-                  You have <span className="text-thread font-mono font-medium">{wrongLeft}</span> accusation attempts remaining. Selecting the exact group of conspirators closes the case.
+                  {wrongLeft > 0 ? (
+                    <>You have <span className="text-thread font-mono font-medium">{wrongLeft}</span> accusation {wrongLeft === 1 ? 'attempt' : 'attempts'} remaining. Selecting the exact group of conspirators closes the case.</>
+                  ) : (
+                    <span className="text-thread font-medium">All formal accusations for this session have been exhausted. You may review the final verdict.</span>
+                  )}
                 </p>
               </div>
             </div>
@@ -336,15 +340,26 @@ export function AccuseModal() {
               >
                 Cancel
               </Button>
-              <Button
-                variant="default"
-                size="default"
-                disabled={selectedPersons.length === 0 || selectedPersons.length > 4 || isSubmitting}
-                onClick={handleSubmitAccusation}
-              >
-                <ShieldAlert className="size-4 mr-2" />
-                {isSubmitting ? 'Submitting Indictment...' : 'Deliver Accusation'}
-              </Button>
+              {wrongLeft === 0 ? (
+                <Button
+                  variant="default"
+                  size="default"
+                  onClick={handleGoToVerdict}
+                >
+                  View Case Summary
+                  <ArrowRight className="size-4 ml-2" />
+                </Button>
+              ) : (
+                <Button
+                  variant="default"
+                  size="default"
+                  disabled={selectedPersons.length === 0 || selectedPersons.length > 4 || isSubmitting}
+                  onClick={handleSubmitAccusation}
+                >
+                  <ShieldAlert className="size-4 mr-2" />
+                  {isSubmitting ? 'Submitting Indictment...' : 'Deliver Accusation'}
+                </Button>
+              )}
             </div>
           </div>
         )}

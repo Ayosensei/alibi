@@ -48,8 +48,13 @@ export const TOOL_DISPATCH: Record<keyof typeof TOOLS, ToolFn> = {
 export function formatToolResult(
   tool: string,
   data: any,
-  args: any
+  args: any,
+  caseData?: CaseType
 ): { summary: string; rows: number; highlight: string[] } {
+  const getPersonName = (id?: string) => caseData?.people.find((p) => p.id === id)?.name ?? id ?? '';
+  const getRoomName = (id?: string) => caseData?.rooms.find((r) => r.id === id)?.name ?? id?.replace(/_/g, ' ') ?? '';
+  const getEvTitle = (id?: string) => caseData?.evidence.find((e) => e.id === id)?.title ?? id ?? '';
+
   switch (tool) {
     case 'getBoard':
       return {
@@ -77,25 +82,25 @@ export function formatToolResult(
       };
     case 'checkFeasibility':
       return {
-        summary: `${args?.person} at slot ${args?.slot} in ${args?.room}: ${data?.feasible ? 'feasible' : 'infeasible'}.`,
+        summary: `${getPersonName(args?.person)} at slot ${args?.slot} in ${getRoomName(args?.room)}: ${data?.feasible ? 'feasible' : 'infeasible'}.`,
         rows: data?.violations?.length ?? 0,
         highlight: (data?.violations ?? []).map((v: any) => v.anchor).filter(Boolean),
       };
     case 'whoCouldHave':
       return {
-        summary: `Evaluated candidates for ${args?.evidenceId}: ${data?.candidates?.filter((c: any) => c.feasible).map((c: any) => c.person).join(', ') || 'none'}.`,
+        summary: `Evaluated candidates for ${getEvTitle(args?.evidenceId)}: ${data?.candidates?.filter((c: any) => c.feasible).map((c: any) => getPersonName(c.person)).join(', ') || 'none'}.`,
         rows: data?.candidates?.length ?? 0,
         highlight: (data?.candidates ?? []).filter((c: any) => c.feasible).map((c: any) => c.person),
       };
     case 'motivePaths':
       return {
-        summary: `Found ${data?.paths?.length ?? 0} motive paths for ${args?.person}.`,
+        summary: `Found ${data?.paths?.length ?? 0} motive paths for ${getPersonName(args?.person)}.`,
         rows: data?.paths?.length ?? 0,
         highlight: (data?.paths ?? []).flatMap((p: any) => p.relationIds ?? []),
       };
     case 'alibiSupport':
       return {
-        summary: `${args?.person} at slot ${args?.slot}: ${data?.supported ? 'supported' : 'unsupported'}.`,
+        summary: `${getPersonName(args?.person)} at slot ${args?.slot}: ${data?.supported ? 'supported' : 'unsupported'}.`,
         rows: data?.supporters?.length ?? 0,
         highlight: (data?.supporters ?? []).map((s: any) => s.claimId ?? s.claim).filter(Boolean),
       };
@@ -336,7 +341,7 @@ export async function runInspector(
       stepCount++;
 
       const resData = res.ok ? res.data : undefined;
-      const formatted = formatToolResult(step.tool, resData, step.args);
+      const formatted = formatToolResult(step.tool, resData, step.args, caseData);
       sendEvent({
         type: 'tool_result',
         tool: step.tool,
@@ -391,7 +396,7 @@ export async function runInspector(
     stepCount++;
 
     const resData = res.ok ? res.data : undefined;
-    const formatted = formatToolResult(toolName, resData, args);
+    const formatted = formatToolResult(toolName, resData, args, caseData);
     sendEvent({
       type: 'tool_result',
       tool: toolName,
@@ -529,16 +534,70 @@ export async function runInspector(
     await callTool('motivePaths', { person: p });
   }
 
-  // Formulate hypothesis
-  const primeSuspect = feasibleSuspects[0] ?? nonCleared[0] ?? suspects[0];
+  // Formulate hypothesis and summary message based on question and findings
+  const targetSuspectId = suspects.find((sid) => {
+    const p = caseData.people.find((person) => person.id === sid);
+    if (!p) return false;
+    const qLower = (question || '').toLowerCase();
+    return (
+      qLower.includes(p.name.toLowerCase()) ||
+      qLower.includes(p.name.split(' ')[0].toLowerCase()) ||
+      qLower.includes(p.id.toLowerCase())
+    );
+  });
+
   const findingsCount = contradictionPairs.length + cleared.length;
   const confidence = Math.min(0.95, 0.35 + 0.15 * findingsCount);
   const hypothesisRefs = contradictionPairs.flatMap((c: any) => [c.a?.src, c.b?.src].filter(Boolean));
 
+  let hypothesisText = '';
+  let primeSuspect = feasibleSuspects[0] ?? nonCleared[0] ?? suspects[0];
+  let summaryText = '';
+
+  const getPName = (id: string) => caseData.people.find((p) => p.id === id)?.name ?? id;
+  const sceneObj = caseData.rooms.find((r) => r.id === crimeScene);
+  const crimeSceneName = sceneObj?.name ?? crimeScene.replace(/_/g, ' ');
+
+  if (targetSuspectId) {
+    const targetName = getPName(targetSuspectId);
+    primeSuspect = targetSuspectId;
+    const isTargetCleared = cleared.includes(targetSuspectId);
+
+    if (isTargetCleared) {
+      hypothesisText = `${targetName} is cleared from the crime scene at slot ${windowSlot}.`;
+      summaryText = `I evaluated ${targetName}'s movements during the murder window at slot ${windowSlot} in the ${crimeSceneName}. Physical door connectivity proves they could not reach the scene in time, conclusively clearing them.`;
+    } else {
+      hypothesisText = `${targetName} had physical opportunity to reach the crime scene during slot ${windowSlot}.`;
+      summaryText = `Physical floor-plan analysis confirms ${targetName} was capable of reaching the ${crimeSceneName} during the murder window at slot ${windowSlot}. Their alibi requires cross-referencing against physical logs.`;
+    }
+  } else if (question && question.toLowerCase().includes("doesn't add up")) {
+    if (contradictionPairs.length > 0) {
+      hypothesisText = `Timeline and physical exhibits expose ${contradictionPairs.length} direct contradiction(s).`;
+      summaryText = `Cross-referencing the evidence board reveals ${contradictionPairs.length} critical contradiction(s) during the murder window at slot ${windowSlot} in the ${crimeSceneName}. Suspect testimonies clash directly with verified physical exhibits.`;
+    } else {
+      hypothesisText = `Suspect statements currently show no direct physical contradictions.`;
+      summaryText = `I examined the board for the murder window at slot ${windowSlot} in the ${crimeSceneName}. Statements do not show direct contradictions yet; search more rooms to uncover physical exhibits.`;
+    }
+  } else if (question && question.toLowerCase().includes('suggest')) {
+    summaryText = `To make progress on the murder window at slot ${windowSlot} in the ${crimeSceneName}, focus on searching uninvestigated rooms and questioning suspects whose alibis lack corroborating witnesses.`;
+    hypothesisText = `Further physical exhibits needed to resolve suspect alibis during the murder window.`;
+  } else {
+    // General or cold case: recognize group of conspirators if multiple are feasible
+    if (feasibleSuspects.length > 1) {
+      const conspiratorNames = feasibleSuspects.map(getPName).join(' and ');
+      hypothesisText = `Evidence and timeline suggest a coordinated conspiracy involving ${conspiratorNames}.`;
+      summaryText = `I have reviewed the evidence board and cross-referenced all suspect movements. The murder window is confirmed at slot ${windowSlot} in the ${crimeSceneName}. Timeline analysis points toward ${conspiratorNames}, who shared access and coordinated false alibis.`;
+    } else {
+      const pName = getPName(primeSuspect);
+      hypothesisText = `Evidence and timeline suggest ${pName} had access to the crime scene during the murder window.`;
+      summaryText = `I have reviewed the evidence board and cross-referenced all suspect movements. The murder window is confirmed at slot ${windowSlot} in the ${crimeSceneName}. Our prime line of inquiry focuses on ${pName}.`;
+    }
+  }
+
   await callTool(
     'hypothesize',
     {
-      text: `Evidence and timeline suggest ${primeSuspect} had access to the crime scene during the murder window.`,
+      text: hypothesisText,
       person: primeSuspect,
       confidence,
       supportedBy: hypothesisRefs,
@@ -547,22 +606,9 @@ export async function runInspector(
     true
   );
 
-  // Summary narration lines (3 to 6 sentences)
-  const sentences = [
-    `I have reviewed the evidence board and cross-referenced all suspect movements.`,
-    `The murder window is confirmed at slot ${windowSlot} in the ${crimeScene}.`,
-    contradictionPairs.length > 0
-      ? `We have uncovered ${contradictionPairs.length} major contradiction(s) in the timeline.`
-      : `Suspect statements currently show no blatant contradictions.`,
-    cleared.length > 0
-      ? `Hard anchors conclusively clear ${cleared.join(', ')} from the scene of the crime.`
-      : `No suspects have been completely cleared by physical anchors yet.`,
-    `Our prime line of inquiry focuses on ${feasibleSuspects.length > 0 ? feasibleSuspects.join(' and ') : 'unconfirmed whereabouts'}.`,
-  ];
-
   sendEvent({
     type: 'message',
-    text: sentences.join(' '),
+    text: summaryText,
   });
 
   sendEvent({

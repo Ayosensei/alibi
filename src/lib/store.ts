@@ -274,6 +274,10 @@ export const useGameStore = create<GameState>((set, get) => ({
       caseData,
       selectedSuspectId: firstSuspect,
       isBriefingOpen: !isSolved,
+      isAccuseModalOpen: false,
+      isBaitModalOpen: false,
+      isSearchModalOpen: false,
+      prefilledAccused: [],
       chatHistory: cachedChat,
       inspectorEvents: [],
       lastSearchResults: null,
@@ -293,13 +297,13 @@ export const useGameStore = create<GameState>((set, get) => ({
         localStorage.removeItem(`alibi_chat_${caseId}`);
       } catch {}
     }
-    await get().initCase(caseId, true);
     const nextProgress = {
       ...get().progress,
       [caseId]: { stars: 0, solved: false, accusationsUsed: 0 },
     };
     saveStoredProgress(nextProgress);
     set({ progress: nextProgress, lastVerdict: null, chatHistory: [] });
+    await get().initCase(caseId, true);
   },
 
   resetAllProgress: async () => {
@@ -313,9 +317,15 @@ export const useGameStore = create<GameState>((set, get) => ({
         } catch {}
       }
     }
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('alibi_progress');
+      } catch {}
+    }
     saveStoredProgress(DEFAULT_PROGRESS);
     set({ progress: DEFAULT_PROGRESS, lastVerdict: null, chatHistory: [] });
-    await get().initCase(get().caseId, true);
+    const targetCaseId = get().caseId || 'l1-quiet-pact';
+    await get().initCase(targetCaseId, true);
   },
 
   refreshBoard: async () => {

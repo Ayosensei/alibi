@@ -51,10 +51,13 @@ function evaluateProof(
       return `inferred anchor from ${ev?.title ?? eid}`;
     }
     const ev = caseData.evidence.find((e) => e.id === src);
-    if (ev) return `${ev.title} (${ev.room})`;
+    if (ev) return `${ev.title}`;
     const cl = caseData.claims.find((c) => c.id === src);
-    if (cl) return `${cl.by}'s statement (${cl.id})`;
-    return src;
+    if (cl) {
+      const p = caseData.people.find((person) => person.id === cl.by);
+      return `${p?.name ?? cl.by}'s statement`;
+    }
+    return src.replace(/_/g, ' ');
   };
 
   const getWhereToLook = (src: string): string => {
@@ -81,35 +84,39 @@ function evaluateProof(
       found.push(`Contradiction established between ${getSourceDesc(src1)} and ${getSourceDesc(src2)}.`);
     } else {
       const missing = !has1 && !has2 ? `${getWhereToLook(src1)} and ${getWhereToLook(src2)}` : !has1 ? getWhereToLook(src1) : getWhereToLook(src2);
-      missed.push(`Contradiction between ${src1} and ${src2}: ${missing}.`);
+      missed.push(`Contradiction between ${getSourceDesc(src1)} and ${getSourceDesc(src2)}: ${missing}.`);
     }
   }
 
   // 2. Rehearsed alibis
   for (const group of proof.rehearsed) {
     const missingClaims = group.filter((c) => !board.statements.has(c));
+    const who = group
+      .map((cid) => {
+        const cl = caseData.claims.find((c) => c.id === cid);
+        const p = caseData.people.find((person) => person.id === cl?.by);
+        return p?.name ?? cl?.by ?? cid;
+      })
+      .join(', ');
+
     if (missingClaims.length === 0) {
-      found.push(`Rehearsed alibi identified across statements [${group.join(', ')}].`);
+      found.push(`Rehearsed alibi identified across statements by ${who}.`);
     } else {
-      const who = missingClaims
-        .map((cid) => {
-          const cl = caseData.claims.find((c) => c.id === cid);
-          return cl?.by ?? cid;
-        })
-        .join(', ');
-      missed.push(`Rehearsed alibi across claims [${group.join(', ')}]: Question ${who}.`);
+      missed.push(`Rehearsed alibi among ${who}: Question each suspect regarding their whereabouts.`);
     }
   }
 
   // 3. Impossible moves
   for (const imp of proof.impossible) {
+    const p = caseData.people.find((person) => person.id === imp.person);
+    const personName = p?.name ?? imp.person;
     const has1 = board.statements.has(imp.claims[0]) || board.evidence.has(imp.claims[0]);
     const has2 = board.statements.has(imp.claims[1]) || board.evidence.has(imp.claims[1]);
     if (has1 && has2) {
-      found.push(`Impossible movement discovered for ${imp.person} between ${imp.claims[0]} and ${imp.claims[1]}.`);
+      found.push(`Impossible movement discovered for ${personName} between ${getSourceDesc(imp.claims[0])} and ${getSourceDesc(imp.claims[1])}.`);
     } else {
       const missing = !has1 ? getWhereToLook(imp.claims[0]) : getWhereToLook(imp.claims[1]);
-      missed.push(`Impossible movement for ${imp.person}: ${missing}.`);
+      missed.push(`Impossible movement for ${personName}: ${missing}.`);
     }
   }
 
@@ -165,6 +172,28 @@ function evaluateProof(
 function buildReplay(caseData: CaseType): { title: string; detail: string; refs: string[]; path: string[] }[] {
   const replay: { title: string; detail: string; refs: string[]; path: string[] }[] = [];
   const scene = caseData.truth.murder.room;
+  const sceneObj = caseData.rooms.find((r) => r.id === scene);
+  const sceneName = sceneObj?.name ?? scene.replace(/_/g, ' ');
+
+  const getRefLabel = (src: string): string => {
+    if (src.startsWith('inferred:')) {
+      const eid = src.replace('inferred:', '');
+      const ev = caseData.evidence.find((e) => e.id === eid);
+      return `inferred elimination from ${ev?.title ?? eid}`;
+    }
+    const ev = caseData.evidence.find((e) => e.id === src);
+    if (ev) return ev.title;
+    const cl = caseData.claims.find((c) => c.id === src);
+    if (cl) {
+      const p = caseData.people.find((person) => person.id === cl.by);
+      return `${p?.name ?? cl.by}'s statement`;
+    }
+    const p = caseData.people.find((person) => person.id === src);
+    if (p) return p.name;
+    const r = caseData.rooms.find((room) => room.id === src);
+    if (r) return r.name;
+    return src.replace(/_/g, ' ');
+  };
 
   // 1. The murder window
   const revisesEv = caseData.evidence.find((e) => e.windowKind === 'revises');
@@ -178,7 +207,7 @@ function buildReplay(caseData: CaseType): { title: string; detail: string; refs:
   } else {
     replay.push({
       title: 'The Murder Window',
-      detail: `The crime took place at slot ${caseData.truth.murder.slot} in the ${scene}.`,
+      detail: `The crime took place at slot ${caseData.truth.murder.slot} in the ${sceneName}.`,
       refs: caseData.evidence.filter((e) => e.window).map((e) => e.id),
       path: [scene],
     });
@@ -188,23 +217,32 @@ function buildReplay(caseData: CaseType): { title: string; detail: string; refs:
   for (const [s1, s2] of caseData.solution.proof.contradictions) {
     replay.push({
       title: `Lie Exposed: Contradiction`,
-      detail: `Incompatible statements regarding location or sighting between ${s1} and ${s2}.`,
+      detail: `Incompatible evidence between ${getRefLabel(s1)} and ${getRefLabel(s2)}.`,
       refs: [s1, s2],
       path: [scene],
     });
   }
   for (const group of caseData.solution.proof.rehearsed) {
+    const who = group
+      .map((cid) => {
+        const cl = caseData.claims.find((c) => c.id === cid);
+        const p = caseData.people.find((person) => person.id === cl?.by);
+        return p?.name ?? cl?.by ?? cid;
+      })
+      .join(', ');
     replay.push({
       title: 'Lie Exposed: Rehearsed Alibi',
-      detail: `Multiple suspects gave statements sharing identical rehearsed details.`,
+      detail: `${who} each gave coordinated statements sharing identical rehearsed details.`,
       refs: group,
       path: [scene],
     });
   }
   for (const imp of caseData.solution.proof.impossible) {
+    const p = caseData.people.find((person) => person.id === imp.person);
+    const personName = p?.name ?? imp.person;
     replay.push({
       title: `Lie Exposed: Impossible Movement`,
-      detail: `${imp.person} could not travel between locations in the time available.`,
+      detail: `${personName} could not physically travel between ${getRefLabel(imp.claims[0])} and ${getRefLabel(imp.claims[1])} in the time available.`,
       refs: [...imp.claims],
       path: [scene],
     });
@@ -213,9 +251,14 @@ function buildReplay(caseData: CaseType): { title: string; detail: string; refs:
   // 3. Cleared suspects
   if (caseData.solution.cleared) {
     for (const [person, info] of Object.entries(caseData.solution.cleared)) {
+      const p = caseData.people.find((per) => per.id === person);
+      const personName = p?.name ?? person;
+      const room = caseData.rooms.find((r) => r.id === info.room);
+      const roomName = room?.name ?? info.room.replace(/_/g, ' ');
+      const anchorLabels = info.anchors.map(getRefLabel).join(', ');
       replay.push({
-        title: `Cleared Suspect: ${person}`,
-        detail: `${person} was proved to be outside the ${info.room} at slot ${info.slot} by hard anchor(s) [${info.anchors.join(', ')}].`,
+        title: `Cleared Suspect: ${personName}`,
+        detail: `${personName} was proved to be outside the ${roomName} at slot ${info.slot} by verified physical record(s): ${anchorLabels}.`,
         refs: info.anchors,
         path: [info.room],
       });
@@ -225,10 +268,13 @@ function buildReplay(caseData: CaseType): { title: string; detail: string; refs:
   // 4. Culprits' motive paths
   if (caseData.solution.motive) {
     for (const [culprit, relId] of Object.entries(caseData.solution.motive)) {
-      const victim = caseData.people.find((p) => p.victim)?.id ?? 'victim';
+      const p = caseData.people.find((per) => per.id === culprit);
+      const culpritName = p?.name ?? culprit;
+      const rel = caseData.relations.find((r) => r.id === relId);
+      const victim = caseData.people.find((per) => per.victim)?.id ?? 'victim';
       replay.push({
-        title: `Motive: ${culprit}`,
-        detail: `Established motive connecting ${culprit} to the victim.`,
+        title: `Motive: ${culpritName}`,
+        detail: rel?.text ?? `Established motive connecting ${culpritName} to the victim.`,
         refs: [relId],
         path: [culprit, victim],
       });
@@ -237,10 +283,12 @@ function buildReplay(caseData: CaseType): { title: string; detail: string; refs:
 
   // 5. Baits and slips
   for (const sb of caseData.solution.proof.sharpBaits ?? []) {
+    const p = caseData.people.find((per) => per.id === sb.person);
+    const personName = p?.name ?? sb.person;
     const baitObj = caseData.baits.find((b) => b.id === sb.bait);
     replay.push({
-      title: `Guilty Knowledge: ${sb.person}`,
-      detail: `${sb.person} slipped when confronted with announcement: "${baitObj?.announcement ?? sb.bait}".`,
+      title: `Guilty Knowledge: ${personName}`,
+      detail: `${personName} slipped when confronted with announcement: "${baitObj?.announcement ?? sb.bait}".`,
       refs: [sb.bait],
       path: [sb.person],
     });
