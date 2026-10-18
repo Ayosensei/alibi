@@ -16,7 +16,7 @@
 [![Test Suite](https://img.shields.io/badge/Tests-76%2F76_Passing_(Live_DB)-success)](file:///tests)
 [![Offline Capable](https://img.shields.io/badge/Offline_Mode-100%25_Deterministic-emerald)](#quickstart)
 
-🎥 **Demo Video:** [Watch the Working Walkthrough](https://youtu.be/DEMO_LINK) *(See submission form for video link)*  
+🎥 **Demo Video:** [Watch the Working Walkthrough](https://youtu.be/FuiIWO71Ogg)  
 🌐 **Live Deployed App:** [https://alibi-game.vercel.app](https://alibi-game.vercel.app)  
 📦 **Repository:** [https://github.com/Ayosensei/alibi](https://github.com/Ayosensei/alibi) (Public)
 
