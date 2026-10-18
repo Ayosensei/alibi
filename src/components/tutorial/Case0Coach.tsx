@@ -51,7 +51,9 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
 
   const hasSelectedDee = selectedSuspectId === 'dee';
   const hasDeeStatement = statements.some((s) => s.by === 'dee');
-  const hasSearchedHall = hardAnchors.some((a) => a.room === 'hall');
+  const hasSearchedScene =
+    hardAnchors.some((a) => a.room === 'prop_store') ||
+    (board?.searchedRooms ?? []).includes('prop_store');
   const hasClash = contradictions.length > 0;
 
   // Track step acknowledgement
@@ -67,9 +69,9 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
   let activeStep = 1;
   if (isSolved) {
     activeStep = 6;
-  } else if (isAccuseModalOpen || (hasSearchedHall && hasDeeStatement && step4Acknowledged)) {
+  } else if (isAccuseModalOpen || (hasSearchedScene && hasDeeStatement && step4Acknowledged)) {
     activeStep = 5;
-  } else if (hasSearchedHall && hasDeeStatement) {
+  } else if (hasSearchedScene && hasDeeStatement) {
     activeStep = 4;
   } else if (hasDeeStatement) {
     activeStep = 3;
@@ -121,7 +123,7 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
   let stepTitle = 'Step 1: Inspect Suspect Dee';
   let stepSubtitle = 'The Blank Starting State';
   let modalDescription =
-    'Welcome Detective. Lord Harrington has been poisoned tonight in his estate. Every fact and statement you discover lives as a node in your live FalkorDB knowledge graph.\n\nFirst, select Dee from the suspect dossier in the left panel. Look at your Pocket Graph below—all suspect nodes start in a clean, blank slate.';
+    'Welcome Detective. Walter, director of the Grand Playhouse, was struck down tonight in the Prop Store. Every fact and statement you discover lives as a node in your live FalkorDB knowledge graph.\n\nFirst, select Dee from the suspect dossier in the left panel. Look at your Pocket Graph below—all suspect nodes start in a clean, blank slate.';
   let falkorDetail =
     'FalkorDB stores suspects as (:Person) nodes. Currently, no claims (:CLAIMED) or anchors (:IN_ROOM) exist in your play graph.';
   let actionButtonLabel = 'Show Me Dee →';
@@ -132,29 +134,29 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
     stepTitle = 'Step 2: Interrogate Dee for an Alibi';
     stepSubtitle = 'Extracting Authored Claims';
     modalDescription =
-      'Suspects may attempt to lie, but their statements are bound to authored claims by our LLM Firewall. Each statement writes a live (:CLAIMED) relationship to FalkorDB.\n\nIn the interrogation room, ask Dee: "Where were you at 8:20?". Watch her claimed location connect to the Lounge on your Pocket Graph.';
+      'Suspects may attempt to lie, but their statements are bound to authored claims by our LLM Firewall. Each statement writes a live (:CLAIMED) relationship to FalkorDB.\n\nIn the interrogation room, ask Dee: "Where were you at 8:20?". Watch her claimed location connect to the Green Room on your Pocket Graph.';
     falkorDetail =
-      'FalkorDB executes: MATCH (p:Person {id: "dee"}), (r:Room {id: "lounge"}) CREATE (p)-[:CLAIMED {at: 5}]->(r)';
+      'FalkorDB executes: MATCH (p:Person {id: "dee"}), (r:Room {id: "green_room"}) CREATE (p)-[:CLAIMED {at: 5}]->(r)';
     actionButtonLabel = 'Guide Me to Question →';
     beaconTooltip = 'Click "Where were you at 8:20?" to interrogate Dee.';
   } else if (activeStep === 3) {
-    targetSelector = '[data-room-search="hall"]';
-    stepTitle = 'Step 3: Sweep the Estate for Hard Evidence';
+    targetSelector = '[data-room-search="prop_store"]';
+    stepTitle = 'Step 3: Search the Scene for Hard Evidence';
     stepSubtitle = 'Ground Truth Scene Anchors';
     modalDescription =
-      'Suspects can fabricate alibis, but physical scene evidence cannot lie. Ground truth exhibits become unshakeable (:Anchor) nodes in your graph.\n\nUnder Rooms in the left dossier, click "Search" on the Hall to inspect electronic passcard and motion logs.';
+      'Suspects can fabricate alibis, but physical scene evidence cannot lie. Ground truth exhibits become unshakeable (:Anchor) nodes in your graph.\n\nUnder Rooms & Scene in the left dossier, click "Search" on the Prop Store (Scene) to inspect the electronic door log and physical exhibits.';
     falkorDetail =
-      'FalkorDB registers scene evidence: CREATE (:Anchor:Exhibit {type: "passcard_log", room: "hall", at: 5})';
-    actionButtonLabel = 'Guide Me to Search the Hall →';
-    beaconTooltip = 'Click Search on the Hall in the left panel.';
+      'FalkorDB registers scene evidence: CREATE (:Anchor:Exhibit {id: "e1_doorlog", room: "prop_store", at: 5})';
+    actionButtonLabel = 'Guide Me to Search Prop Store →';
+    beaconTooltip = 'Click Search on the Prop Store in the left panel.';
   } else if (activeStep === 4) {
     targetSelector = '[data-tour="phone"]';
     stepTitle = 'Step 4: Read the Pocket Graph Reasoning';
     stepSubtitle = 'FalkorDB Traversal & Contradiction Detection';
     modalDescription =
-      'Look at your Pocket Graph below! The moment you searched the hall, FalkorDB executed graph reasoning queries in real time:\n\n• Red Contradiction (Q60): Dee claimed she was in the Lounge at 8:20, but the Hall keycard log proves she was in the corridor.\n• Green Clearance (Q63): Dr. Okoye was in the Conservatory—2 rooms away with zero connecting door path.\n\nDee is caught in an undeniable physical impossibility!';
+      'Look at your Pocket Graph below! The moment you searched the Prop Store, FalkorDB executed graph reasoning queries in real time:\n\n• Red Contradiction (Q60): Dee claimed she was in the Green Room at 8:20, but the Prop Store keycard reader logged her entering the murder scene!\n• Green Clearance (Q63): Mr. Okoye was in the Box Office stamping receipts—away from the crime scene.\n\nDee is caught in an undeniable physical contradiction on your connected graph!';
     falkorDetail =
-      'Q60 Contradiction Cypher: MATCH (s:Statement)-[:AT_TIME]->(t), (a:Anchor)-[:AT_TIME]->(t) WHERE s.room <> a.room RETURN clash';
+      'Q60 Contradiction Cypher: MATCH (s:Statement {by: "dee", slot: 5, room: "green_room"}), (a:Anchor {subject: "dee", slot: 5, room: "prop_store"}) RETURN clash';
     actionButtonLabel = 'Inspect Pocket Graph →';
     beaconTooltip = 'Review the red contradiction line and clearance shield on your Pocket Graph below.';
   } else if (activeStep === 5) {
