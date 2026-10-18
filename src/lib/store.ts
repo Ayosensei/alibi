@@ -23,6 +23,7 @@ export interface ChatMessage {
   observation?: string | null;
   firewallWarning?: boolean;
   tick?: number;
+  status?: 'answered' | 'nothing_new';
 }
 
 export interface LevelProgress {
@@ -417,10 +418,23 @@ export const useGameStore = create<GameState>((set, get) => ({
     const slotTime = slot && get().caseData?.slots[slot - 1] ? get().caseData?.slots[slot - 1] : `slot ${slot}`;
 
     let playerQuestion = 'Tell me what you know.';
-    if (topic === 'whereabouts' && slot) playerQuestion = `Where were you at ${slotTime}?`;
-    else if (topic === 'witness' && slot) playerQuestion = `Who did you see at ${slotTime}?`;
-    else if (topic === 'motive') playerQuestion = `What was your history with the victim?`;
-    else if (topic === 'general') playerQuestion = `Tell me about the night.`;
+    const targetPerson = about ? get().caseData?.people.find((p) => p.id === about) : undefined;
+    const victim = get().caseData?.people.find((p) => p.victim);
+    const victimName = victim?.name ?? 'the victim';
+
+    if (topic === 'whereabouts' && slot) {
+      playerQuestion = `Where were you at ${slotTime}?`;
+    } else if (topic === 'witness' && slot && targetPerson) {
+      playerQuestion = `Did you see ${targetPerson.name} at ${slotTime}?`;
+    } else if (topic === 'witness' && slot) {
+      playerQuestion = `Who did you see at ${slotTime}?`;
+    } else if (topic === 'witness' && targetPerson) {
+      playerQuestion = `Did you see ${targetPerson.name}?`;
+    } else if (topic === 'motive') {
+      playerQuestion = `What was your history with ${victimName}?`;
+    } else if (topic === 'general') {
+      playerQuestion = `Tell me about the night.`;
+    }
 
     const playerMsg: ChatMessage = {
       id: `msg_p_${Date.now()}`,
@@ -451,6 +465,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       text: res.data.reply,
       observation: res.data.observation,
       firewallWarning: !res.data.firewall.passed,
+      status: res.data.status,
       tick: (board?.tick ?? 0) + 1,
     };
 

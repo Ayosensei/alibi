@@ -207,6 +207,59 @@ describe('ask.ts, suspect.ts, firewall.ts, llm.ts — Ask Pipeline (Task A6)', (
     expect(json).not.toContain('knownBy');
   });
 
+  it('returns in-character contextual responses for routine time, unencountered witnesses, and missing evidence', async () => {
+    process.env.ALIBI_LLM = 'off';
+    await startPlay({ playerId: pOff, caseId: 'l1-quiet-pact', reset: true });
+
+    // 1. Asking Kofi about routine hour (slot 1: 7:00) where he has no authored alibi
+    const routineRes = await ask({
+      playerId: pOff,
+      caseId: 'l1-quiet-pact',
+      suspectId: 'kofi',
+      topic: 'whereabouts',
+      slot: 1,
+    });
+    expect(routineRes.ok).toBe(true);
+    if (routineRes.ok) {
+      expect(routineRes.data.status).toBe('nothing_new');
+      expect(routineRes.data.newStatements).toEqual([]);
+      // Should give in-character reply about the early hour rather than "already told you"
+      expect(routineRes.data.reply).toContain('control board');
+      expect(routineRes.data.reply).not.toContain('already told you');
+    }
+
+    // 2. Asking Dee if she saw Okoye at slot 5 (she only saw Kofi and Hana)
+    const witnessRes = await ask({
+      playerId: pOff,
+      caseId: 'l1-quiet-pact',
+      suspectId: 'dee',
+      topic: 'witness',
+      slot: 5,
+      about: 'okoye',
+    });
+    expect(witnessRes.ok).toBe(true);
+    if (witnessRes.ok) {
+      expect(witnessRes.data.status).toBe('nothing_new');
+      expect(witnessRes.data.reply).toContain('Okoye');
+    }
+
+    // 3. Asking Rufus in L2 at slot 3 about Beatrix before finding e2_tab (claim requires e2_tab)
+    await startPlay({ playerId: pOff, caseId: 'l2-stopped-watch', reset: true });
+    const lockedRes = await ask({
+      playerId: pOff,
+      caseId: 'l2-stopped-watch',
+      suspectId: 'rufus',
+      topic: 'witness',
+      slot: 3,
+      about: 'beatrix',
+    });
+    expect(lockedRes.ok).toBe(true);
+    if (lockedRes.ok) {
+      expect(lockedRes.data.status).toBe('nothing_new');
+      expect(lockedRes.data.reply).toContain("you've actually got");
+    }
+  });
+
   it('handles POST /api/ask route handler', async () => {
     process.env.ALIBI_LLM = 'off';
     await startPlay({ playerId: pRoute, caseId: 'l1-quiet-pact', reset: true });

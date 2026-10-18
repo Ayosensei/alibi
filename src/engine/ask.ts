@@ -10,9 +10,11 @@ import { callSuspectLLM } from './llm';
 import {
   buildForbiddenKeywords,
   buildSuspectPrompt,
+  buildNegativeDialoguePrompt,
   getBrushOff,
   type SuspectClaim,
 } from './suspect';
+import { getContextualReply } from './personaDialogue';
 import {
   Q40_select_claims,
   Q41_asked_claims,
@@ -105,13 +107,73 @@ export async function ask(input: AskInput): Promise<Envelope<AskOutput>> {
 
   // 1. None left -> status 'nothing_new'
   if (selectedClaims.length === 0) {
-    const brushOff = getBrushOff(suspect.name, suspect.persona ?? '');
+    const isAlreadyAsked = caseData.claims.some(
+      (c) =>
+        c.by === suspectId &&
+        c.topics.includes(topic) &&
+        (slot === undefined || slot === 0 || c.slot === slot || c.slot === 0) &&
+        (!about || c.subject === about || c.kind === 'relation' || c.kind === 'fact') &&
+        askedClaimIds.includes(c.id)
+    );
+
+    const isLockedByEvidence = caseData.claims.some(
+      (c) =>
+        c.by === suspectId &&
+        c.topics.includes(topic) &&
+        (slot === undefined || slot === 0 || c.slot === slot || c.slot === 0) &&
+        (!about || c.subject === about || c.kind === 'relation' || c.kind === 'fact') &&
+        c.requires &&
+        c.requires.some((req) => !foundEvidenceIds.includes(req))
+    );
+
+    const templateReply = getContextualReply({
+      caseData,
+      suspectId,
+      topic,
+      slot: slot ?? 0,
+      about: about ?? '',
+      isAlreadyAsked,
+      isLockedByEvidence,
+    });
+
+    let reply = templateReply;
+    let source: 'llm' | 'template_fallback' = 'template_fallback';
+    let firewallResult: FirewallResult = { passed: true, violations: [] };
+
+    // If live LLM is active and this is NOT a repeat question, allow LLM in-character styling
+    if (process.env.ALIBI_LLM === 'live' && !isAlreadyAsked) {
+      const questionContext = [topic, slot ? `slot ${slot}` : '', about ?? ''].filter(Boolean).join(' ');
+      const allowedKeywords = [questionContext, templateReply].join(' ');
+      const forbiddenKeywords = buildForbiddenKeywords(
+        caseData,
+        [],
+        allowedKeywords,
+        suspectId
+      );
+      const negPrompt = buildNegativeDialoguePrompt(
+        suspect.name,
+        suspect.role,
+        suspect.persona ?? '',
+        questionContext,
+        templateReply
+      );
+      const llmRes = await callSuspectLLM({ prompt: negPrompt, isRetry: false });
+      if (llmRes) {
+        const fw = validateFirewall(llmRes.reply, llmRes.claimIds, [], forbiddenKeywords);
+        if (fw.passed) {
+          reply = llmRes.reply;
+          source = 'llm';
+          firewallResult = fw;
+        }
+      }
+    }
+
     return {
       ok: true,
       data: {
-        reply: brushOff,
-        source: 'template_fallback',
-        firewall: { passed: true, violations: [] },
+        reply,
+        source,
+        firewall: firewallResult,
         newStatements: [],
         observation: null,
         status: 'nothing_new',

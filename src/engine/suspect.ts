@@ -106,3 +106,18 @@ Stick STRICTLY and ONLY to the exact facts in the statements above. Do not menti
 export function getBrushOff(suspectName: string, persona: string): string {
   return `I have already told you everything I know on that matter.`;
 }
+
+export function buildNegativeDialoguePrompt(
+  suspectName: string,
+  suspectRole: string,
+  suspectPersona: string,
+  questionContext: string,
+  templateText: string
+): string {
+  return `You are ${suspectName}, ${suspectRole}. ${suspectPersona}
+You are being questioned by the Consultant: "${questionContext}".
+You have nothing suspicious, unusual, or new to report regarding this inquiry.
+Say the following in your own natural character voice in under 35 words. Do NOT add any room names, do NOT mention any murder weapons, and do NOT confess or make accusations:
+"${templateText}"
+Return JSON: {"reply": string, "claimIds": []}`;
+}
