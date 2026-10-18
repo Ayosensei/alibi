@@ -99,7 +99,7 @@ export default function Home() {
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-          <Link href="/play/case-0">
+          <Link href="/play/case-0?reset=1">
             <Button variant="default" size="default" className="px-6 h-11 text-sm bg-brass text-on-brass hover:bg-brass/90 shadow-sm">
               <Compass className="size-4 mr-2" />
               Play Case 0 (Guided Walkthrough)

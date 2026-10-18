@@ -38,7 +38,9 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
     progress,
     lastVerdict,
     initCase,
+    resetCaseProgress,
     setAccuseModalOpen,
+    setPrefilledAccused,
   } = useGameStore();
 
   const statements = board?.statements ?? [];
@@ -112,6 +114,8 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
     selectSuspect,
   ]);
 
+  if (!caseData) return null;
+
   // Target element selector and messages per step
   let targetSelector = '[data-suspect-id="dee"]';
   let stepTitle = 'Step 1: Inspect Suspect Dee';
@@ -177,8 +181,9 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
   const handleResetCase0 = async () => {
     setStep1Confirmed(false);
     setStep4Acknowledged(false);
+    setLastStep(1);
     setShowCenterModal(true);
-    await initCase('l1-quiet-pact', true);
+    await resetCaseProgress('l1-quiet-pact', false);
     selectSuspect(null);
   };
 
@@ -275,6 +280,10 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
                         setTimeout(() => {
                           document.querySelector('[data-tour="phone"]')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                         }, 100);
+                      }
+                      if (activeStep === 5) {
+                        setPrefilledAccused(['dee']);
+                        setAccuseModalOpen(true);
                       }
                     }}
                     className="text-xs gap-1.5 px-4 font-semibold shadow-md"

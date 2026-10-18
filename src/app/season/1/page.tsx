@@ -221,7 +221,7 @@ function Season1Content() {
         </div>
 
         <div className="flex items-center gap-2.5 shrink-0 self-end md:self-auto">
-          <Link href="/play/case-0">
+          <Link href="/play/case-0?reset=1">
             <Button variant="default" size="default" className="text-xs bg-brass text-on-brass hover:bg-brass/90 gap-1.5 shadow-sm">
               <span>Launch Case 0</span>
               <ArrowRight className="size-3.5" />

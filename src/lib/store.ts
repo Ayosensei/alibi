@@ -155,8 +155,8 @@ export interface GameState {
   usedBaitIds: string[];
 
   // Actions
-  initCase: (caseId: string, reset?: boolean) => Promise<void>;
-  resetCaseProgress: (caseId: string) => Promise<void>;
+  initCase: (caseId: string, reset?: boolean, preselectSuspect?: boolean) => Promise<void>;
+  resetCaseProgress: (caseId: string, preselectSuspect?: boolean) => Promise<void>;
   resetAllProgress: () => Promise<void>;
   refreshBoard: () => Promise<void>;
   selectSuspect: (suspectId: string | null) => void;
@@ -241,7 +241,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   prefilledAccused: [],
   usedBaitIds: [],
 
-  initCase: async (caseId: string, reset = false) => {
+  initCase: async (caseId: string, reset = false, preselectSuspect = true) => {
     const currentCaseId = get().caseId;
     const currentCaseData = get().caseData;
     if (!reset && currentCaseId === caseId && currentCaseData) {
@@ -280,8 +280,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
 
     const caseData = startRes.data;
-    // Set first suspect selected by default
-    const firstSuspect = caseData.people.find((p) => !p.victim)?.id ?? null;
+    // Set first suspect selected by default if preselectSuspect is enabled
+    const firstSuspect = preselectSuspect
+      ? (caseData.people.find((p) => !p.victim)?.id ?? null)
+      : null;
 
     set({
       caseData,
@@ -303,7 +305,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({ isLoading: false });
   },
 
-  resetCaseProgress: async (caseId: string) => {
+  resetCaseProgress: async (caseId: string, preselectSuspect = true) => {
     if (typeof window !== 'undefined') {
       try {
         localStorage.removeItem(`alibi_verdict_${caseId}`);
@@ -316,7 +318,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     };
     saveStoredProgress(nextProgress);
     set({ progress: nextProgress, lastVerdict: null, chatHistory: [] });
-    await get().initCase(caseId, true);
+    await get().initCase(caseId, true, preselectSuspect);
   },
 
   resetAllProgress: async () => {

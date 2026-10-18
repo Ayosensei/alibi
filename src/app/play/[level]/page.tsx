@@ -34,6 +34,7 @@ function PlayPageContent({ level }: { level: string }) {
     isLoading,
     error,
     initCase,
+    resetCaseProgress,
     runInspectorAction,
     selectTab,
     selectedSuspectId,
@@ -55,8 +56,16 @@ function PlayPageContent({ level }: { level: string }) {
     }
   }, [selectedSuspectId]);
 
+  const shouldReset =
+    searchParams.get('reset') === '1' ||
+    Boolean(isCase0 && progress['l1-quiet-pact']?.solved);
+
   React.useEffect(() => {
-    initCase(backendCaseId).then(() => {
+    const startAction = shouldReset
+      ? () => resetCaseProgress(backendCaseId, !isCase0)
+      : () => initCase(backendCaseId, false, !isCase0);
+
+    startAction().then(() => {
       if (isCase0) {
         selectSuspect(null);
       }
@@ -64,7 +73,7 @@ function PlayPageContent({ level }: { level: string }) {
         runInspectorAction('cold_case');
       }
     });
-  }, [backendCaseId, initialMode, initCase, runInspectorAction, isCase0, selectSuspect]);
+  }, [backendCaseId, initialMode, initCase, resetCaseProgress, isCase0, selectSuspect, shouldReset]);
 
   React.useEffect(() => {
     if (isPresentMode) {

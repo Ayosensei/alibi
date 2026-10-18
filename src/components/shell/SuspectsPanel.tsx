@@ -29,11 +29,6 @@ export function SuspectsPanel() {
     isLoading,
   } = useGameStore();
 
-  if (!caseData) return null;
-
-  const searchedSet = new Set(board?.searchedRooms ?? []);
-  const baitsLeft = board?.baitsLeft ?? caseData.baitsAllowed;
-
   const exhibitsByRoom = React.useMemo(() => {
     const map: Record<string, number> = {};
     for (const ev of board?.evidence ?? []) {
@@ -43,6 +38,11 @@ export function SuspectsPanel() {
     }
     return map;
   }, [board?.evidence]);
+
+  if (!caseData) return null;
+
+  const searchedSet = new Set(board?.searchedRooms ?? []);
+  const baitsLeft = board?.baitsLeft ?? caseData.baitsAllowed;
 
   return (
     <aside className="w-full h-full flex flex-col bg-surface-1 border-r border-border overflow-y-auto overflow-x-hidden p-3 sm:p-3.5 space-y-5 select-none">
