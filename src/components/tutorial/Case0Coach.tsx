@@ -28,9 +28,12 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
     caseData,
     board,
     selectedSuspectId,
+    selectSuspect,
     contradictions,
     clearedSuspects,
     isAccuseModalOpen,
+    isSearchModalOpen,
+    setPhoneDockedUnderInterrogation,
     caseId,
     progress,
     lastVerdict,
@@ -50,9 +53,13 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
   const hasClash = contradictions.length > 0;
 
   // Track step acknowledgement
+  const [step1Confirmed, setStep1Confirmed] = React.useState(false);
   const [step4Acknowledged, setStep4Acknowledged] = React.useState(false);
   const [showCenterModal, setShowCenterModal] = React.useState(!specimenMode);
   const [lastStep, setLastStep] = React.useState(1);
+
+  // If Dee already has a statement, step 1 is done; otherwise requires user to confirm/click Dee
+  const isStep1Done = hasDeeStatement || (hasSelectedDee && step1Confirmed);
 
   // Derive logical active step (1..6)
   let activeStep = 1;
@@ -64,19 +71,46 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
     activeStep = 4;
   } else if (hasDeeStatement) {
     activeStep = 3;
-  } else if (hasSelectedDee) {
+  } else if (isStep1Done) {
     activeStep = 2;
   } else {
     activeStep = 1;
   }
 
+  // When step 1 action occurs (user clicks Dee while on step 1), confirm step 1
+  React.useEffect(() => {
+    if (activeStep === 1 && hasSelectedDee && !showCenterModal) {
+      setStep1Confirmed(true);
+    }
+  }, [activeStep, hasSelectedDee, showCenterModal]);
+
   // When step transitions, reopen the darkened center modal automatically
+  // (Wait until SearchModal is closed so they don't collide)
   React.useEffect(() => {
     if (activeStep !== lastStep) {
+      if (activeStep === 4 && isSearchModalOpen) {
+        // Wait for search modal to close before popping step 4 center modal
+        return;
+      }
       setLastStep(activeStep);
       setShowCenterModal(true);
+
+      // In step 4, ensure phone is docked and visible
+      if (activeStep === 4) {
+        setPhoneDockedUnderInterrogation(true);
+        if (!selectedSuspectId) {
+          selectSuspect('dee');
+        }
+      }
     }
-  }, [activeStep, lastStep]);
+  }, [
+    activeStep,
+    lastStep,
+    isSearchModalOpen,
+    setPhoneDockedUnderInterrogation,
+    selectedSuspectId,
+    selectSuspect,
+  ]);
 
   // Target element selector and messages per step
   let targetSelector = '[data-suspect-id="dee"]';
@@ -87,7 +121,7 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
   let falkorDetail =
     'FalkorDB stores suspects as (:Person) nodes. Currently, no claims (:CLAIMED) or anchors (:IN_ROOM) exist in your play graph.';
   let actionButtonLabel = 'Show Me Dee →';
-  let beaconTooltip = 'Click Dee to open her dossier.';
+  let beaconTooltip = 'Click Dee in the left dossier to inspect her file.';
 
   if (activeStep === 2) {
     targetSelector = '[data-lead-button="murder-window"]';
@@ -108,9 +142,9 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
     falkorDetail =
       'FalkorDB registers scene evidence: CREATE (:Anchor:Exhibit {type: "passcard_log", room: "hall", at: 5})';
     actionButtonLabel = 'Guide Me to Search the Hall →';
-    beaconTooltip = 'Click Search on the Hall to reveal physical evidence.';
+    beaconTooltip = 'Click Search on the Hall in the left panel.';
   } else if (activeStep === 4) {
-    targetSelector = '[data-phone-container="true"]';
+    targetSelector = '[data-tour="phone"]';
     stepTitle = 'Step 4: Read the Pocket Graph Reasoning';
     stepSubtitle = 'FalkorDB Traversal & Contradiction Detection';
     modalDescription =
@@ -118,7 +152,7 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
     falkorDetail =
       'Q60 Contradiction Cypher: MATCH (s:Statement)-[:AT_TIME]->(t), (a:Anchor)-[:AT_TIME]->(t) WHERE s.room <> a.room RETURN clash';
     actionButtonLabel = 'Inspect Pocket Graph →';
-    beaconTooltip = 'Review the red contradiction line and clearance shield on your Pocket Graph.';
+    beaconTooltip = 'Review the red contradiction line and clearance shield on your Pocket Graph below.';
   } else if (activeStep === 5) {
     targetSelector = '[data-accuse-button="true"]';
     stepTitle = 'Step 5: File Formal Accusation';
@@ -128,7 +162,7 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
     falkorDetail =
       'FalkorDB verdict verification: Un-eliminated suspects with unresolved contradictions match ground truth culprit with 100% precision.';
     actionButtonLabel = 'Take Me to Accuse →';
-    beaconTooltip = 'Click Accuse to submit your verdict against Dee.';
+    beaconTooltip = 'Click Accuse in the top header to convict Dee.';
   } else if (activeStep === 6) {
     stepTitle = '🎉 Case 0 Solved: Perfect Conviction!';
     stepSubtitle = 'Training Induction Complete';
@@ -141,15 +175,17 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
   }
 
   const handleResetCase0 = async () => {
+    setStep1Confirmed(false);
     setStep4Acknowledged(false);
     setShowCenterModal(true);
     await initCase('l1-quiet-pact', true);
+    selectSuspect(null);
   };
 
   return (
     <>
       {/* 1. Darkened Center Modal Step Dialog */}
-      {showCenterModal && (
+      {showCenterModal && !isSearchModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-200">
           <div className="max-w-lg w-full bg-surface-2 border-2 border-brass/80 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 relative">
             {/* Modal Top Bar */}
@@ -223,7 +259,7 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
               <div className="flex items-center gap-2">
                 {activeStep === 6 ? (
                   <Link href="/play/case-1">
-                    <Button variant="brass" size="default" className="text-xs gap-1.5 px-4">
+                    <Button variant="brass" size="default" className="text-xs gap-1.5 px-4 font-semibold shadow-md">
                       <span>Start Case 1</span>
                       <ArrowRight className="size-3.5" />
                     </Button>
@@ -232,7 +268,15 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
                   <Button
                     variant="brass"
                     size="default"
-                    onClick={() => setShowCenterModal(false)}
+                    onClick={() => {
+                      setShowCenterModal(false);
+                      if (activeStep === 4) {
+                        setPhoneDockedUnderInterrogation(true);
+                        setTimeout(() => {
+                          document.querySelector('[data-tour="phone"]')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }, 100);
+                      }
+                    }}
                     className="text-xs gap-1.5 px-4 font-semibold shadow-md"
                   >
                     <span>{actionButtonLabel}</span>
@@ -244,12 +288,12 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
         </div>
       )}
 
-      {/* 2. Slim Top Helper Pill when modal is closed */}
+      {/* 2. Sticky Top Helper Pill when modal is closed */}
       {!showCenterModal && (
-        <div className="w-full bg-surface-2 border-b-2 border-brass/60 px-4 py-2 shadow-card shrink-0 select-none animate-in fade-in duration-200">
+        <div className="sticky top-0 z-40 w-full bg-surface-2 border-b-2 border-brass/60 px-4 py-2 shadow-md shrink-0 select-none animate-in fade-in duration-200">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-brass/15 border border-brass/40 shrink-0">
+              <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-brass/15 border border-brass/40 shrink-0">
                 <Compass className="size-3 text-brass" />
                 <span className="font-mono text-xs font-semibold text-brass">
                   Step {activeStep}/5
@@ -269,7 +313,7 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
                     setStep4Acknowledged(true);
                     setShowCenterModal(true);
                   }}
-                  className="h-7 px-2.5 text-xs font-semibold gap-1"
+                  className="h-7 px-3 text-xs font-semibold gap-1"
                 >
                   <span>Ready to Accuse Dee</span>
                   <ArrowRight className="size-3" />
@@ -305,6 +349,7 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
         <SpotlightBeacon
           targetSelector={targetSelector}
           message={beaconTooltip}
+          stepSubtitle={`Step ${activeStep} of 5`}
           onReopen={() => setShowCenterModal(true)}
           isStep4={activeStep === 4}
           onProceedStep4={() => {
@@ -321,12 +366,14 @@ export function Case0Coach({ onDismiss, specimenMode = false }: Case0CoachProps)
 function SpotlightBeacon({
   targetSelector,
   message,
+  stepSubtitle,
   onReopen,
   isStep4,
   onProceedStep4,
 }: {
   targetSelector: string;
   message: string;
+  stepSubtitle: string;
   onReopen: () => void;
   isStep4?: boolean;
   onProceedStep4?: () => void;
@@ -337,7 +384,10 @@ function SpotlightBeacon({
     const updatePosition = () => {
       const el = document.querySelector(targetSelector);
       if (el) {
-        setRect(el.getBoundingClientRect());
+        const r = el.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0) {
+          setRect(r);
+        }
       } else {
         setRect(null);
       }
@@ -346,7 +396,7 @@ function SpotlightBeacon({
     updatePosition();
     window.addEventListener('resize', updatePosition);
     window.addEventListener('scroll', updatePosition, true);
-    const interval = setInterval(updatePosition, 250);
+    const interval = setInterval(updatePosition, 300);
 
     return () => {
       window.removeEventListener('resize', updatePosition);
@@ -355,63 +405,65 @@ function SpotlightBeacon({
     };
   }, [targetSelector]);
 
-  if (!rect) return null;
-
-  // Calculate tooltip coordinates without overflow
-  const isBottomClamped = rect.bottom + 70 > (typeof window !== 'undefined' ? window.innerHeight : 900);
-  const tooltipTop = isBottomClamped
-    ? Math.max(12, rect.top - 54)
-    : Math.min((typeof window !== 'undefined' ? window.innerHeight : 900) - 80, rect.bottom + 10);
-  const tooltipLeft = Math.min(
-    (typeof window !== 'undefined' ? window.innerWidth : 1440) - 340,
-    Math.max(16, rect.left)
-  );
+  const hasTargetOnScreen =
+    rect &&
+    rect.width > 0 &&
+    rect.height > 0 &&
+    rect.top >= -50 &&
+    rect.bottom <= (typeof window !== 'undefined' ? window.innerHeight + 100 : 1000);
 
   return (
     <>
-      {/* High-visibility glowing pulsing ring directly over the target element */}
-      <div
-        className="fixed pointer-events-none z-40 rounded-xl border-2 border-brass ring-4 ring-brass/60 shadow-lg animate-pulse transition-all duration-150"
-        style={{
-          top: Math.max(0, rect.top - 4),
-          left: Math.max(0, rect.left - 4),
-          width: rect.width + 8,
-          height: rect.height + 8,
-        }}
-      />
+      {/* High-visibility glowing pulsing ring directly over the target element when on-screen */}
+      {hasTargetOnScreen && (
+        <div
+          className="fixed pointer-events-none z-[55] rounded-xl border-2 border-brass ring-4 ring-brass/60 shadow-lg animate-pulse transition-all duration-150"
+          style={{
+            top: Math.max(0, rect.top - 4),
+            left: Math.max(0, rect.left - 4),
+            width: rect.width + 8,
+            height: rect.height + 8,
+          }}
+        />
+      )}
 
-      {/* Floating Pointer Beacon Tooltip */}
+      {/* Floating Pointer Beacon Tooltip — 100% GUARANTEED visible at bottom of screen */}
       <div
-        className="fixed z-50 pointer-events-auto bg-surface-3/95 backdrop-blur-sm border-2 border-brass rounded-xl p-3 shadow-xl text-text-primary text-xs flex items-center gap-2 max-w-sm animate-in fade-in zoom-in-95 duration-150"
-        style={{
-          top: tooltipTop,
-          left: tooltipLeft,
-        }}
+        className="fixed z-[60] bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-xl bg-surface-3/98 backdrop-blur-md border-2 border-brass rounded-2xl p-3 sm:p-4 shadow-2xl text-text-primary flex flex-col sm:flex-row items-center justify-between gap-3 animate-in slide-in-from-bottom-4 duration-200"
       >
-        <span className="text-base select-none shrink-0 animate-bounce">👉</span>
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold text-xs text-text-primary">{message}</p>
+        <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto">
+          <span className="text-xl select-none shrink-0 animate-bounce">👉</span>
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className="font-mono text-xs uppercase tracking-wider text-brass font-semibold">
+              {stepSubtitle}
+            </span>
+            <p className="font-semibold text-xs sm:text-sm text-text-primary leading-snug">
+              {message}
+            </p>
+          </div>
         </div>
 
-        {isStep4 && onProceedStep4 && (
-          <Button
-            variant="brass"
-            size="sm"
-            onClick={onProceedStep4}
-            className="h-6 px-2 text-xs font-semibold shrink-0"
-          >
-            Accuse Dee →
-          </Button>
-        )}
+        <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+          {isStep4 && onProceedStep4 && (
+            <Button
+              variant="brass"
+              size="sm"
+              onClick={onProceedStep4}
+              className="h-8 px-3 text-xs font-semibold shrink-0 shadow-md gap-1"
+            >
+              <span>Accuse Dee →</span>
+            </Button>
+          )}
 
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={onReopen}
-          className="h-6 px-2 text-xs shrink-0"
-        >
-          Guide
-        </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onReopen}
+            className="h-8 px-3 text-xs shrink-0"
+          >
+            Guide
+          </Button>
+        </div>
       </div>
     </>
   );

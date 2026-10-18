@@ -37,6 +37,7 @@ function PlayPageContent({ level }: { level: string }) {
     runInspectorAction,
     selectTab,
     selectedSuspectId,
+    selectSuspect,
     setBriefingOpen,
     setBaitModalOpen,
     setAccuseModalOpen,
@@ -56,11 +57,14 @@ function PlayPageContent({ level }: { level: string }) {
 
   React.useEffect(() => {
     initCase(backendCaseId).then(() => {
+      if (isCase0) {
+        selectSuspect(null);
+      }
       if (initialMode === 'cold_case') {
         runInspectorAction('cold_case');
       }
     });
-  }, [backendCaseId, initialMode, initCase, runInspectorAction]);
+  }, [backendCaseId, initialMode, initCase, runInspectorAction, isCase0, selectSuspect]);
 
   React.useEffect(() => {
     if (isPresentMode) {
