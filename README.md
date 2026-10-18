@@ -13,8 +13,13 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16_App_Router-black?logo=next.js)](https://nextjs.org)
 [![Vercel AI SDK](https://img.shields.io/badge/AI_SDK-Gemini_Flash-blue?logo=google)](https://sdk.vercel.ai)
 [![Model Context Protocol](https://img.shields.io/badge/MCP-Standard_stdio_Server-purple)](https://modelcontextprotocol.io)
-[![Test Suite](https://img.shields.io/badge/Tests-75%2F75_Passing_(Live_DB)-success)](file:///tests)
+[![Test Suite](https://img.shields.io/badge/Tests-76%2F76_Passing_(Live_DB)-success)](file:///tests)
 [![Offline Capable](https://img.shields.io/badge/Offline_Mode-100%25_Deterministic-emerald)](#quickstart)
+
+🎥 **Demo Video:** [Watch the Working Walkthrough](https://youtu.be/DEMO_LINK) *(See submission form for video link)*  
+🌐 **Live Deployed App:** [https://alibi-game.vercel.app](https://alibi-game.vercel.app)  
+📦 **Repository:** [https://github.com/Ayosensei/alibi](https://github.com/Ayosensei/alibi) (Public)
+
 
 ---
 
@@ -193,6 +198,99 @@ graph TD
 2. `public:{caseId}`: Clean case template with public rooms, standard doors, suspect biographies, and time slots.
 3. `play:{playerId}:{caseId}`: The isolated tenant workspace. When a player begins a case, `GRAPH.COPY` clones `public:{caseId}` into `play:{playerId}:{caseId}`. As statements are taken and rooms are searched, nodes are added exclusively to this graph.
 4. `player:{playerId}`: Anonymous persistence graph tracking case completions, brass stars, and accusation counts.
+
+### Detailed Property Graph Schema Map (FalkorDB)
+
+The player's deduction graph (`play:{playerId}:{caseId}`) maps real-time investigation evidence into connected graph primitives:
+
+```mermaid
+classDiagram
+  class Person {
+    string id
+    string name
+    string role
+    boolean victim
+  }
+  class Room {
+    string id
+    string name
+  }
+  class Statement {
+    string id
+    string by
+    string text
+    int tick
+    string claimId
+  }
+  class Evidence {
+    string id
+    string title
+    string text
+    string room
+  }
+  class Assertion {
+    string src
+    string subject
+    int slot
+    string room
+    boolean hard
+  }
+  class Flag {
+    string id
+    string kind
+    string note
+    string by
+  }
+  class Hypothesis {
+    string id
+    string text
+    string by
+  }
+
+  Person --> Statement : MAKES
+  Statement --> Assertion : ASSERTS
+  Evidence --> Assertion : ASSERTS
+  Evidence --> Room : FOUND_IN
+  Room --> Room : CONNECTS / HIDDEN_KNOWN
+  Flag --> Statement : ABOUT
+  Flag --> Evidence : ABOUT
+  Hypothesis --> Flag : SUPPORTED_BY
+```
+
+### Graph Node & Edge Dictionary
+
+| Node Label | Key Properties | Purpose in Deduction |
+| :--- | :--- | :--- |
+| `(:Room)` | `id`, `name` | Vertices of the physical floor plan. Connected by directional `[:CONNECTS {state}]` or unlocked `[:HIDDEN_KNOWN {knowers}]`. |
+| `(:Person)` | `id`, `name`, `role`, `victim` | Suspects and victims of the inquiry. Target for feasibility shortest-path pruning and motive paths. |
+| `(:Statement)` | `id`, `by`, `text`, `tick`, `claimId` | Interrogation statements recorded from suspects during gameplay. |
+| `(:Evidence)` | `id`, `title`, `text`, `room` | Physical exhibits discovered by searching rooms (keycard door logs, cash receipts, diaries, weapons). |
+| `(:Assertion)` | `src`, `subject`, `slot`, `room`, `hard` | Atomic location or sighting facts. When two assertions clash on `(subject, slot, room)`, Cypher detects a contradiction (`Q60`). |
+| `(:Flag)` | `id`, `kind`, `note`, `by` | Visual corkboard pins (`contradiction`, `rehearsed`, `impossible`) placed by the player or AI Inspector. |
+| `(:Hypothesis)` | `id`, `text`, `by` | Synthesized deductions linking multiple flags into an evidentiary conclusion. |
+
+### Concrete Subgraph: Catching the Murder Conspiracy in Level 1
+
+The diagram below illustrates how FalkorDB evaluates the conspirators' lie in *The Quiet Pact*:
+
+```mermaid
+graph LR
+  subgraph RehearsedConspiracy ["Rehearsed Alibi Clustered via Q61_rehearsed"]
+    D_Stmt["(:Statement {by: 'dee'})"] -->|ASSERTS| A_Green["(:Assertion {subject: 'dee', slot: 5, room: 'green_room'})"]
+    K_Stmt["(:Statement {by: 'kofi'})"] -->|ASSERTS| K_Green["(:Assertion {subject: 'kofi', slot: 5, room: 'green_room'})"]
+    H_Stmt["(:Statement {by: 'hana'})"] -->|ASSERTS| H_Green["(:Assertion {subject: 'hana', slot: 5, room: 'green_room'})"]
+  end
+
+  subgraph PhysicalEvidence ["Physical Crime Scene Discovery"]
+    E_Log["(:Evidence {id: 'e1_doorlog'})<br/>Prop Store Keycard Log"] -->|ASSERTS| A_Prop["(:Assertion {subject: 'dee', slot: 5, room: 'prop_store', hard: true})"]
+  end
+
+  A_Green <== "CLASH (Q60_contradictions)<br/>slot 5: green_room vs prop_store" ==> A_Prop
+
+  style A_Green fill:#2d1a10,stroke:#d4a359,stroke-width:2px
+  style A_Prop fill:#3d1414,stroke:#e05252,stroke-width:2px
+  style E_Log fill:#1e2430,stroke:#60a5fa,stroke-width:2px
+```
 
 ---
 
