@@ -12,9 +12,13 @@ import {
   Lock,
   DoorOpen,
 } from 'lucide-react';
+import { MiniFloorPlan } from '@/components/map/MiniFloorPlan';
+
 
 export function SuspectsPanel() {
+  const [roomsView, setRoomsView] = React.useState<'map' | 'list'>('map');
   const {
+
     caseData,
     board,
     selectedSuspectId,
@@ -28,6 +32,16 @@ export function SuspectsPanel() {
 
   const searchedSet = new Set(board?.searchedRooms ?? []);
   const baitsLeft = board?.baitsLeft ?? caseData.baitsAllowed;
+
+  const exhibitsByRoom = React.useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const ev of board?.evidence ?? []) {
+      if (ev.room) {
+        map[ev.room] = (map[ev.room] ?? 0) + 1;
+      }
+    }
+    return map;
+  }, [board?.evidence]);
 
   return (
     <aside className="w-full h-full flex flex-col bg-surface-1 border-r border-border overflow-y-auto overflow-x-hidden p-3 sm:p-3.5 space-y-5 select-none">
@@ -70,27 +84,60 @@ export function SuspectsPanel() {
       {/* 2. Rooms & Search Section */}
       <div className="space-y-3 border-t border-border pt-4">
         <div className="flex items-center justify-between">
-          <span className="font-mono text-xs uppercase tracking-widest text-brass">
-            Rooms & Crime Scene
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="font-mono text-xs uppercase tracking-widest text-brass">
+              Rooms & Scene
+            </span>
+            <div className="flex items-center rounded border border-border bg-surface-2 p-0.5">
+              <Button
+                variant={roomsView === 'map' ? 'secondary' : 'ghost'}
+                size="sm"
+                className="h-5 px-1.5 text-xs font-mono"
+                onClick={() => setRoomsView('map')}
+              >
+                Map
+              </Button>
+              <Button
+                variant={roomsView === 'list' ? 'secondary' : 'ghost'}
+                size="sm"
+                className="h-5 px-1.5 text-xs font-mono"
+                onClick={() => setRoomsView('list')}
+              >
+                List
+              </Button>
+            </div>
+          </div>
           <span className="text-xs text-text-tertiary font-mono tabular-nums">
             {searchedSet.size}/{caseData.rooms.length} Searched
           </span>
         </div>
 
-        <div className="space-y-1.5">
-          {caseData.rooms.map((room) => {
-            const isSearched = searchedSet.has(room.id);
-            const isCrimeScene = room.id === caseData.crimeScene;
+        {roomsView === 'map' ? (
+          <MiniFloorPlan
+            caseId={caseData.caseId}
+            rooms={caseData.rooms}
+            edges={caseData.edges}
+            crimeScene={caseData.crimeScene}
+            searchedRooms={board?.searchedRooms ?? []}
+            exhibitsByRoom={exhibitsByRoom}
+            hiddenEdgeKnown={board?.hiddenEdgeKnown ?? false}
+            onSearchRoom={(roomId) => searchRoomAction(roomId)}
+            isSearching={isLoading}
+          />
+        ) : (
+          <div className="space-y-1.5">
+            {caseData.rooms.map((room) => {
+              const isSearched = searchedSet.has(room.id);
+              const isCrimeScene = room.id === caseData.crimeScene;
 
-            // Count exhibits in this room discovered on board
-            const roomExhibits =
-              board?.evidence.filter((e) => e.room === room.id).length ?? 0;
+              // Count exhibits in this room discovered on board
+              const roomExhibits =
+                board?.evidence.filter((e) => e.room === room.id).length ?? 0;
 
-            return (
-              <div
-                key={room.id}
-                className={`flex items-center justify-between gap-1.5 p-2 rounded-lg border text-xs transition-colors min-w-0 ${
+              return (
+                <div
+                  key={room.id}
+                  className={`flex items-center justify-between gap-1.5 p-2 rounded-lg border text-xs transition-colors min-w-0 ${
                   isSearched
                     ? 'bg-surface-2/60 border-border/40 text-text-secondary'
                     : 'bg-surface-2 border-border text-text-primary'
@@ -143,7 +190,8 @@ export function SuspectsPanel() {
             );
           })}
         </div>
-      </div>
+      )}
+    </div>
 
       {/* 3. Bait Announcement Section */}
       {caseData.baitsAllowed > 0 && (

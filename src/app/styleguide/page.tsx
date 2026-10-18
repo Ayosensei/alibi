@@ -29,6 +29,7 @@ import {
 import { TimelineGrid } from '@/components/timeline/TimelineGrid';
 import { EvidenceBoard } from '@/components/board/EvidenceBoard';
 import { InspectorPanel } from '@/components/inspector/InspectorPanel';
+import { MiniFloorPlan } from '@/components/map/MiniFloorPlan';
 import { useGameStore } from '@/lib/store';
 
 const COLOR_CLASSES: Record<keyof typeof colors, { bg: string; text: string; border?: string }> = {
@@ -625,7 +626,80 @@ export default function StyleguidePage() {
         </div>
       </section>
 
-      {/* 15. Accessibility, States, & Present Mode (Task U7) */}
+      {/* 15. Mini Floor Plan & Crime Scene Schematics */}
+      <section className="space-y-6">
+        <div className="space-y-1">
+          <div className="font-mono text-xs text-brass uppercase tracking-wider">Spatial Intelligence</div>
+          <h2 className="font-serif text-2xl font-semibold">Mini Floor Plan Schematics</h2>
+          <p className="text-text-secondary text-sm max-w-2xl">
+            Pure SVG crime scene topologies displaying hallway connectivity, locked barriers, discovered secret passages, and one-click room exploration.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Case 1: The Quiet Pact */}
+          <div className="space-y-2">
+            <span className="font-mono text-xs uppercase tracking-wider text-text-tertiary block">
+              Case 1: Playhouse Topology (Prop Store Crime Scene)
+            </span>
+            <MiniFloorPlan
+              caseId="l1-quiet-pact"
+              rooms={[
+                { id: 'foyer', name: 'Foyer' },
+                { id: 'box_office', name: 'Box Office' },
+                { id: 'stage', name: 'Stage' },
+                { id: 'green_room', name: 'Green Room' },
+                { id: 'prop_store', name: 'Prop Store' },
+                { id: 'lighting_booth', name: 'Lighting Booth' },
+              ]}
+              edges={[
+                { a: 'foyer', b: 'box_office', state: 'open' },
+                { a: 'foyer', b: 'stage', state: 'open' },
+                { a: 'stage', b: 'green_room', state: 'open' },
+                { a: 'stage', b: 'lighting_booth', state: 'open' },
+                { a: 'green_room', b: 'prop_store', state: 'open' },
+              ]}
+              crimeScene="prop_store"
+              searchedRooms={['foyer', 'prop_store']}
+              exhibitsByRoom={{ prop_store: 2, green_room: 1 }}
+              hiddenEdgeKnown={false}
+            />
+          </div>
+
+          {/* Case 3: The Blackout Dinner with Discovered Secret Passage */}
+          <div className="space-y-2">
+            <span className="font-mono text-xs uppercase tracking-wider text-brass block">
+              Case 3: Manor House with Discovered Secret Passage
+            </span>
+            <MiniFloorPlan
+              caseId="l3-blackout-dinner"
+              rooms={[
+                { id: 'dining_hall', name: 'Dining Hall' },
+                { id: 'kitchen', name: 'Kitchen' },
+                { id: 'hall', name: 'Great Hall' },
+                { id: 'library', name: 'Library' },
+                { id: 'study', name: 'Study' },
+                { id: 'drawing_room', name: 'Drawing Room' },
+                { id: 'conservatory', name: 'Conservatory' },
+              ]}
+              edges={[
+                { a: 'dining_hall', b: 'hall', state: 'open' },
+                { a: 'hall', b: 'kitchen', state: 'open' },
+                { a: 'hall', b: 'library', state: 'open' },
+                { a: 'hall', b: 'drawing_room', state: 'open' },
+                { a: 'drawing_room', b: 'conservatory', state: 'open' },
+                { a: 'hall', b: 'study', state: 'locked' },
+              ]}
+              crimeScene="study"
+              searchedRooms={['hall', 'library', 'study']}
+              exhibitsByRoom={{ library: 1, study: 2 }}
+              hiddenEdgeKnown={true}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* 16. Accessibility, States, & Present Mode (Task U7) */}
       <section className="space-y-6">
         <div className="space-y-1">
           <div className="font-mono text-xs text-brass uppercase tracking-wider">Quality & Ergonomics</div>

@@ -187,3 +187,7 @@ export type EvidenceType = z.infer<typeof EvidenceSchema>;
 export type FactType = z.infer<typeof FactSchema>;
 export type BaitType = z.infer<typeof BaitSchema>;
 export type RelationType = z.infer<typeof RelationSchema>;
+
+export type Room = RoomType;
+export type Edge = EdgeType;
+
